@@ -4,15 +4,18 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 28 CVEs across 16 drivers, with 14 exploited in the wild.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 31 CVEs across 18 unique drivers, with 16 exploited in the wild.
 
 ## CVE Index
 
 | CVE | Driver | Class | ITW | Build (Vuln → Fix) |
 |-----|--------|-------|-----|---------------------|
+| [CVE-2025-29824](CVE-2025-29824.md) | `clfs.sys` | Use-After-Free / Logic Bug | Yes | `10.0.26100.3476` → `10.0.26100.3775` |
 | [CVE-2025-24993](CVE-2025-24993.md) | `ntfs.sys` | Buffer Overflow / Bounds Check | Yes | `10.0.22621.4830` → `10.0.22621.4890` |
 | [CVE-2025-24985](CVE-2025-24985.md) | `fastfat.sys` | Integer Overflow | Yes | `10.0.22621.4830` → `10.0.22621.5037` |
+| [CVE-2025-21333](CVE-2025-21333.md) | `vsp.sys` | Buffer Overflow | Yes | `10.0.26100.2605` → `10.0.26100.2894` |
 | [CVE-2024-49138](CVE-2024-49138.md) | `clfs.sys` | Buffer Overflow / Bounds Check | Yes | `10.0.22621.4541` → `10.0.22621.4601` |
+| [CVE-2024-49114](CVE-2024-49114.md) | `cldflt.sys` | Buffer Overflow | No | `10.0.22621.4460` → `10.0.22621.4602` |
 | [CVE-2024-38256](CVE-2024-38256.md) | `win32k.sys` | Information Disclosure | No | `10.0.22621.3958` → `10.0.22621.4169` |
 | [CVE-2024-38238](CVE-2024-38238.md) | `ksthunk.sys` | MDL Handling | No | `10.0.22621.4036` → `10.0.22621.4169` |
 | [CVE-2024-38193](CVE-2024-38193.md) | `afd.sys` | Use-After-Free / Lifetime | Yes | `10.0.22621.3672` → `10.0.22621.4036` |
@@ -55,6 +58,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 
 - [CVE-2023-36036](CVE-2023-36036.md) — Cloud Files Mini Filter — heap overflow via crafted reparse data
 - [CVE-2024-30085](CVE-2024-30085.md) — Cloud Files Mini Filter — missing size check before memcpy leads to heap overflow
+- [CVE-2024-49114](CVE-2024-49114.md) — Cloud Files Mini-Filter — elevation of privilege via buffer overflow
 
 ### `clfs.sys`
 
@@ -62,6 +66,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2023-28252](CVE-2023-28252.md) — Common Log File System — OOB write via corrupted base log offset
 - [CVE-2023-36424](CVE-2023-36424.md) — Common Log File System — pool overflow from unvalidated reparse data
 - [CVE-2024-49138](CVE-2024-49138.md) — Common Log File System — heap overflow in LoadContainerQ allows EoP
+- [CVE-2025-29824](CVE-2025-29824.md) — Common Log File System — elevation of privilege via log file metadata corruption
 
 ### `csc.sys`
 
@@ -101,6 +106,10 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2024-30088](CVE-2024-30088.md) — NT Kernel — TOCTOU race in AuthzBasepCopyoutInternalSecurityAttributes
 - [CVE-2024-38106](CVE-2024-38106.md) — NT Kernel — missing lock around VslpEnterIumSecureMode causes race condition EoP
 
+### `vsp.sys`
+
+- [CVE-2025-21333](CVE-2025-21333.md) — Hyper-V Virtual Service Provider — heap-based buffer overflow
+
 ### `tcpip.sys`
 
 - [CVE-2024-38063](CVE-2024-38063.md) — TCP/IP stack — integer underflow in IPv6 packet reassembly allows RCE
@@ -134,4 +143,6 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2024-38193](CVE-2024-38193.md) — `afd.sys` — AFD — use-after-free race on Registered I/O buffers allows EoP
 - [CVE-2024-49138](CVE-2024-49138.md) — `clfs.sys` — Common Log File System — heap overflow in LoadContainerQ allows EoP
 - [CVE-2025-24985](CVE-2025-24985.md) — `fastfat.sys` — FAT File System — cluster count overflow in FAT bitmap allocation allows RCE
+- [CVE-2025-21333](CVE-2025-21333.md) — `vsp.sys` — Hyper-V Virtual Service Provider — heap-based buffer overflow
 - [CVE-2025-24993](CVE-2025-24993.md) — `ntfs.sys` — NTFS — MFT metadata heap buffer overflow via crafted VHD allows RCE
+- [CVE-2025-29824](CVE-2025-29824.md) — `clfs.sys` — Common Log File System — elevation of privilege via log file metadata corruption
