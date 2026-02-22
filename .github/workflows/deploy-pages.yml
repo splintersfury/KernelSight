@@ -26,7 +26,7 @@ jobs:
 
       - run: pip install mkdocs-material
 
-      - run: mkdocs build --strict 2>&1 | grep -v "MkDocs 2.0" || true
+      - run: mkdocs build
 
       - uses: actions/upload-pages-artifact@v3
         with:
