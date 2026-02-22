@@ -1,0 +1,118 @@
+# KernelSight Collector Configuration
+version: 1
+
+# Schedule: how often to run collection cycle
+schedule:
+  interval_hours: 6
+
+# GitHub repository for PR creation
+github:
+  repo: "your-org/KernelSight"
+  branch_prefix: "collector"
+  labels:
+    - collector
+    - auto-generated
+
+# Redis for deduplication (seen-set)
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: 6379
+  db: 5
+  seen_set_key: "kernelsight:collector:seen"
+  seen_set_ttl_days: 90
+
+# Source configurations
+sources:
+  msrc:
+    enabled: true
+    api_url: "https://api.msrc.microsoft.com/cvrf/v3.0"
+    update_guide_url: "https://msrc.microsoft.com/update-guide"
+    # Filter for kernel driver CVEs
+    keywords:
+      - "Kernel"
+      - "Win32k"
+      - "CLFS"
+      - "NDIS"
+      - "AFD"
+      - "Driver"
+      - "Kernel Streaming"
+      - "NTFS"
+      - "HTTP.sys"
+    # Only look at recent months
+    lookback_months: 3
+    rate_limit:
+      requests_per_minute: 10
+
+  project_zero:
+    enabled: true
+    tracker_url: "https://bugs.chromium.org/p/project-zero/issues/list"
+    blog_url: "https://googleprojectzero.blogspot.com"
+    blog_rss: "https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss"
+    labels:
+      - "Windows"
+      - "Kernel"
+    rate_limit:
+      requests_per_minute: 5
+
+  github_poc:
+    enabled: true
+    search_queries:
+      - "CVE windows kernel driver exploit"
+      - "CVE windows privilege escalation kernel"
+      - "CVE win32k exploit"
+      - "CVE CLFS exploit"
+      - "CVE afd.sys exploit"
+    # Minimum stars to consider
+    min_stars: 2
+    rate_limit:
+      requests_per_minute: 10
+
+  security_blogs:
+    enabled: true
+    feeds:
+      - name: "Project Zero Blog"
+        url: "https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss"
+        keywords: ["windows", "kernel", "driver"]
+      - name: "Synacktiv"
+        url: "https://www.synacktiv.com/en/publications.rss"
+        keywords: ["windows", "kernel", "driver", "exploit"]
+      - name: "STAR Labs"
+        url: "https://starlabs.sg/blog/feed.xml"
+        keywords: ["windows", "kernel", "driver", "CVE"]
+      - name: "SSD Disclosure"
+        url: "https://ssd-disclosure.com/feed/"
+        keywords: ["windows", "kernel", "driver"]
+      - name: "Exodus Intelligence"
+        url: "https://blog.exodusintel.com/feed/"
+        keywords: ["windows", "kernel"]
+      - name: "ZDI Blog"
+        url: "https://www.zerodayinitiative.com/blog/feed"
+        keywords: ["windows", "kernel", "driver", "pwn2own"]
+      - name: "SafeBreach Labs"
+        url: "https://www.safebreach.com/blog/rss.xml"
+        keywords: ["windows", "kernel"]
+    rate_limit:
+      requests_per_minute: 5
+
+  nvd:
+    enabled: true
+    api_url: "https://services.nvd.nist.gov/rest/json/cves/2.0"
+    # NVD API key (optional, increases rate limit)
+    api_key: "${NVD_API_KEY:-}"
+    rate_limit:
+      requests_per_minute: 5  # 50 with API key
+
+# Analyzer configuration
+analyzer:
+  # Minimum confidence to create a PR
+  min_confidence: 0.5
+  # Driver file extensions to match
+  driver_extensions:
+    - ".sys"
+    - ".exe"  # ntoskrnl.exe
+  # Technique classification keywords loaded from index/techniques.yaml
+
+# Logging
+logging:
+  level: INFO
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"

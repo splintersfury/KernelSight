@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and secrets
+.env
+*.secret
+github_token.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# mkdocs build
+site/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Collector state
+collector/state/
+*.cache

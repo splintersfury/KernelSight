@@ -1,0 +1,23 @@
+services:
+  kernelsight-collector:
+    build:
+      context: ./collector
+    restart: unless-stopped
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - REDIS_HOST=redis
+      - NVD_API_KEY=${NVD_API_KEY:-}
+    volumes:
+      - ./collector/config.yaml:/app/config.yaml:ro
+      - ./index:/app/../index:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

@@ -1,0 +1,107 @@
+site_name: KernelSight
+site_description: Windows Kernel Driver Exploitation Knowledge Base
+repo_url: https://github.com/your-org/KernelSight
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - Attack Surfaces:
+    - attack-surfaces/index.md
+    - IOCTL Handlers: attack-surfaces/ioctl-handlers.md
+    - Filesystem IRPs: attack-surfaces/filesystem-irps.md
+    - NDIS / Network: attack-surfaces/ndis-network.md
+    - PnP & Power: attack-surfaces/pnp-power.md
+    - WDF / KMDF: attack-surfaces/wdf.md
+    - Registry Callbacks: attack-surfaces/registry-callbacks.md
+    - ALPC: attack-surfaces/alpc.md
+    - Shared Memory: attack-surfaces/shared-memory.md
+    - WMI / ETW: attack-surfaces/wmi-etw.md
+  - Vulnerability Classes:
+    - vuln-classes/index.md
+    - Buffer Overflow: vuln-classes/buffer-overflow.md
+    - Integer Overflow: vuln-classes/integer-overflow.md
+    - Type Confusion: vuln-classes/type-confusion.md
+    - TOCTOU / Double-Fetch: vuln-classes/toctou-double-fetch.md
+    - Use-After-Free: vuln-classes/use-after-free.md
+    - Race Conditions: vuln-classes/race-conditions.md
+    - Uninitialized Memory: vuln-classes/uninitialized-memory.md
+    - Arbitrary R/W Primitives: vuln-classes/arbitrary-rw-primitives.md
+    - NULL Deref: vuln-classes/null-deref.md
+    - Logic Bugs: vuln-classes/logic-bugs.md
+  - Primitives:
+    - primitives/index.md
+    - Arbitrary R/W:
+      - Direct IOCTL R/W: primitives/arw/direct-ioctl-rw.md
+      - Pool Overflow: primitives/arw/pool-overflow.md
+      - MDL Mapping: primitives/arw/mdl-mapping.md
+      - Arb Increment/Decrement: primitives/arw/arb-increment-decrement.md
+      - Write-What-Where: primitives/arw/write-what-where.md
+      - Registry-Based: primitives/arw/registry-based.md
+      - DMA / MMIO: primitives/arw/dma-mmio.md
+      - Pipe Attributes: primitives/arw/pipe-attributes.md
+      - Token Manipulation: primitives/arw/token-manipulation.md
+      - PTE Manipulation: primitives/arw/pte-manipulation.md
+    - Exploitation:
+      - Pool Spray / Feng Shui: primitives/exploitation/pool-spray-feng-shui.md
+      - Named Pipe Objects: primitives/exploitation/named-pipe-objects.md
+      - I/O Ring: primitives/exploitation/io-ring.md
+      - WNF State Data: primitives/exploitation/wnf-state-data.md
+      - Palette / Bitmap: primitives/exploitation/palette-bitmap.md
+      - KUSER_SHARED_DATA: primitives/exploitation/kuser-shared-data.md
+      - PreviousMode Manipulation: primitives/exploitation/previous-mode-manipulation.md
+      - Token Swapping: primitives/exploitation/token-swapping.md
+      - ACL / SD Manipulation: primitives/exploitation/acl-sd-manipulation.md
+  - Mitigations:
+    - mitigations/index.md
+    - SMEP / SMAP: mitigations/smep-smap.md
+    - kCFG / kCET: mitigations/kcfg-kcet.md
+    - VBS / HVCI: mitigations/vbs-hvci.md
+    - KDP: mitigations/kdp.md
+    - Pool Hardening: mitigations/pool-hardening.md
+    - Secure Pool: mitigations/secure-pool.md
+    - ACG: mitigations/acg.md
+    - KASLR: mitigations/kaslr.md
+  - Case Studies:
+    - case-studies/index.md
+  - Tooling:
+    - tooling/index.md
+    - Static Analysis: tooling/static-analysis.md
+    - Fuzzing: tooling/fuzzing.md
+    - Debugging: tooling/debugging.md
+    - AutoPiff Integration: tooling/autopiff-integration.md

@@ -1,0 +1,521 @@
+# KernelSight Technique Registry
+# Each entry defines a technique page with cross-references to CVEs, AutoPiff categories, and related techniques.
+version: 1
+
+techniques:
+
+  # ── Attack Surfaces ──────────────────────────────────────────────────
+
+  - slug: ioctl-handlers
+    title: "IOCTL Handlers"
+    section: attack-surfaces
+    path: docs/attack-surfaces/ioctl-handlers.md
+    description: "Device I/O control dispatch — the most common user-reachable kernel attack surface."
+    autopiff_categories: [ioctl_hardening]
+    tags: [ioctl, IRP_MJ_DEVICE_CONTROL, METHOD_BUFFERED, METHOD_NEITHER, DeviceIoControl]
+    cves: [CVE-2024-21338, CVE-2024-35250, CVE-2024-38054, CVE-2024-26229]
+    related: [buffer-overflow, integer-overflow, write-what-where, direct-ioctl-rw]
+    status: stub
+
+  - slug: filesystem-irps
+    title: "Filesystem IRPs"
+    section: attack-surfaces
+    path: docs/attack-surfaces/filesystem-irps.md
+    description: "Filesystem filter drivers and IRP_MJ_CREATE/READ/WRITE dispatch attack surface."
+    autopiff_categories: [filesystem_filter, bounds_check]
+    tags: [filesystem, minifilter, IRP_MJ_CREATE, reparse, FltMgr]
+    cves: [CVE-2024-30085, CVE-2023-36036, CVE-2025-24985, CVE-2025-24993]
+    related: [buffer-overflow, toctou-double-fetch, pool-overflow]
+    status: stub
+
+  - slug: ndis-network
+    title: "NDIS / Network Drivers"
+    section: attack-surfaces
+    path: docs/attack-surfaces/ndis-network.md
+    description: "NDIS miniport and protocol driver attack surface — OID requests, NBL chains, packet parsing."
+    autopiff_categories: [ndis_hardening]
+    tags: [ndis, network, OID, NBL, NET_BUFFER, tcpip, packet]
+    cves: [CVE-2024-38063]
+    related: [buffer-overflow, integer-overflow, pool-overflow]
+    status: stub
+
+  - slug: pnp-power
+    title: "PnP & Power Management"
+    section: attack-surfaces
+    path: docs/attack-surfaces/pnp-power.md
+    description: "Plug and Play and power state transitions — removal races, state validation."
+    autopiff_categories: [pnp_power]
+    tags: [pnp, power, IRP_MN_REMOVE_DEVICE, remove_lock, D0, surprise_removal]
+    cves: []
+    related: [race-conditions, use-after-free]
+    status: stub
+
+  - slug: wdf
+    title: "WDF / KMDF Drivers"
+    section: attack-surfaces
+    path: docs/attack-surfaces/wdf.md
+    description: "Windows Driver Framework managed drivers — request handling, buffer retrieval, completion."
+    autopiff_categories: [wdf_hardening]
+    tags: [wdf, kmdf, WdfRequest, WDFREQUEST, WdfIoQueueCreate]
+    cves: []
+    related: [buffer-overflow, ioctl-handlers]
+    status: stub
+
+  - slug: registry-callbacks
+    title: "Registry Callbacks"
+    section: attack-surfaces
+    path: docs/attack-surfaces/registry-callbacks.md
+    description: "CmRegisterCallbackEx-based registry filtering — callback race conditions and TOCTOU."
+    autopiff_categories: [authorization, race_condition]
+    tags: [registry, CmRegisterCallback, RegNtPreCreateKeyEx, filtering]
+    cves: []
+    related: [toctou-double-fetch, race-conditions, registry-based]
+    status: stub
+
+  - slug: alpc
+    title: "ALPC"
+    section: attack-surfaces
+    path: docs/attack-surfaces/alpc.md
+    description: "Advanced Local Procedure Call — kernel message passing attack surface."
+    autopiff_categories: []
+    tags: [alpc, lpc, NtAlpcSendWaitReceivePort, port, message]
+    cves: []
+    related: [type-confusion, use-after-free]
+    status: stub
+
+  - slug: shared-memory
+    title: "Shared Memory"
+    section: attack-surfaces
+    path: docs/attack-surfaces/shared-memory.md
+    description: "Kernel-user shared memory regions — sections, MDL mappings, KUSER_SHARED_DATA."
+    autopiff_categories: [mdl_handling]
+    tags: [shared_memory, section, MDL, ZwMapViewOfSection, KUSER_SHARED_DATA]
+    cves: [CVE-2023-29360, CVE-2024-38238]
+    related: [mdl-mapping, toctou-double-fetch, kuser-shared-data]
+    status: stub
+
+  - slug: wmi-etw
+    title: "WMI / ETW"
+    section: attack-surfaces
+    path: docs/attack-surfaces/wmi-etw.md
+    description: "WMI provider and ETW trace session attack surface in kernel drivers."
+    autopiff_categories: []
+    tags: [wmi, etw, WMILIB, IoWMIRegistrationControl, trace]
+    cves: []
+    related: [ioctl-handlers, buffer-overflow]
+    status: stub
+
+  # ── Vulnerability Classes ────────────────────────────────────────────
+
+  - slug: buffer-overflow
+    title: "Buffer Overflow"
+    section: vuln-classes
+    path: docs/vuln-classes/buffer-overflow.md
+    description: "Stack and heap buffer overflows from missing or incorrect size validation."
+    autopiff_categories: [bounds_check]
+    tags: [overflow, heap, stack, memcpy, RtlCopyMemory, OOB]
+    cves: [CVE-2024-30085, CVE-2023-36036, CVE-2023-28252, CVE-2024-49138, CVE-2022-37969, CVE-2025-24993]
+    related: [pool-overflow, write-what-where, pool-spray-feng-shui]
+    status: stub
+
+  - slug: integer-overflow
+    title: "Integer Overflow"
+    section: vuln-classes
+    path: docs/vuln-classes/integer-overflow.md
+    description: "Integer overflow/underflow leading to incorrect allocation sizes or bounds."
+    autopiff_categories: [int_overflow]
+    tags: [integer, overflow, underflow, truncation, RtlULongAdd, safe_math]
+    cves: [CVE-2024-38063, CVE-2024-38054, CVE-2023-28218, CVE-2025-24985]
+    related: [buffer-overflow, pool-overflow]
+    status: stub
+
+  - slug: type-confusion
+    title: "Type Confusion"
+    section: vuln-classes
+    path: docs/vuln-classes/type-confusion.md
+    description: "Object type confusion — wrong struct interpretation, handle type misuse, WOW64 layout mismatch."
+    autopiff_categories: [type_confusion]
+    tags: [type_confusion, object_type, handle, vtable, WOW64, ObReferenceObjectByHandle]
+    cves: [CVE-2023-36802, CVE-2022-21882]
+    related: [use-after-free, write-what-where]
+    status: stub
+
+  - slug: toctou-double-fetch
+    title: "TOCTOU / Double-Fetch"
+    section: vuln-classes
+    path: docs/vuln-classes/toctou-double-fetch.md
+    description: "Time-of-check-to-time-of-use races from re-reading user buffers or shared state."
+    autopiff_categories: [race_condition]
+    tags: [toctou, double_fetch, race, capture, local_copy]
+    cves: [CVE-2024-30088]
+    related: [race-conditions, shared-memory]
+    status: stub
+
+  - slug: use-after-free
+    title: "Use-After-Free"
+    section: vuln-classes
+    path: docs/vuln-classes/use-after-free.md
+    description: "Dangling pointer dereference after object or pool chunk has been freed."
+    autopiff_categories: [lifetime_fix]
+    tags: [uaf, use_after_free, dangling, ExFreePool, refcount]
+    cves: [CVE-2024-38193, CVE-2024-30089, CVE-2023-29336]
+    related: [pool-spray-feng-shui, named-pipe-objects, token-swapping]
+    status: stub
+
+  - slug: race-conditions
+    title: "Race Conditions"
+    section: vuln-classes
+    path: docs/vuln-classes/race-conditions.md
+    description: "Concurrency bugs — missing locks, broken synchronization, IRQ-level races."
+    autopiff_categories: [race_condition]
+    tags: [race, spinlock, mutex, concurrency, KeAcquireSpinLock, ExAcquireFastMutex]
+    cves: [CVE-2024-30088, CVE-2024-38106, CVE-2024-38193]
+    related: [toctou-double-fetch, use-after-free]
+    status: stub
+
+  - slug: uninitialized-memory
+    title: "Uninitialized Memory"
+    section: vuln-classes
+    path: docs/vuln-classes/uninitialized-memory.md
+    description: "Kernel stack or pool memory leaked to user mode without initialization."
+    autopiff_categories: [info_disclosure]
+    tags: [uninitialized, info_leak, RtlZeroMemory, stack, KASLR]
+    cves: [CVE-2023-32019, CVE-2024-38256]
+    related: [kaslr, kuser-shared-data]
+    status: stub
+
+  - slug: arbitrary-rw-primitives
+    title: "Arbitrary R/W Primitives"
+    section: vuln-classes
+    path: docs/vuln-classes/arbitrary-rw-primitives.md
+    description: "Overview of vulnerability patterns that yield arbitrary kernel read/write capabilities."
+    autopiff_categories: [bounds_check, ioctl_hardening, mdl_handling]
+    tags: [arbitrary_rw, read_write, primitive, wwwcondition]
+    cves: [CVE-2024-21338, CVE-2023-21768, CVE-2024-26229]
+    related: [direct-ioctl-rw, write-what-where, mdl-mapping, pool-overflow]
+    status: stub
+
+  - slug: null-deref
+    title: "NULL Pointer Dereference"
+    section: vuln-classes
+    path: docs/vuln-classes/null-deref.md
+    description: "NULL pointer dereference in kernel context — exploitability on modern Windows."
+    autopiff_categories: [lifetime_fix, pool_hardening]
+    tags: [null_deref, NULL, MmGetSystemAddressForMdlSafe, crash]
+    cves: []
+    related: [use-after-free, mdl-mapping]
+    status: stub
+
+  - slug: logic-bugs
+    title: "Logic Bugs"
+    section: vuln-classes
+    path: docs/vuln-classes/logic-bugs.md
+    description: "Design-level logic errors — missing access checks, incorrect state machines, privilege escalation by design."
+    autopiff_categories: [authorization, state_hardening]
+    tags: [logic, access_check, privilege, state_machine, design]
+    cves: [CVE-2024-26229, CVE-2024-21302]
+    related: [acl-sd-manipulation, previous-mode-manipulation, token-manipulation]
+    status: stub
+
+  # ── Primitives: Arbitrary R/W ────────────────────────────────────────
+
+  - slug: direct-ioctl-rw
+    title: "Direct IOCTL Read/Write"
+    section: primitives/arw
+    path: docs/primitives/arw/direct-ioctl-rw.md
+    description: "Drivers that expose IOCTLs allowing direct physical or virtual memory read/write."
+    autopiff_categories: [ioctl_hardening, authorization]
+    tags: [ioctl, direct_rw, MmMapIoSpace, physical_memory, BYOVD]
+    cves: [CVE-2024-21338]
+    related: [ioctl-handlers, dma-mmio]
+    status: stub
+
+  - slug: pool-overflow
+    title: "Pool Overflow to R/W"
+    section: primitives/arw
+    path: docs/primitives/arw/pool-overflow.md
+    description: "Heap/pool overflow corrupting adjacent allocations to build a R/W primitive."
+    autopiff_categories: [bounds_check, pool_hardening]
+    tags: [pool, overflow, adjacent, corruption, LFH, VS, segment_heap]
+    cves: [CVE-2024-30085, CVE-2023-36036, CVE-2024-49138, CVE-2023-36424]
+    related: [pool-spray-feng-shui, named-pipe-objects, buffer-overflow]
+    status: stub
+
+  - slug: mdl-mapping
+    title: "MDL Mapping Primitive"
+    section: primitives/arw
+    path: docs/primitives/arw/mdl-mapping.md
+    description: "Abusing MDL lock/map operations to map arbitrary physical memory into user space."
+    autopiff_categories: [mdl_handling]
+    tags: [mdl, MmProbeAndLockPages, MmMapLockedPages, MmGetSystemAddressForMdl, IoAllocateMdl]
+    cves: [CVE-2023-29360, CVE-2024-38238]
+    related: [shared-memory, direct-ioctl-rw]
+    status: stub
+
+  - slug: arb-increment-decrement
+    title: "Arbitrary Increment / Decrement"
+    section: primitives/arw
+    path: docs/primitives/arw/arb-increment-decrement.md
+    description: "Primitives that increment or decrement an arbitrary kernel address by a controlled value."
+    autopiff_categories: [bounds_check]
+    tags: [increment, decrement, InterlockedIncrement, refcount, token]
+    cves: []
+    related: [token-manipulation, write-what-where]
+    status: stub
+
+  - slug: write-what-where
+    title: "Write-What-Where"
+    section: primitives/arw
+    path: docs/primitives/arw/write-what-where.md
+    description: "Classic write-what-where condition — controlled address and value write."
+    autopiff_categories: [user_boundary_check, bounds_check]
+    tags: [www, write_what_where, arbitrary_write, ProbeForWrite]
+    cves: [CVE-2023-21768, CVE-2023-28252]
+    related: [direct-ioctl-rw, pte-manipulation, token-manipulation]
+    status: stub
+
+  - slug: registry-based
+    title: "Registry-Based Primitives"
+    section: primitives/arw
+    path: docs/primitives/arw/registry-based.md
+    description: "Using registry key values to pass controlled data into kernel memory."
+    autopiff_categories: [authorization]
+    tags: [registry, ZwSetValueKey, ZwQueryValueKey, controlled_data]
+    cves: []
+    related: [registry-callbacks, logic-bugs]
+    status: stub
+
+  - slug: dma-mmio
+    title: "DMA / MMIO Access"
+    section: primitives/arw
+    path: docs/primitives/arw/dma-mmio.md
+    description: "Using DMA or memory-mapped I/O to read/write physical memory."
+    autopiff_categories: [dma_mmio]
+    tags: [dma, mmio, MmMapIoSpace, AllocateCommonBuffer, physical_memory, IOMMU]
+    cves: []
+    related: [direct-ioctl-rw, vbs-hvci]
+    status: stub
+
+  - slug: pipe-attributes
+    title: "Pipe Attribute Primitives"
+    section: primitives/arw
+    path: docs/primitives/arw/pipe-attributes.md
+    description: "Abusing named pipe extended attributes for controlled kernel pool reads/writes."
+    autopiff_categories: []
+    tags: [pipe, named_pipe, EA, extended_attributes, NtFsControlFile]
+    cves: []
+    related: [named-pipe-objects, pool-overflow, pool-spray-feng-shui]
+    status: stub
+
+  - slug: token-manipulation
+    title: "Token Manipulation"
+    section: primitives/arw
+    path: docs/primitives/arw/token-manipulation.md
+    description: "Overwriting or corrupting token structures to escalate privileges."
+    autopiff_categories: [authorization]
+    tags: [token, _TOKEN, Privileges, SepAdjustPrivileges, SeAssignPrimaryToken]
+    cves: [CVE-2024-30088]
+    related: [token-swapping, write-what-where, arb-increment-decrement]
+    status: stub
+
+  - slug: pte-manipulation
+    title: "PTE Manipulation"
+    section: primitives/arw
+    path: docs/primitives/arw/pte-manipulation.md
+    description: "Modifying page table entries to remap pages or change protection flags."
+    autopiff_categories: []
+    tags: [pte, page_table, MiGetPteAddress, CR3, SMEP_bypass]
+    cves: []
+    related: [smep-smap, vbs-hvci, write-what-where]
+    status: stub
+
+  # ── Primitives: Exploitation ─────────────────────────────────────────
+
+  - slug: pool-spray-feng-shui
+    title: "Pool Spray / Feng Shui"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/pool-spray-feng-shui.md
+    description: "Heap grooming techniques to control pool layout for exploitation."
+    autopiff_categories: [pool_hardening]
+    tags: [pool_spray, feng_shui, LFH, segment_heap, grooming, slab]
+    cves: [CVE-2024-30085, CVE-2023-36036, CVE-2023-29336]
+    related: [pool-overflow, named-pipe-objects, wnf-state-data]
+    status: stub
+
+  - slug: named-pipe-objects
+    title: "Named Pipe Objects"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/named-pipe-objects.md
+    description: "Using named pipe and data queue entry objects as pool spray and R/W gadgets."
+    autopiff_categories: []
+    tags: [named_pipe, DATA_QUEUE_ENTRY, NpFsdWrite, spray]
+    cves: []
+    related: [pool-spray-feng-shui, pipe-attributes, pool-overflow]
+    status: stub
+
+  - slug: io-ring
+    title: "I/O Ring Exploitation"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/io-ring.md
+    description: "Abusing the Windows I/O Ring mechanism for kernel R/W primitives."
+    autopiff_categories: [user_boundary_check]
+    tags: [io_ring, IoRing, NtSubmitIoRing, IORING_OP_READ]
+    cves: [CVE-2023-21768]
+    related: [write-what-where, direct-ioctl-rw]
+    status: stub
+
+  - slug: wnf-state-data
+    title: "WNF State Data"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/wnf-state-data.md
+    description: "Windows Notification Facility state data objects as pool spray and R/W primitives."
+    autopiff_categories: []
+    tags: [wnf, WNF_STATE_DATA, NtUpdateWnfStateData, spray]
+    cves: []
+    related: [pool-spray-feng-shui, pool-overflow]
+    status: stub
+
+  - slug: palette-bitmap
+    title: "Palette / Bitmap Objects"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/palette-bitmap.md
+    description: "Legacy GDI palette/bitmap object exploitation for kernel R/W (pre-RS3)."
+    autopiff_categories: []
+    tags: [palette, bitmap, GDI, SURFOBJ, pvScan0, hPalette]
+    cves: []
+    related: [pool-overflow, write-what-where]
+    status: stub
+
+  - slug: kuser-shared-data
+    title: "KUSER_SHARED_DATA"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/kuser-shared-data.md
+    description: "Abusing KUSER_SHARED_DATA at fixed address 0xFFFFF78000000000 for info leak or shellcode."
+    autopiff_categories: []
+    tags: [KUSER_SHARED_DATA, fixed_address, info_leak, 0xFFFFF780]
+    cves: []
+    related: [kaslr, smep-smap, uninitialized-memory]
+    status: stub
+
+  - slug: previous-mode-manipulation
+    title: "PreviousMode Manipulation"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/previous-mode-manipulation.md
+    description: "Overwriting KTHREAD.PreviousMode to bypass user/kernel boundary checks."
+    autopiff_categories: [user_boundary_check, authorization]
+    tags: [PreviousMode, KTHREAD, ExGetPreviousMode, KernelMode, bypass]
+    cves: [CVE-2024-26229]
+    related: [write-what-where, logic-bugs, token-manipulation]
+    status: stub
+
+  - slug: token-swapping
+    title: "Token Swapping"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/token-swapping.md
+    description: "Replacing a process token pointer with SYSTEM token for privilege escalation."
+    autopiff_categories: [authorization]
+    tags: [token, EPROCESS, Token, PsReferencePrimaryToken, swap]
+    cves: [CVE-2024-30088, CVE-2023-29336]
+    related: [token-manipulation, write-what-where, previous-mode-manipulation]
+    status: stub
+
+  - slug: acl-sd-manipulation
+    title: "ACL / Security Descriptor Manipulation"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/acl-sd-manipulation.md
+    description: "Modifying ACLs or security descriptors on kernel objects to escalate access."
+    autopiff_categories: [authorization]
+    tags: [acl, security_descriptor, DACL, SACL, SeAccessCheck]
+    cves: []
+    related: [token-manipulation, logic-bugs, previous-mode-manipulation]
+    status: stub
+
+  # ── Mitigations ──────────────────────────────────────────────────────
+
+  - slug: smep-smap
+    title: "SMEP / SMAP"
+    section: mitigations
+    path: docs/mitigations/smep-smap.md
+    description: "Supervisor Mode Execution/Access Prevention — prevents kernel from executing/reading user pages."
+    autopiff_categories: []
+    tags: [smep, smap, CR4, supervisor, user_pages]
+    cves: []
+    related: [pte-manipulation, vbs-hvci]
+    status: stub
+
+  - slug: kcfg-kcet
+    title: "kCFG / kCET"
+    section: mitigations
+    path: docs/mitigations/kcfg-kcet.md
+    description: "Kernel Control Flow Guard and Control-flow Enforcement Technology."
+    autopiff_categories: []
+    tags: [kcfg, kcet, CFG, CET, shadow_stack, indirect_call]
+    cves: []
+    related: [vbs-hvci, smep-smap]
+    status: stub
+
+  - slug: vbs-hvci
+    title: "VBS / HVCI"
+    section: mitigations
+    path: docs/mitigations/vbs-hvci.md
+    description: "Virtualization-Based Security and Hypervisor-protected Code Integrity."
+    autopiff_categories: []
+    tags: [vbs, hvci, hypervisor, secure_kernel, SKCI, credential_guard]
+    cves: [CVE-2024-21302]
+    related: [smep-smap, kdp, kcfg-kcet]
+    status: stub
+
+  - slug: kdp
+    title: "Kernel Data Protection (KDP)"
+    section: mitigations
+    path: docs/mitigations/kdp.md
+    description: "VBS-backed read-only protection for kernel data structures."
+    autopiff_categories: []
+    tags: [kdp, kernel_data_protection, VBS, read_only, MmProtectDriverSection]
+    cves: []
+    related: [vbs-hvci, token-manipulation]
+    status: stub
+
+  - slug: pool-hardening
+    title: "Pool Hardening"
+    section: mitigations
+    path: docs/mitigations/pool-hardening.md
+    description: "Segment heap, LFH randomization, pool cookie, and NonPagedPoolNx."
+    autopiff_categories: [pool_hardening]
+    tags: [pool, segment_heap, LFH, pool_cookie, NonPagedPoolNx, ExAllocatePool2]
+    cves: []
+    related: [pool-overflow, pool-spray-feng-shui, secure-pool]
+    status: stub
+
+  - slug: secure-pool
+    title: "Secure Pool"
+    section: mitigations
+    path: docs/mitigations/secure-pool.md
+    description: "VBS-protected secure pool for sensitive kernel allocations."
+    autopiff_categories: []
+    tags: [secure_pool, VBS, ExSecurePoolAlloc, isolated]
+    cves: []
+    related: [pool-hardening, vbs-hvci]
+    status: stub
+
+  - slug: acg
+    title: "Arbitrary Code Guard (ACG)"
+    section: mitigations
+    path: docs/mitigations/acg.md
+    description: "Prevents dynamic code generation and modification in protected processes."
+    autopiff_categories: []
+    tags: [acg, arbitrary_code_guard, dynamic_code, W^X, ProcessDynamicCodePolicy]
+    cves: []
+    related: [vbs-hvci, smep-smap]
+    status: stub
+
+  - slug: kaslr
+    title: "KASLR"
+    section: mitigations
+    path: docs/mitigations/kaslr.md
+    description: "Kernel Address Space Layout Randomization — base address and pool randomization."
+    autopiff_categories: [info_disclosure]
+    tags: [kaslr, aslr, randomization, base_address, NtQuerySystemInformation, info_leak]
+    cves: [CVE-2023-32019, CVE-2024-38256]
+    related: [uninitialized-memory, kuser-shared-data]
+    status: stub

@@ -1,0 +1,249 @@
+# AutoPiff Rule ID → KernelSight Technique Slug Mapping
+# Maps each AutoPiff semantic rule to the most relevant KernelSight technique page(s).
+version: 1
+
+rules:
+
+  # ── Bounds Check ─────────────────────────────────────────────────────
+  added_len_check_before_memcpy:
+    techniques: [buffer-overflow, pool-overflow]
+    primary: buffer-overflow
+  added_struct_size_validation:
+    techniques: [buffer-overflow, ioctl-handlers]
+    primary: buffer-overflow
+  added_index_bounds_check:
+    techniques: [buffer-overflow]
+    primary: buffer-overflow
+
+  # ── Lifetime Fix ─────────────────────────────────────────────────────
+  null_after_free_added:
+    techniques: [use-after-free]
+    primary: use-after-free
+  guard_before_free_added:
+    techniques: [use-after-free]
+    primary: use-after-free
+
+  # ── User Boundary Check ─────────────────────────────────────────────
+  probe_for_read_or_write_added:
+    techniques: [write-what-where, ioctl-handlers]
+    primary: write-what-where
+  previous_mode_gating_added:
+    techniques: [previous-mode-manipulation, logic-bugs]
+    primary: previous-mode-manipulation
+  seh_guard_added_around_user_deref:
+    techniques: [ioctl-handlers]
+    primary: ioctl-handlers
+
+  # ── Integer Overflow ─────────────────────────────────────────────────
+  safe_size_math_helper_added:
+    techniques: [integer-overflow]
+    primary: integer-overflow
+  alloc_size_overflow_check_added:
+    techniques: [integer-overflow, pool-overflow]
+    primary: integer-overflow
+
+  # ── State Hardening ──────────────────────────────────────────────────
+  interlocked_refcount_added:
+    techniques: [race-conditions, use-after-free]
+    primary: race-conditions
+
+  # ── Race Condition ───────────────────────────────────────────────────
+  spinlock_acquisition_added:
+    techniques: [race-conditions]
+    primary: race-conditions
+  mutex_or_resource_lock_added:
+    techniques: [race-conditions]
+    primary: race-conditions
+  double_fetch_to_capture_fix:
+    techniques: [toctou-double-fetch]
+    primary: toctou-double-fetch
+  cancel_safe_irp_queue_added:
+    techniques: [race-conditions]
+    primary: race-conditions
+
+  # ── Type Confusion ───────────────────────────────────────────────────
+  object_type_validation_added:
+    techniques: [type-confusion]
+    primary: type-confusion
+  handle_object_type_check_added:
+    techniques: [type-confusion]
+    primary: type-confusion
+  wow64_thunk_validation_added:
+    techniques: [type-confusion, ioctl-handlers]
+    primary: type-confusion
+
+  # ── Authorization ────────────────────────────────────────────────────
+  privilege_check_added:
+    techniques: [logic-bugs, acl-sd-manipulation]
+    primary: logic-bugs
+  access_mode_enforcement_added:
+    techniques: [previous-mode-manipulation, logic-bugs]
+    primary: previous-mode-manipulation
+  device_acl_hardening:
+    techniques: [ioctl-handlers, acl-sd-manipulation]
+    primary: ioctl-handlers
+  registry_access_mask_hardened:
+    techniques: [registry-based, logic-bugs]
+    primary: registry-based
+
+  # ── Information Disclosure ───────────────────────────────────────────
+  buffer_zeroing_before_copy_added:
+    techniques: [uninitialized-memory, kaslr]
+    primary: uninitialized-memory
+  stack_variable_initialization_added:
+    techniques: [uninitialized-memory, kaslr]
+    primary: uninitialized-memory
+  output_length_truncation_added:
+    techniques: [uninitialized-memory]
+    primary: uninitialized-memory
+  kernel_pointer_scrubbing_added:
+    techniques: [kaslr, uninitialized-memory]
+    primary: kaslr
+
+  # ── IOCTL Hardening ──────────────────────────────────────────────────
+  method_neither_probe_added:
+    techniques: [ioctl-handlers, write-what-where]
+    primary: ioctl-handlers
+  ioctl_input_size_validation_added:
+    techniques: [ioctl-handlers, buffer-overflow]
+    primary: ioctl-handlers
+  ioctl_code_default_case_added:
+    techniques: [ioctl-handlers]
+    primary: ioctl-handlers
+
+  # ── MDL Handling ─────────────────────────────────────────────────────
+  mdl_safe_mapping_replacement:
+    techniques: [mdl-mapping, null-deref]
+    primary: mdl-mapping
+  mdl_probe_access_mode_fix:
+    techniques: [mdl-mapping, shared-memory]
+    primary: mdl-mapping
+  mdl_null_check_added:
+    techniques: [mdl-mapping, null-deref]
+    primary: mdl-mapping
+
+  # ── Object Management ───────────────────────────────────────────────
+  ob_reference_balance_fix:
+    techniques: [use-after-free]
+    primary: use-after-free
+  handle_force_access_check_added:
+    techniques: [logic-bugs, acl-sd-manipulation]
+    primary: logic-bugs
+
+  # ── String Handling ──────────────────────────────────────────────────
+  safe_string_function_replacement:
+    techniques: [buffer-overflow]
+    primary: buffer-overflow
+  unicode_string_length_validation_added:
+    techniques: [buffer-overflow]
+    primary: buffer-overflow
+
+  # ── Pool Hardening ──────────────────────────────────────────────────
+  pool_type_nx_migration:
+    techniques: [pool-hardening]
+    primary: pool-hardening
+  deprecated_pool_api_replacement:
+    techniques: [pool-hardening]
+    primary: pool-hardening
+  pool_allocation_null_check_added:
+    techniques: [null-deref, pool-hardening]
+    primary: pool-hardening
+
+  # ── Crypto Hardening ────────────────────────────────────────────────
+  secure_zero_memory_added:
+    techniques: [uninitialized-memory]
+    primary: uninitialized-memory
+  constant_time_comparison_added:
+    techniques: [logic-bugs]
+    primary: logic-bugs
+
+  # ── Error Path Hardening ────────────────────────────────────────────
+  error_path_cleanup_added:
+    techniques: [use-after-free]
+    primary: use-after-free
+  goto_cleanup_pattern_added:
+    techniques: [use-after-free]
+    primary: use-after-free
+  irp_completion_status_fix:
+    techniques: [logic-bugs]
+    primary: logic-bugs
+
+  # ── DoS Hardening ───────────────────────────────────────────────────
+  recursion_depth_limit_added:
+    techniques: [logic-bugs]
+    primary: logic-bugs
+  loop_iteration_bound_added:
+    techniques: [logic-bugs]
+    primary: logic-bugs
+  resource_quota_check_added:
+    techniques: [logic-bugs, integer-overflow]
+    primary: logic-bugs
+
+  # ── NDIS Hardening ──────────────────────────────────────────────────
+  oid_request_validation_added:
+    techniques: [ndis-network, buffer-overflow]
+    primary: ndis-network
+  nbl_chain_length_validation_added:
+    techniques: [ndis-network, buffer-overflow]
+    primary: ndis-network
+
+  # ── Filesystem Filter ───────────────────────────────────────────────
+  flt_context_reference_leak_fix:
+    techniques: [filesystem-irps, use-after-free]
+    primary: filesystem-irps
+  flt_create_race_mitigation:
+    techniques: [filesystem-irps, toctou-double-fetch]
+    primary: filesystem-irps
+
+  # ── PnP/Power ───────────────────────────────────────────────────────
+  surprise_removal_guard_added:
+    techniques: [pnp-power, use-after-free]
+    primary: pnp-power
+  power_state_validation_added:
+    techniques: [pnp-power, logic-bugs]
+    primary: pnp-power
+  io_remove_lock_added:
+    techniques: [pnp-power, race-conditions]
+    primary: pnp-power
+
+  # ── DMA/MMIO ────────────────────────────────────────────────────────
+  mmio_mapping_bounds_validation_added:
+    techniques: [dma-mmio, direct-ioctl-rw]
+    primary: dma-mmio
+  dma_buffer_bounds_check_added:
+    techniques: [dma-mmio, buffer-overflow]
+    primary: dma-mmio
+
+  # ── WDF Hardening ───────────────────────────────────────────────────
+  wdf_request_buffer_size_check_added:
+    techniques: [wdf, buffer-overflow]
+    primary: wdf
+  wdf_request_completion_guard_added:
+    techniques: [wdf, logic-bugs]
+    primary: wdf
+
+  # ── Attack Surface Detection ─────────────────────────────────────────
+  new_ioctl_handler:
+    techniques: [ioctl-handlers]
+    primary: ioctl-handlers
+  new_pool_operations:
+    techniques: [pool-overflow, pool-hardening]
+    primary: pool-overflow
+  new_user_buffer_access:
+    techniques: [write-what-where, ioctl-handlers]
+    primary: ioctl-handlers
+  new_mdl_operations:
+    techniques: [mdl-mapping]
+    primary: mdl-mapping
+  new_object_handle_ops:
+    techniques: [type-confusion, logic-bugs]
+    primary: type-confusion
+  new_dma_mmio_access:
+    techniques: [dma-mmio]
+    primary: dma-mmio
+  new_memory_copy_operations:
+    techniques: [buffer-overflow]
+    primary: buffer-overflow
+  new_string_operations:
+    techniques: [buffer-overflow]
+    primary: buffer-overflow
