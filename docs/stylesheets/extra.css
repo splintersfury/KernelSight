@@ -1,0 +1,134 @@
+/* Driver type card styling */
+.driver-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.driver-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.4rem;
+  padding: 1.2rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.driver-card:hover {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.driver-card .card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.driver-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  color: var(--md-accent-fg-color);
+}
+
+.driver-card .card-drivers {
+  font-size: 0.8rem;
+  font-family: var(--md-code-font-family);
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 0.5rem;
+}
+
+.driver-card .card-desc {
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 0.5rem;
+}
+
+.driver-card .card-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--md-default-fg-color--lighter);
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.driver-card .card-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.driver-card .card-stats .stat strong {
+  color: var(--md-default-fg-color--light);
+}
+
+/* Badge styles for ITW / Remote */
+.badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+}
+
+.badge-itw {
+  background: #d32f2f;
+  color: #fff;
+}
+
+.badge-remote {
+  background: #f57c00;
+  color: #fff;
+}
+
+/* Hero section */
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 2rem;
+  max-width: 700px;
+}
+
+/* Section divider */
+.section-header {
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--md-accent-fg-color);
+  display: inline-block;
+}
+
+/* Quick nav pills */
+.nav-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 2rem;
+}
+
+.nav-pill {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--md-default-fg-color--light);
+  transition: all 0.2s;
+}
+
+.nav-pill:hover {
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+  text-decoration: none;
+}

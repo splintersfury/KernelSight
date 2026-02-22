@@ -25,6 +25,10 @@ theme:
     - content.code.copy
   icon:
     repo: fontawesome/brands/github
+  custom_dir: docs/overrides
+
+extra_css:
+  - stylesheets/extra.css
 
 markdown_extensions:
   - admonition
