@@ -17,5 +17,5 @@ Page Table Entries (PTEs) control virtual-to-physical address translation and pa
 
 ## Mitigations
 
-- [VBS/HVCI](../mitigations/vbs-hvci.md) protects page tables via hypervisor
+- [VBS/HVCI](../../mitigations/vbs-hvci.md) protects page tables via hypervisor
 - PTE base randomization complicates address calculation

@@ -17,10 +17,10 @@ A pool overflow allows writing past the end of a kernel pool allocation, corrupt
 
 | CVE | Driver | Description |
 |-----|--------|-------------|
-| [CVE-2024-30085](../case-studies/CVE-2024-30085.md) | `cldflt.sys` | Heap overflow from missing size check |
-| [CVE-2023-36036](../case-studies/CVE-2023-36036.md) | `cldflt.sys` | Heap overflow via reparse data |
-| [CVE-2024-49138](../case-studies/CVE-2024-49138.md) | `clfs.sys` | Heap overflow in LoadContainerQ |
-| [CVE-2023-36424](../case-studies/CVE-2023-36424.md) | `clfs.sys` | Pool overflow from unvalidated reparse data |
+| [CVE-2024-30085](../../case-studies/CVE-2024-30085.md) | `cldflt.sys` | Heap overflow from missing size check |
+| [CVE-2023-36036](../../case-studies/CVE-2023-36036.md) | `cldflt.sys` | Heap overflow via reparse data |
+| [CVE-2024-49138](../../case-studies/CVE-2024-49138.md) | `clfs.sys` | Heap overflow in LoadContainerQ |
+| [CVE-2023-36424](../../case-studies/CVE-2023-36424.md) | `clfs.sys` | Pool overflow from unvalidated reparse data |
 
 ## AutoPiff Detection
 

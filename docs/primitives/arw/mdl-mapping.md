@@ -17,8 +17,8 @@ MDLs describe physical memory regions. If a driver calls `MmProbeAndLockPages` w
 
 | CVE | Driver | Description |
 |-----|--------|-------------|
-| [CVE-2023-29360](../case-studies/CVE-2023-29360.md) | `mskssrv.sys` | MmProbeAndLockPages with KernelMode |
-| [CVE-2024-38238](../case-studies/CVE-2024-38238.md) | `ksthunk.sys` | MmMapLockedPages without probe |
+| [CVE-2023-29360](../../case-studies/CVE-2023-29360.md) | `mskssrv.sys` | MmProbeAndLockPages with KernelMode |
+| [CVE-2024-38238](../../case-studies/CVE-2024-38238.md) | `ksthunk.sys` | MmMapLockedPages without probe |
 
 ## AutoPiff Detection
 

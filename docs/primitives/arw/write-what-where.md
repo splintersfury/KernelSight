@@ -16,8 +16,8 @@ A write-what-where primitive allows writing an attacker-controlled value to an a
 
 | CVE | Driver | Description |
 |-----|--------|-------------|
-| [CVE-2023-21768](../case-studies/CVE-2023-21768.md) | `afd.sys` | Missing ProbeForWrite allows kernel write |
-| [CVE-2023-28252](../case-studies/CVE-2023-28252.md) | `clfs.sys` | OOB write via corrupted base log offset |
+| [CVE-2023-21768](../../case-studies/CVE-2023-21768.md) | `afd.sys` | Missing ProbeForWrite allows kernel write |
+| [CVE-2023-28252](../../case-studies/CVE-2023-28252.md) | `clfs.sys` | OOB write via corrupted base log offset |
 
 ## AutoPiff Detection
 

@@ -16,7 +16,7 @@ Some drivers intentionally expose IOCTLs for diagnostics, hardware access, or fi
 
 | CVE | Driver | Description |
 |-----|--------|-------------|
-| [CVE-2024-21338](../case-studies/CVE-2024-21338.md) | `appid.sys` | IOCTL 0x22A018 missing access control |
+| [CVE-2024-21338](../../case-studies/CVE-2024-21338.md) | `appid.sys` | IOCTL 0x22A018 missing access control |
 
 ## AutoPiff Detection
 

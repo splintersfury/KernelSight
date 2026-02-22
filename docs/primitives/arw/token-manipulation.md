@@ -10,7 +10,7 @@ The `_TOKEN` structure contains privilege bitmasks and integrity levels. An arbi
 
 | CVE | Driver | Description |
 |-----|--------|-------------|
-| [CVE-2024-30088](../case-studies/CVE-2024-30088.md) | `ntoskrnl.exe` | TOCTOU in security attribute copy |
+| [CVE-2024-30088](../../case-studies/CVE-2024-30088.md) | `ntoskrnl.exe` | TOCTOU in security attribute copy |
 
 ## AutoPiff Detection
 

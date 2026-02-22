@@ -99,6 +99,34 @@ nav:
     - KASLR: mitigations/kaslr.md
   - Case Studies:
     - case-studies/index.md
+    - CVE-2025-24993: case-studies/CVE-2025-24993.md
+    - CVE-2025-24985: case-studies/CVE-2025-24985.md
+    - CVE-2024-49138: case-studies/CVE-2024-49138.md
+    - CVE-2024-38256: case-studies/CVE-2024-38256.md
+    - CVE-2024-38238: case-studies/CVE-2024-38238.md
+    - CVE-2024-38193: case-studies/CVE-2024-38193.md
+    - CVE-2024-38106: case-studies/CVE-2024-38106.md
+    - CVE-2024-38063: case-studies/CVE-2024-38063.md
+    - CVE-2024-38054: case-studies/CVE-2024-38054.md
+    - CVE-2024-35250: case-studies/CVE-2024-35250.md
+    - CVE-2024-30089: case-studies/CVE-2024-30089.md
+    - CVE-2024-30088: case-studies/CVE-2024-30088.md
+    - CVE-2024-30085: case-studies/CVE-2024-30085.md
+    - CVE-2024-26229: case-studies/CVE-2024-26229.md
+    - CVE-2024-21338: case-studies/CVE-2024-21338.md
+    - CVE-2024-21302: case-studies/CVE-2024-21302.md
+    - CVE-2023-36802: case-studies/CVE-2023-36802.md
+    - CVE-2023-36424: case-studies/CVE-2023-36424.md
+    - CVE-2023-36036: case-studies/CVE-2023-36036.md
+    - CVE-2023-32019: case-studies/CVE-2023-32019.md
+    - CVE-2023-29360: case-studies/CVE-2023-29360.md
+    - CVE-2023-29336: case-studies/CVE-2023-29336.md
+    - CVE-2023-28252: case-studies/CVE-2023-28252.md
+    - CVE-2023-28218: case-studies/CVE-2023-28218.md
+    - CVE-2023-21768: case-studies/CVE-2023-21768.md
+    - CVE-2022-37969: case-studies/CVE-2022-37969.md
+    - CVE-2022-21907: case-studies/CVE-2022-21907.md
+    - CVE-2022-21882: case-studies/CVE-2022-21882.md
   - Tooling:
     - tooling/index.md
     - Static Analysis: tooling/static-analysis.md
