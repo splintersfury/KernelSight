@@ -1,6 +1,7 @@
 site_name: KernelSight
 site_description: Windows Kernel Driver Exploitation Knowledge Base
-repo_url: https://github.com/your-org/KernelSight
+repo_url: https://github.com/splintersfury/KernelSight
+site_url: https://splintersfury.github.io/KernelSight/
 
 theme:
   name: material
