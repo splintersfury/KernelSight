@@ -41,6 +41,17 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Driver Types:
+    - driver-types/index.md
+    - File System Drivers: driver-types/filesystem.md
+    - File System Minifilters: driver-types/minifilter.md
+    - Log / Transaction: driver-types/log-transaction.md
+    - Network Stack: driver-types/network-stack.md
+    - Kernel Streaming: driver-types/kernel-streaming.md
+    - Win32k Subsystem: driver-types/win32k.md
+    - Core Kernel: driver-types/core-kernel.md
+    - Security / Policy: driver-types/security-policy.md
+    - Storage / Caching: driver-types/storage-caching.md
   - Attack Surfaces:
     - attack-surfaces/index.md
     - IOCTL Handlers: attack-surfaces/ioctl-handlers.md

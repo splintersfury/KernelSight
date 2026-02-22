@@ -8,6 +8,12 @@ KernelSight catalogs attack surfaces, vulnerability classes, exploitation primit
 
 <div class="grid cards" markdown>
 
+-   **[Driver Types](driver-types/index.md)**
+
+    ---
+
+    File system, minifilter, log/transaction, network stack, kernel streaming, Win32k, core kernel, security/policy, storage
+
 -   **[Attack Surfaces](attack-surfaces/index.md)**
 
     ---
