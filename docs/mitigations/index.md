@@ -62,6 +62,7 @@ Mitigations are cross-cutting defenses that intersect every stage of the exploit
 | [Secure Pool](secure-pool.md) | VBS-protected pool allocations | Very High |
 | [ACG](acg.md) | Arbitrary Code Guard | High |
 | [KASLR](kaslr.md) | Kernel address space randomization | Low-Medium |
+| [KASLR Bypasses](kaslr-bypasses.md) | Catalog of KASLR defeat techniques | -- |
 
 ## Mitigation vs. Primitive
 

@@ -6,7 +6,7 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 28 real CVEs with specific builds and patches.
+A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 31 real CVEs with specific builds and patches.
 </p>
 
 <div class="ks-figure" markdown>
@@ -91,7 +91,7 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 28 real CVEs — root cause, exploitation path, patch analysis, and AutoPiff detection rules. 14 exploited in the wild.</p>
+<p>Walk through the full chain for 31 real CVEs — root cause, exploitation path, patch analysis, and AutoPiff detection rules. 16 exploited in the wild.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -108,13 +108,13 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">28</span> CVE case studies &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">16</span> unique drivers &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">14</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">31</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">18</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">16</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">9</span> driver type categories &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">46</span> technique pages &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">66</span> AutoPiff detection rules
+<span class="ks-stat-num">56</span> technique pages &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">80+</span> AutoPiff detection rules
 </div>
 
 ## Recommended Paths

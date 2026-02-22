@@ -101,11 +101,15 @@ nav:
         - PreviousMode Manipulation: primitives/exploitation/previous-mode-manipulation.md
         - Token Swapping: primitives/exploitation/token-swapping.md
         - ACL / SD Manipulation: primitives/exploitation/acl-sd-manipulation.md
+        - Primitive Matrix: primitives/exploitation/primitive-matrix.md
     - Case Studies:
       - case-studies/index.md
+      - CVE-2025-29824: case-studies/CVE-2025-29824.md
       - CVE-2025-24993: case-studies/CVE-2025-24993.md
       - CVE-2025-24985: case-studies/CVE-2025-24985.md
+      - CVE-2025-21333: case-studies/CVE-2025-21333.md
       - CVE-2024-49138: case-studies/CVE-2024-49138.md
+      - CVE-2024-49114: case-studies/CVE-2024-49114.md
       - CVE-2024-38256: case-studies/CVE-2024-38256.md
       - CVE-2024-38238: case-studies/CVE-2024-38238.md
       - CVE-2024-38193: case-studies/CVE-2024-38193.md
@@ -142,9 +146,15 @@ nav:
       - Secure Pool: mitigations/secure-pool.md
       - ACG: mitigations/acg.md
       - KASLR: mitigations/kaslr.md
+      - KASLR Bypasses: mitigations/kaslr-bypasses.md
     - Tooling:
       - tooling/index.md
       - Static Analysis: tooling/static-analysis.md
       - Fuzzing: tooling/fuzzing.md
       - Debugging: tooling/debugging.md
+      - Patch Diffing: tooling/patch-diffing.md
       - AutoPiff Integration: tooling/autopiff-integration.md
+    - Deep Dives:
+      - BYOVD: reference/byovd.md
+      - CLFS Deep-Dive: case-studies/clfs-deep-dive.md
+      - Resources: reference/resources.md

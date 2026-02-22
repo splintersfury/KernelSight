@@ -66,16 +66,16 @@ Once attacker-controlled input reaches the kernel through an attack surface, the
 
 | Class | Description | Typical Primitive | Key CVEs |
 |-------|-------------|-------------------|----------|
-| [Buffer Overflow](buffer-overflow.md) | Stack and heap buffer overflows | Arbitrary write, pool corruption | CVE-2024-30085, CVE-2023-28252 |
-| [Integer Overflow](integer-overflow.md) | Integer overflow/underflow | Undersized allocation, OOB access | CVE-2024-38063, CVE-2024-38054 |
-| [Type Confusion](type-confusion.md) | Object type misinterpretation | Controlled pointer dereference | CVE-2023-36802, CVE-2022-21882 |
-| [TOCTOU / Double-Fetch](toctou-double-fetch.md) | Time-of-check-to-time-of-use | Race to swap validated data | CVE-2024-30088 |
-| [Use-After-Free](use-after-free.md) | Dangling pointer dereference | Object reuse via pool spray | CVE-2024-38193, CVE-2023-29336 |
-| [Race Conditions](race-conditions.md) | Concurrency and synchronization | State corruption, double-free | CVE-2024-38106 |
-| [Uninitialized Memory](uninitialized-memory.md) | Kernel memory disclosure | KASLR bypass, info leak | CVE-2023-32019, CVE-2024-38256 |
-| [Arbitrary R/W Primitives](arbitrary-rw-primitives.md) | Patterns yielding arb R/W | Direct kernel R/W | CVE-2024-21338, CVE-2023-21768 |
-| [NULL Deref](null-deref.md) | NULL pointer dereference | DoS, limited code exec | -- |
-| [Logic Bugs](logic-bugs.md) | Design-level logic errors | Privilege escalation | CVE-2024-26229, CVE-2024-21302 |
+| [Buffer Overflow](buffer-overflow.md) | Stack and heap buffer overflows | [Pool Overflow](../primitives/arw/pool-overflow.md), [Pool Spray](../primitives/exploitation/pool-spray-feng-shui.md) | CVE-2024-30085, CVE-2023-28252 |
+| [Integer Overflow](integer-overflow.md) | Integer overflow/underflow | Undersized alloc → [Pool Overflow](../primitives/arw/pool-overflow.md) | CVE-2024-38063, CVE-2024-38054 |
+| [Type Confusion](type-confusion.md) | Object type misinterpretation | [Write-What-Where](../primitives/arw/write-what-where.md) | CVE-2023-36802, CVE-2022-21882 |
+| [TOCTOU / Double-Fetch](toctou-double-fetch.md) | Time-of-check-to-time-of-use | Depends on raced field (size → overflow, ptr → ARW) | CVE-2024-30088, CVE-2024-38106 |
+| [Use-After-Free](use-after-free.md) | Dangling pointer dereference | [Pool Spray](../primitives/exploitation/pool-spray-feng-shui.md) reclaim | CVE-2024-38193, CVE-2023-29336 |
+| [Race Conditions](race-conditions.md) | Concurrency and synchronization | UAF, double-free, state corruption | CVE-2024-38106, CVE-2024-30089 |
+| [Uninitialized Memory](uninitialized-memory.md) | Kernel memory disclosure | KASLR bypass via leaked pointers | CVE-2023-32019, CVE-2024-38256 |
+| [Arbitrary R/W Primitives](arbitrary-rw-primitives.md) | Patterns yielding arb R/W | [Direct IOCTL R/W](../primitives/arw/direct-ioctl-rw.md) | CVE-2024-21338, CVE-2023-21768 |
+| [NULL Deref](null-deref.md) | NULL pointer dereference | DoS (BSOD), legacy code exec | CVE-2024-35250 |
+| [Logic Bugs](logic-bugs.md) | Design-level logic errors | Direct privilege escalation | CVE-2024-26229, CVE-2024-21302 |
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../primitives/">Primitives</a> &rarr; How is the corruption converted into a reliable exploitation capability?
