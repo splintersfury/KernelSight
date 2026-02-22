@@ -21,6 +21,18 @@
   --ks-svg-text: #1d1d1f;
   --ks-badge-itw: #d32f2f;
   --ks-badge-remote: #e65100;
+
+  /* Section palette — each pipeline stage gets a distinct color */
+  --ks-c-drivers: #2563EB;
+  --ks-c-surfaces: #0891B2;
+  --ks-c-vulns: #D97706;
+  --ks-c-primitives: #7C3AED;
+  --ks-c-cases: #DC2626;
+  --ks-c-mitigations: #059669;
+  --ks-c-tooling: #6366F1;
+
+  /* Active section color — defaults to cobalt, overridden per section */
+  --ks-section: var(--ks-cobalt);
 }
 
 [data-md-color-scheme="slate"] {
@@ -40,7 +52,24 @@
   --ks-svg-text: #e6edf3;
   --ks-badge-itw: #ef5350;
   --ks-badge-remote: #ff9800;
+
+  --ks-c-drivers: #60A5FA;
+  --ks-c-surfaces: #22D3EE;
+  --ks-c-vulns: #FBBF24;
+  --ks-c-primitives: #A78BFA;
+  --ks-c-cases: #F87171;
+  --ks-c-mitigations: #34D399;
+  --ks-c-tooling: #818CF8;
 }
+
+/* --- Section Color Overrides --- */
+[data-ks-section="drivers"]     { --ks-section: var(--ks-c-drivers); }
+[data-ks-section="surfaces"]    { --ks-section: var(--ks-c-surfaces); }
+[data-ks-section="vulns"]       { --ks-section: var(--ks-c-vulns); }
+[data-ks-section="primitives"]  { --ks-section: var(--ks-c-primitives); }
+[data-ks-section="cases"]       { --ks-section: var(--ks-c-cases); }
+[data-ks-section="mitigations"] { --ks-section: var(--ks-c-mitigations); }
+[data-ks-section="tooling"]     { --ks-section: var(--ks-c-tooling); }
 
 /* --- Typography --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -84,7 +113,7 @@ body,
   margin-bottom: 1rem;
   color: var(--ks-fg);
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--ks-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--ks-section) 30%, var(--ks-border));
 }
 
 .md-typeset h3 {
@@ -125,7 +154,7 @@ body,
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ks-fg-muted);
-  border-bottom: 2px solid var(--ks-cobalt);
+  border-bottom: 2px solid var(--ks-section);
   border-top: none;
   border-left: none;
   border-right: none;
@@ -144,7 +173,7 @@ body,
 }
 
 .md-typeset table:not([class]) tr:hover {
-  background: var(--ks-cobalt-wash);
+  background: color-mix(in srgb, var(--ks-section) 5%, transparent);
 }
 
 /* --- Admonitions --- */
@@ -239,7 +268,7 @@ body,
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
   display: block;
   margin-bottom: 1.2rem;
   position: static;
@@ -297,7 +326,7 @@ body,
 }
 
 .ks-pipeline-pos .ks-active {
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
   font-weight: 600;
 }
 
@@ -324,7 +353,7 @@ body,
 }
 
 .ks-pipeline-list > li:hover {
-  background: var(--ks-cobalt-wash);
+  background: color-mix(in srgb, var(--ks-section) 5%, transparent);
 }
 
 .ks-pipeline-list > li::before {
@@ -335,7 +364,7 @@ body,
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
 }
 
 .ks-pipeline-list > li strong {
@@ -368,7 +397,7 @@ body,
 }
 
 .ks-stats-box .ks-stat-num {
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
   font-weight: 600;
 }
 
@@ -535,19 +564,19 @@ body,
 }
 
 .ks-figure svg .ks-box {
-  stroke: var(--ks-svg-stroke);
-  fill: var(--ks-svg-fill);
+  stroke: var(--ks-section);
+  fill: color-mix(in srgb, var(--ks-section) 4%, transparent);
   stroke-width: 1;
 }
 
 .ks-figure svg .ks-line {
-  stroke: var(--ks-svg-stroke);
+  stroke: var(--ks-section);
   stroke-width: 1;
   fill: none;
 }
 
 .ks-figure svg .ks-arrow {
-  stroke: var(--ks-svg-stroke);
+  stroke: var(--ks-section);
   stroke-width: 1;
   fill: none;
 }
@@ -583,12 +612,12 @@ body,
   letter-spacing: 0.03em;
   background: var(--ks-bg-surface);
   color: var(--ks-fg-muted);
-  border-bottom: 1px solid var(--ks-border);
+  border-bottom: 2px solid var(--ks-section);
 }
 
 [data-md-color-scheme="slate"] .md-tabs {
   background: var(--ks-bg-surface);
-  border-bottom-color: var(--ks-border);
+  border-bottom-color: var(--ks-section);
 }
 
 .md-tabs__link {
@@ -597,7 +626,7 @@ body,
 
 .md-tabs__link--active,
 .md-tabs__link:hover {
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
   opacity: 1;
 }
 
@@ -635,7 +664,7 @@ article:has(.ks-hero-title) > h1:first-child {
 
 .md-nav__link--active,
 .md-nav__link:hover {
-  color: var(--ks-cobalt);
+  color: var(--ks-section);
 }
 
 /* --- Search --- */
@@ -648,6 +677,53 @@ article:has(.ks-hero-title) > h1:first-child {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.02em;
+}
+
+/* --- Pipeline Diagram: Per-Stage Colors --- */
+/* Color each pipeline box by its href target, on any page containing the SVG */
+.ks-figure svg a[href*="driver-types"] .ks-box {
+  stroke: var(--ks-c-drivers);
+  fill: color-mix(in srgb, var(--ks-c-drivers) 6%, transparent);
+}
+.ks-figure svg a[href*="attack-surfaces"] .ks-box {
+  stroke: var(--ks-c-surfaces);
+  fill: color-mix(in srgb, var(--ks-c-surfaces) 6%, transparent);
+}
+.ks-figure svg a[href*="vuln-classes"] .ks-box {
+  stroke: var(--ks-c-vulns);
+  fill: color-mix(in srgb, var(--ks-c-vulns) 6%, transparent);
+}
+.ks-figure svg a[href*="primitives"] .ks-box {
+  stroke: var(--ks-c-primitives);
+  fill: color-mix(in srgb, var(--ks-c-primitives) 6%, transparent);
+}
+.ks-figure svg a[href*="case-studies"] .ks-box {
+  stroke: var(--ks-c-cases);
+  fill: color-mix(in srgb, var(--ks-c-cases) 6%, transparent);
+}
+.ks-figure svg a[href*="mitigations"] .ks-box {
+  stroke: var(--ks-c-mitigations);
+  fill: color-mix(in srgb, var(--ks-c-mitigations) 6%, transparent);
+}
+.ks-figure svg a[href*="tooling"] .ks-box {
+  stroke: var(--ks-c-tooling);
+  fill: color-mix(in srgb, var(--ks-c-tooling) 6%, transparent);
+}
+
+/* Homepage pipeline arrows stay neutral for multi-color diagram */
+[data-ks-section="home"] .ks-figure svg .ks-line,
+[data-ks-section="home"] .ks-figure svg .ks-arrow {
+  stroke: var(--ks-fg-light);
+}
+
+/* Driver card hover uses section color */
+.driver-card:hover {
+  background: color-mix(in srgb, var(--ks-section) 5%, transparent);
+}
+
+/* Next-pipeline link uses section color */
+.ks-next-pipeline a {
+  color: var(--ks-section);
 }
 
 /* --- Responsive --- */

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  <script>
+    (function() {
+      var m = location.pathname.match(
+        /\/(driver-types|attack-surfaces|vuln-classes|primitives|case-studies|mitigations|tooling|reference)\b/
+      );
+      var map = {
+        'driver-types': 'drivers',
+        'attack-surfaces': 'surfaces',
+        'vuln-classes': 'vulns',
+        'primitives': 'primitives',
+        'case-studies': 'cases',
+        'mitigations': 'mitigations',
+        'tooling': 'tooling',
+        'reference': 'tooling'
+      };
+      document.documentElement.setAttribute(
+        'data-ks-section', m ? map[m[1]] : 'home'
+      );
+    })();
+  </script>
+{% endblock %}
