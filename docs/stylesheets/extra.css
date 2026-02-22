@@ -1,134 +1,671 @@
-/* Driver type card styling */
+/* ============================================================
+   KernelSight — Technical Manual Theme
+   Inspired by makingsoftware.com blueprint aesthetic
+   ============================================================ */
+
+/* --- Color System --- */
+:root {
+  --ks-cobalt: #2955E0;
+  --ks-cobalt-light: #5A7FFF;
+  --ks-cobalt-wash: rgba(41, 85, 224, 0.04);
+  --ks-cobalt-wash-strong: rgba(41, 85, 224, 0.08);
+  --ks-bg: #FAFAFA;
+  --ks-bg-surface: #FFFFFF;
+  --ks-fg: #1d1d1f;
+  --ks-fg-muted: #6e6e73;
+  --ks-fg-light: #aeaeb2;
+  --ks-border: #e5e5e7;
+  --ks-border-subtle: #f0f0f2;
+  --ks-svg-stroke: #2955E0;
+  --ks-svg-fill: rgba(41, 85, 224, 0.03);
+  --ks-svg-text: #1d1d1f;
+  --ks-badge-itw: #d32f2f;
+  --ks-badge-remote: #e65100;
+}
+
+[data-md-color-scheme="slate"] {
+  --ks-cobalt: #7B9EFF;
+  --ks-cobalt-light: #A3BBFF;
+  --ks-cobalt-wash: rgba(123, 158, 255, 0.05);
+  --ks-cobalt-wash-strong: rgba(123, 158, 255, 0.10);
+  --ks-bg: #0D1117;
+  --ks-bg-surface: #161b22;
+  --ks-fg: #e6edf3;
+  --ks-fg-muted: #8b949e;
+  --ks-fg-light: #484f58;
+  --ks-border: #21262d;
+  --ks-border-subtle: #1a1f27;
+  --ks-svg-stroke: #7B9EFF;
+  --ks-svg-fill: rgba(123, 158, 255, 0.05);
+  --ks-svg-text: #e6edf3;
+  --ks-badge-itw: #ef5350;
+  --ks-badge-remote: #ff9800;
+}
+
+/* --- Typography --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+body,
+.md-typeset {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+}
+
+.md-typeset {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--ks-fg);
+  letter-spacing: -0.006em;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ks-fg);
+}
+
+.md-typeset h1 {
+  font-size: 1.65rem;
+  font-weight: 600;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 1rem;
+}
+
+.md-typeset h2 {
+  font-size: 1.1rem;
+  margin-top: 3.5rem;
+  margin-bottom: 1rem;
+  color: var(--ks-fg);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ks-border);
+}
+
+.md-typeset h3 {
+  font-size: 0.92rem;
+  margin-top: 2.5rem;
+}
+
+.md-typeset h4 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ks-fg-muted);
+}
+
+/* --- Layout --- */
+.md-content {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* --- Tables --- */
+.md-typeset table:not([class]) {
+  border-radius: 0;
+  border: none;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  width: 100%;
+}
+
+.md-typeset table:not([class]) thead {
+  background: transparent;
+}
+
+.md-typeset table:not([class]) th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ks-fg-muted);
+  border-bottom: 2px solid var(--ks-cobalt);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+}
+
+.md-typeset table:not([class]) td {
+  border: none;
+  border-bottom: 1px solid var(--ks-border);
+  padding: 0.5rem 0.6rem;
+}
+
+.md-typeset table:not([class]) tbody tr:last-child td {
+  border-bottom: 1px solid var(--ks-border);
+}
+
+.md-typeset table:not([class]) tr:hover {
+  background: var(--ks-cobalt-wash);
+}
+
+/* --- Admonitions --- */
+.md-typeset .admonition,
+.md-typeset details {
+  border: none;
+  border-left: 3px solid var(--ks-cobalt);
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--ks-cobalt-wash);
+  font-size: 0.82rem;
+}
+
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-left-color: var(--ks-badge-itw);
+  background: rgba(211, 47, 47, 0.04);
+}
+
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-left-color: #e6a700;
+  background: rgba(230, 167, 0, 0.04);
+}
+
+/* --- Code blocks --- */
+.md-typeset pre > code {
+  border-radius: 2px;
+  border: 1px solid var(--ks-border);
+}
+
+.md-typeset code {
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+  font-size: 0.8em;
+  background: var(--ks-cobalt-wash);
+  color: var(--ks-cobalt);
+  padding: 0.1em 0.3em;
+}
+
+/* --- Links --- */
+.md-typeset a {
+  color: var(--ks-cobalt);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.md-typeset a:hover {
+  border-bottom-color: var(--ks-cobalt);
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  padding: 0.08rem 0.4rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+  background: transparent;
+}
+
+.badge-itw {
+  color: var(--ks-badge-itw);
+  border: 1px solid var(--ks-badge-itw);
+}
+
+.badge-remote {
+  color: var(--ks-badge-remote);
+  border: 1px solid var(--ks-badge-remote);
+}
+
+/* --- Figure System --- */
+.ks-figure {
+  border: none;
+  border-top: 1px solid var(--ks-border);
+  border-bottom: 1px solid var(--ks-border);
+  padding: 2rem 0;
+  position: relative;
+  margin: 3rem 0;
+  background: transparent;
+}
+
+.ks-figure-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ks-cobalt);
+  display: block;
+  margin-bottom: 1.2rem;
+  position: static;
+  background: transparent;
+  padding: 0;
+}
+
+.ks-figure-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ks-fg-muted);
+  margin-top: 1.2rem;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.ks-figure svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Dividers --- */
+.ks-divider {
+  border: none;
+  border-top: 1px solid var(--ks-border);
+  margin: 3.5rem 0;
+}
+
+.ks-divider--dots {
+  border: none;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ks-fg-light) 0px,
+    var(--ks-fg-light) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+  margin: 3.5rem 0;
+  opacity: 0.5;
+}
+
+/* --- Pipeline Position Indicator --- */
+.ks-pipeline-pos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ks-fg-light);
+  margin-bottom: 2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  letter-spacing: 0.02em;
+}
+
+.ks-pipeline-pos .ks-active {
+  color: var(--ks-cobalt);
+  font-weight: 600;
+}
+
+/* --- Pipeline Entry List (numbered definitions) --- */
+.ks-pipeline-list {
+  counter-reset: pipeline;
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.ks-pipeline-list > li {
+  counter-increment: pipeline;
+  position: relative;
+  padding: 1.2rem 1rem 1.2rem 3.5rem;
+  margin-bottom: 0;
+  border-left: none;
+  border-bottom: 1px solid var(--ks-border-subtle);
+  transition: background 0.15s;
+}
+
+.ks-pipeline-list > li:first-child {
+  border-top: 1px solid var(--ks-border-subtle);
+}
+
+.ks-pipeline-list > li:hover {
+  background: var(--ks-cobalt-wash);
+}
+
+.ks-pipeline-list > li::before {
+  content: counter(pipeline, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1.3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ks-cobalt);
+}
+
+.ks-pipeline-list > li strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.ks-pipeline-list > li p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ks-fg-muted);
+  line-height: 1.6;
+}
+
+/* --- Corpus Stats Terminal Box --- */
+.ks-stats-box {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  line-height: 2;
+  border: none;
+  border-top: 1px solid var(--ks-border);
+  border-bottom: 1px solid var(--ks-border);
+  padding: 1.2rem 0;
+  background: transparent;
+  margin: 2rem 0;
+  color: var(--ks-fg-muted);
+}
+
+.ks-stats-box .ks-stat-num {
+  color: var(--ks-cobalt);
+  font-weight: 600;
+}
+
+/* --- Driver Cards --- */
 .driver-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1px;
+  margin: 2rem 0;
+  border: 1px solid var(--ks-border);
 }
 
 .driver-card {
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: 0.4rem;
+  border: none;
+  border-radius: 0;
   padding: 1.2rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: background 0.15s;
   text-decoration: none;
   color: inherit;
   display: block;
+  background: var(--ks-bg-surface);
+  border-right: 1px solid var(--ks-border);
+  border-bottom: 1px solid var(--ks-border);
 }
 
 .driver-card:hover {
-  border-color: var(--md-accent-fg-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: var(--ks-cobalt-wash);
   text-decoration: none;
 }
 
 .driver-card .card-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
   display: block;
+  opacity: 0.7;
 }
 
 .driver-card .card-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  color: var(--md-accent-fg-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--ks-fg);
 }
 
 .driver-card .card-drivers {
-  font-size: 0.8rem;
-  font-family: var(--md-code-font-family);
-  color: var(--md-default-fg-color--light);
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ks-cobalt);
   margin-bottom: 0.5rem;
 }
 
 .driver-card .card-desc {
-  font-size: 0.85rem;
-  color: var(--md-default-fg-color--light);
+  font-size: 0.75rem;
+  color: var(--ks-fg-muted);
   margin-bottom: 0.5rem;
+  line-height: 1.5;
 }
 
 .driver-card .card-stats {
   display: flex;
-  gap: 1rem;
-  font-size: 0.75rem;
-  color: var(--md-default-fg-color--lighter);
-  margin-top: 0.6rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--md-default-fg-color--lightest);
+  gap: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--ks-fg-light);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--ks-border-subtle);
 }
 
 .driver-card .card-stats .stat {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 
 .driver-card .card-stats .stat strong {
-  color: var(--md-default-fg-color--light);
+  color: var(--ks-fg);
 }
 
-/* Badge styles for ITW / Remote */
-.badge {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.1rem 0.4rem;
-  border-radius: 0.2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  vertical-align: middle;
-  margin-left: 0.3rem;
-}
-
-.badge-itw {
-  background: #d32f2f;
-  color: #fff;
-}
-
-.badge-remote {
-  background: #f57c00;
-  color: #fff;
-}
-
-/* Hero section */
-.hero-subtitle {
-  font-size: 1.1rem;
-  color: var(--md-default-fg-color--light);
-  margin-bottom: 2rem;
-  max-width: 700px;
-}
-
-/* Section divider */
-.section-header {
-  margin-top: 2.5rem;
+/* --- Hero Section --- */
+.ks-hero-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   margin-bottom: 0.5rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 2px solid var(--md-accent-fg-color);
-  display: inline-block;
+  border: none;
+  padding: 0;
+  color: var(--ks-fg);
 }
 
-/* Quick nav pills */
-.nav-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0 2rem;
+.ks-hero-subtitle {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.05rem;
+  color: var(--ks-fg-muted);
+  margin-bottom: 3rem;
+  max-width: 600px;
+  line-height: 1.7;
 }
 
-.nav-pill {
-  display: inline-block;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: 2rem;
-  font-size: 0.85rem;
+/* --- Next In Pipeline Block --- */
+.ks-next-pipeline {
+  border: none;
+  border-top: 1px solid var(--ks-border);
+  padding: 1.2rem 0 0 0;
+  margin-top: 3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  background: transparent;
+  color: var(--ks-fg-muted);
+}
+
+.ks-next-pipeline a {
+  color: var(--ks-cobalt);
+  font-weight: 500;
+}
+
+/* --- Recommended Path Cards --- */
+.ks-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0;
+  margin: 2rem 0;
+}
+
+.ks-path-card {
+  border: none;
+  border-bottom: 1px solid var(--ks-border);
+  padding: 1rem 0;
   text-decoration: none;
-  color: var(--md-default-fg-color--light);
-  transition: all 0.2s;
+  color: inherit;
+  display: block;
+  transition: background 0.15s;
 }
 
-.nav-pill:hover {
-  border-color: var(--md-accent-fg-color);
-  color: var(--md-accent-fg-color);
+.ks-path-card:hover {
   text-decoration: none;
+}
+
+.ks-path-card:hover strong {
+  color: var(--ks-cobalt);
+}
+
+.ks-path-card strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--ks-fg);
+  transition: color 0.15s;
+}
+
+.ks-path-card span {
+  font-size: 0.75rem;
+  color: var(--ks-fg-muted);
+  line-height: 1.5;
+}
+
+/* --- SVG Styles --- */
+.ks-figure svg text {
+  fill: var(--ks-svg-text);
+}
+
+.ks-figure svg .ks-box {
+  stroke: var(--ks-svg-stroke);
+  fill: var(--ks-svg-fill);
+  stroke-width: 1;
+}
+
+.ks-figure svg .ks-line {
+  stroke: var(--ks-svg-stroke);
+  stroke-width: 1;
+  fill: none;
+}
+
+.ks-figure svg .ks-arrow {
+  stroke: var(--ks-svg-stroke);
+  stroke-width: 1;
+  fill: none;
+}
+
+.ks-figure svg .ks-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.ks-figure svg .ks-annotation {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  fill: var(--ks-fg-muted);
+}
+
+/* --- Header and Tabs --- */
+.md-header {
+  background: var(--ks-bg-surface);
+  color: var(--ks-fg);
+  box-shadow: none;
+  border-bottom: 1px solid var(--ks-border);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background: var(--ks-bg-surface);
+  border-bottom-color: var(--ks-border);
+}
+
+.md-tabs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  background: var(--ks-bg-surface);
+  color: var(--ks-fg-muted);
+  border-bottom: 1px solid var(--ks-border);
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  background: var(--ks-bg-surface);
+  border-bottom-color: var(--ks-border);
+}
+
+.md-tabs__link {
+  opacity: 0.6;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: var(--ks-cobalt);
+  opacity: 1;
+}
+
+.md-header__button.md-logo {
+  color: var(--ks-fg);
+}
+
+/* Hide the auto-generated h1 "Home" on the index page (ks-hero-title replaces it) */
+.ks-hero-title ~ h1,
+.ks-hero-title + * + * + h1 {
+  display: none;
+}
+/* On pages with ks-hero-title, the actual MkDocs h1 precedes our custom title.
+   Material puts "# Home" as first child of article. Hide it when hero exists. */
+article:has(.ks-hero-title) > h1:first-child {
+  font-size: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  line-height: 0;
+  overflow: hidden;
+  height: 0;
+}
+
+/* --- Sidebar Navigation --- */
+.md-nav {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: -0.006em;
+}
+
+.md-nav__link {
+  color: var(--ks-fg-muted);
+}
+
+.md-nav__link--active,
+.md-nav__link:hover {
+  color: var(--ks-cobalt);
+}
+
+/* --- Search --- */
+.md-search__input {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* --- Footer --- */
+.md-footer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .ks-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .driver-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ks-paths {
+    grid-template-columns: 1fr;
+  }
+
+  .ks-figure {
+    padding: 1.5rem 0;
+    overflow-x: auto;
+  }
 }

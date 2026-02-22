@@ -1,6 +1,10 @@
 # Case Studies
 
-Real-world Windows kernel CVEs with driver names, affected builds, root causes, and exploitation details.
+<div class="ks-pipeline-pos">
+  Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
+</div>
+
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 28 CVEs across 16 drivers, with 14 exploited in the wild.
 
 ## CVE Index
 

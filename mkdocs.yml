@@ -6,19 +6,16 @@ site_url: https://splintersfury.github.io/KernelSight/
 theme:
   name: material
   palette:
-    - scheme: slate
-      primary: deep purple
-      accent: amber
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
     - scheme: default
-      primary: deep purple
-      accent: amber
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
+    - navigation.tabs
     - navigation.sections
     - navigation.expand
     - navigation.indexes
@@ -46,106 +43,108 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Driver Types:
-    - driver-types/index.md
-    - File System Drivers: driver-types/filesystem.md
-    - File System Minifilters: driver-types/minifilter.md
-    - Log / Transaction: driver-types/log-transaction.md
-    - Network Stack: driver-types/network-stack.md
-    - Kernel Streaming: driver-types/kernel-streaming.md
-    - Win32k Subsystem: driver-types/win32k.md
-    - Core Kernel: driver-types/core-kernel.md
-    - Security / Policy: driver-types/security-policy.md
-    - Storage / Caching: driver-types/storage-caching.md
-  - Attack Surfaces:
-    - attack-surfaces/index.md
-    - IOCTL Handlers: attack-surfaces/ioctl-handlers.md
-    - Filesystem IRPs: attack-surfaces/filesystem-irps.md
-    - NDIS / Network: attack-surfaces/ndis-network.md
-    - PnP & Power: attack-surfaces/pnp-power.md
-    - WDF / KMDF: attack-surfaces/wdf.md
-    - Registry Callbacks: attack-surfaces/registry-callbacks.md
-    - ALPC: attack-surfaces/alpc.md
-    - Shared Memory: attack-surfaces/shared-memory.md
-    - WMI / ETW: attack-surfaces/wmi-etw.md
-  - Vulnerability Classes:
-    - vuln-classes/index.md
-    - Buffer Overflow: vuln-classes/buffer-overflow.md
-    - Integer Overflow: vuln-classes/integer-overflow.md
-    - Type Confusion: vuln-classes/type-confusion.md
-    - TOCTOU / Double-Fetch: vuln-classes/toctou-double-fetch.md
-    - Use-After-Free: vuln-classes/use-after-free.md
-    - Race Conditions: vuln-classes/race-conditions.md
-    - Uninitialized Memory: vuln-classes/uninitialized-memory.md
-    - Arbitrary R/W Primitives: vuln-classes/arbitrary-rw-primitives.md
-    - NULL Deref: vuln-classes/null-deref.md
-    - Logic Bugs: vuln-classes/logic-bugs.md
-  - Primitives:
-    - primitives/index.md
-    - Arbitrary R/W:
-      - Direct IOCTL R/W: primitives/arw/direct-ioctl-rw.md
-      - Pool Overflow: primitives/arw/pool-overflow.md
-      - MDL Mapping: primitives/arw/mdl-mapping.md
-      - Arb Increment/Decrement: primitives/arw/arb-increment-decrement.md
-      - Write-What-Where: primitives/arw/write-what-where.md
-      - Registry-Based: primitives/arw/registry-based.md
-      - DMA / MMIO: primitives/arw/dma-mmio.md
-      - Pipe Attributes: primitives/arw/pipe-attributes.md
-      - Token Manipulation: primitives/arw/token-manipulation.md
-      - PTE Manipulation: primitives/arw/pte-manipulation.md
-    - Exploitation:
-      - Pool Spray / Feng Shui: primitives/exploitation/pool-spray-feng-shui.md
-      - Named Pipe Objects: primitives/exploitation/named-pipe-objects.md
-      - I/O Ring: primitives/exploitation/io-ring.md
-      - WNF State Data: primitives/exploitation/wnf-state-data.md
-      - Palette / Bitmap: primitives/exploitation/palette-bitmap.md
-      - KUSER_SHARED_DATA: primitives/exploitation/kuser-shared-data.md
-      - PreviousMode Manipulation: primitives/exploitation/previous-mode-manipulation.md
-      - Token Swapping: primitives/exploitation/token-swapping.md
-      - ACL / SD Manipulation: primitives/exploitation/acl-sd-manipulation.md
-  - Mitigations:
-    - mitigations/index.md
-    - SMEP / SMAP: mitigations/smep-smap.md
-    - kCFG / kCET: mitigations/kcfg-kcet.md
-    - VBS / HVCI: mitigations/vbs-hvci.md
-    - KDP: mitigations/kdp.md
-    - Pool Hardening: mitigations/pool-hardening.md
-    - Secure Pool: mitigations/secure-pool.md
-    - ACG: mitigations/acg.md
-    - KASLR: mitigations/kaslr.md
-  - Case Studies:
-    - case-studies/index.md
-    - CVE-2025-24993: case-studies/CVE-2025-24993.md
-    - CVE-2025-24985: case-studies/CVE-2025-24985.md
-    - CVE-2024-49138: case-studies/CVE-2024-49138.md
-    - CVE-2024-38256: case-studies/CVE-2024-38256.md
-    - CVE-2024-38238: case-studies/CVE-2024-38238.md
-    - CVE-2024-38193: case-studies/CVE-2024-38193.md
-    - CVE-2024-38106: case-studies/CVE-2024-38106.md
-    - CVE-2024-38063: case-studies/CVE-2024-38063.md
-    - CVE-2024-38054: case-studies/CVE-2024-38054.md
-    - CVE-2024-35250: case-studies/CVE-2024-35250.md
-    - CVE-2024-30089: case-studies/CVE-2024-30089.md
-    - CVE-2024-30088: case-studies/CVE-2024-30088.md
-    - CVE-2024-30085: case-studies/CVE-2024-30085.md
-    - CVE-2024-26229: case-studies/CVE-2024-26229.md
-    - CVE-2024-21338: case-studies/CVE-2024-21338.md
-    - CVE-2024-21302: case-studies/CVE-2024-21302.md
-    - CVE-2023-36802: case-studies/CVE-2023-36802.md
-    - CVE-2023-36424: case-studies/CVE-2023-36424.md
-    - CVE-2023-36036: case-studies/CVE-2023-36036.md
-    - CVE-2023-32019: case-studies/CVE-2023-32019.md
-    - CVE-2023-29360: case-studies/CVE-2023-29360.md
-    - CVE-2023-29336: case-studies/CVE-2023-29336.md
-    - CVE-2023-28252: case-studies/CVE-2023-28252.md
-    - CVE-2023-28218: case-studies/CVE-2023-28218.md
-    - CVE-2023-21768: case-studies/CVE-2023-21768.md
-    - CVE-2022-37969: case-studies/CVE-2022-37969.md
-    - CVE-2022-21907: case-studies/CVE-2022-21907.md
-    - CVE-2022-21882: case-studies/CVE-2022-21882.md
-  - Tooling:
-    - tooling/index.md
-    - Static Analysis: tooling/static-analysis.md
-    - Fuzzing: tooling/fuzzing.md
-    - Debugging: tooling/debugging.md
-    - AutoPiff Integration: tooling/autopiff-integration.md
+  - The Pipeline:
+    - Driver Types:
+      - driver-types/index.md
+      - File System Drivers: driver-types/filesystem.md
+      - File System Minifilters: driver-types/minifilter.md
+      - Log / Transaction: driver-types/log-transaction.md
+      - Network Stack: driver-types/network-stack.md
+      - Kernel Streaming: driver-types/kernel-streaming.md
+      - Win32k Subsystem: driver-types/win32k.md
+      - Core Kernel: driver-types/core-kernel.md
+      - Security / Policy: driver-types/security-policy.md
+      - Storage / Caching: driver-types/storage-caching.md
+    - Attack Surfaces:
+      - attack-surfaces/index.md
+      - IOCTL Handlers: attack-surfaces/ioctl-handlers.md
+      - Filesystem IRPs: attack-surfaces/filesystem-irps.md
+      - NDIS / Network: attack-surfaces/ndis-network.md
+      - PnP & Power: attack-surfaces/pnp-power.md
+      - WDF / KMDF: attack-surfaces/wdf.md
+      - Registry Callbacks: attack-surfaces/registry-callbacks.md
+      - ALPC: attack-surfaces/alpc.md
+      - Shared Memory: attack-surfaces/shared-memory.md
+      - WMI / ETW: attack-surfaces/wmi-etw.md
+    - Vulnerability Classes:
+      - vuln-classes/index.md
+      - Buffer Overflow: vuln-classes/buffer-overflow.md
+      - Integer Overflow: vuln-classes/integer-overflow.md
+      - Type Confusion: vuln-classes/type-confusion.md
+      - TOCTOU / Double-Fetch: vuln-classes/toctou-double-fetch.md
+      - Use-After-Free: vuln-classes/use-after-free.md
+      - Race Conditions: vuln-classes/race-conditions.md
+      - Uninitialized Memory: vuln-classes/uninitialized-memory.md
+      - Arbitrary R/W Primitives: vuln-classes/arbitrary-rw-primitives.md
+      - NULL Deref: vuln-classes/null-deref.md
+      - Logic Bugs: vuln-classes/logic-bugs.md
+    - Primitives:
+      - primitives/index.md
+      - Arbitrary R/W:
+        - Direct IOCTL R/W: primitives/arw/direct-ioctl-rw.md
+        - Pool Overflow: primitives/arw/pool-overflow.md
+        - MDL Mapping: primitives/arw/mdl-mapping.md
+        - Arb Increment/Decrement: primitives/arw/arb-increment-decrement.md
+        - Write-What-Where: primitives/arw/write-what-where.md
+        - Registry-Based: primitives/arw/registry-based.md
+        - DMA / MMIO: primitives/arw/dma-mmio.md
+        - Pipe Attributes: primitives/arw/pipe-attributes.md
+        - Token Manipulation: primitives/arw/token-manipulation.md
+        - PTE Manipulation: primitives/arw/pte-manipulation.md
+      - Exploitation:
+        - Pool Spray / Feng Shui: primitives/exploitation/pool-spray-feng-shui.md
+        - Named Pipe Objects: primitives/exploitation/named-pipe-objects.md
+        - I/O Ring: primitives/exploitation/io-ring.md
+        - WNF State Data: primitives/exploitation/wnf-state-data.md
+        - Palette / Bitmap: primitives/exploitation/palette-bitmap.md
+        - KUSER_SHARED_DATA: primitives/exploitation/kuser-shared-data.md
+        - PreviousMode Manipulation: primitives/exploitation/previous-mode-manipulation.md
+        - Token Swapping: primitives/exploitation/token-swapping.md
+        - ACL / SD Manipulation: primitives/exploitation/acl-sd-manipulation.md
+    - Case Studies:
+      - case-studies/index.md
+      - CVE-2025-24993: case-studies/CVE-2025-24993.md
+      - CVE-2025-24985: case-studies/CVE-2025-24985.md
+      - CVE-2024-49138: case-studies/CVE-2024-49138.md
+      - CVE-2024-38256: case-studies/CVE-2024-38256.md
+      - CVE-2024-38238: case-studies/CVE-2024-38238.md
+      - CVE-2024-38193: case-studies/CVE-2024-38193.md
+      - CVE-2024-38106: case-studies/CVE-2024-38106.md
+      - CVE-2024-38063: case-studies/CVE-2024-38063.md
+      - CVE-2024-38054: case-studies/CVE-2024-38054.md
+      - CVE-2024-35250: case-studies/CVE-2024-35250.md
+      - CVE-2024-30089: case-studies/CVE-2024-30089.md
+      - CVE-2024-30088: case-studies/CVE-2024-30088.md
+      - CVE-2024-30085: case-studies/CVE-2024-30085.md
+      - CVE-2024-26229: case-studies/CVE-2024-26229.md
+      - CVE-2024-21338: case-studies/CVE-2024-21338.md
+      - CVE-2024-21302: case-studies/CVE-2024-21302.md
+      - CVE-2023-36802: case-studies/CVE-2023-36802.md
+      - CVE-2023-36424: case-studies/CVE-2023-36424.md
+      - CVE-2023-36036: case-studies/CVE-2023-36036.md
+      - CVE-2023-32019: case-studies/CVE-2023-32019.md
+      - CVE-2023-29360: case-studies/CVE-2023-29360.md
+      - CVE-2023-29336: case-studies/CVE-2023-29336.md
+      - CVE-2023-28252: case-studies/CVE-2023-28252.md
+      - CVE-2023-28218: case-studies/CVE-2023-28218.md
+      - CVE-2023-21768: case-studies/CVE-2023-21768.md
+      - CVE-2022-37969: case-studies/CVE-2022-37969.md
+      - CVE-2022-21907: case-studies/CVE-2022-21907.md
+      - CVE-2022-21882: case-studies/CVE-2022-21882.md
+  - Reference:
+    - Mitigations:
+      - mitigations/index.md
+      - SMEP / SMAP: mitigations/smep-smap.md
+      - kCFG / kCET: mitigations/kcfg-kcet.md
+      - VBS / HVCI: mitigations/vbs-hvci.md
+      - KDP: mitigations/kdp.md
+      - Pool Hardening: mitigations/pool-hardening.md
+      - Secure Pool: mitigations/secure-pool.md
+      - ACG: mitigations/acg.md
+      - KASLR: mitigations/kaslr.md
+    - Tooling:
+      - tooling/index.md
+      - Static Analysis: tooling/static-analysis.md
+      - Fuzzing: tooling/fuzzing.md
+      - Debugging: tooling/debugging.md
+      - AutoPiff Integration: tooling/autopiff-integration.md

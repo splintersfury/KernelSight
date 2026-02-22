@@ -1,130 +1,139 @@
-# KernelSight
+---
+hide:
+  - toc
+---
 
-<p class="hero-subtitle">
-Windows kernel driver exploitation knowledge base — organized by driver type, grounded in real CVEs with specific builds and patches.
+<div class="ks-hero-title" markdown>KernelSight</div>
+
+<p class="ks-hero-subtitle">
+A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 28 real CVEs with specific builds and patches.
 </p>
 
-## Browse by Driver Type
+<div class="ks-figure" markdown>
+  <span class="ks-figure-label">FIG_001 — The Exploitation Pipeline</span>
+  <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Exploitation pipeline: Driver Type to Attack Surface to Vulnerability Class to Primitive to Case Study, with Mitigations below">
+    <!-- Row 1: Five pipeline stages -->
+    <a href="driver-types/">
+      <rect class="ks-box" x="10" y="30" width="150" height="56" rx="0"/>
+      <text class="ks-label" x="85" y="55" text-anchor="middle" fill="currentColor">DRIVER TYPE</text>
+      <text class="ks-annotation" x="85" y="72" text-anchor="middle">Which component?</text>
+    </a>
+    <!-- Arrow 1 -->
+    <line class="ks-line" x1="160" y1="58" x2="185" y2="58"/>
+    <polyline class="ks-arrow" points="180,53 188,58 180,63"/>
+    <a href="attack-surfaces/">
+      <rect class="ks-box" x="190" y="30" width="150" height="56" rx="0"/>
+      <text class="ks-label" x="265" y="55" text-anchor="middle" fill="currentColor">ATTACK SURFACE</text>
+      <text class="ks-annotation" x="265" y="72" text-anchor="middle">How is it reached?</text>
+    </a>
+    <!-- Arrow 2 -->
+    <line class="ks-line" x1="340" y1="58" x2="365" y2="58"/>
+    <polyline class="ks-arrow" points="360,53 368,58 360,63"/>
+    <a href="vuln-classes/">
+      <rect class="ks-box" x="370" y="30" width="150" height="56" rx="0"/>
+      <text class="ks-label" x="445" y="55" text-anchor="middle" fill="currentColor">VULN CLASS</text>
+      <text class="ks-annotation" x="445" y="72" text-anchor="middle">What went wrong?</text>
+    </a>
+    <!-- Arrow 3 -->
+    <line class="ks-line" x1="520" y1="58" x2="545" y2="58"/>
+    <polyline class="ks-arrow" points="540,53 548,58 540,63"/>
+    <a href="primitives/">
+      <rect class="ks-box" x="550" y="30" width="150" height="56" rx="0"/>
+      <text class="ks-label" x="625" y="55" text-anchor="middle" fill="currentColor">PRIMITIVE</text>
+      <text class="ks-annotation" x="625" y="72" text-anchor="middle">What do you gain?</text>
+    </a>
+    <!-- Arrow 4 -->
+    <line class="ks-line" x1="700" y1="58" x2="725" y2="58"/>
+    <polyline class="ks-arrow" points="720,53 728,58 720,63"/>
+    <a href="case-studies/">
+      <rect class="ks-box" x="730" y="30" width="150" height="56" rx="0"/>
+      <text class="ks-label" x="805" y="55" text-anchor="middle" fill="currentColor">CASE STUDY</text>
+      <text class="ks-annotation" x="805" y="72" text-anchor="middle">Real-world CVEs</text>
+    </a>
+    <!-- Mitigations bar below -->
+    <line class="ks-line" x1="10" y1="120" x2="880" y2="120" stroke-dasharray="6,4"/>
+    <a href="mitigations/">
+      <rect class="ks-box" x="280" y="132" width="340" height="40" rx="0"/>
+      <text class="ks-label" x="450" y="157" text-anchor="middle" fill="currentColor">MITIGATIONS</text>
+    </a>
+    <!-- Vertical dashed lines connecting stages to mitigations -->
+    <line class="ks-line" x1="445" y1="86" x2="445" y2="132" stroke-dasharray="4,4" opacity="0.4"/>
+    <line class="ks-line" x1="625" y1="86" x2="625" y2="132" stroke-dasharray="4,4" opacity="0.4"/>
+    <text class="ks-annotation" x="450" y="195" text-anchor="middle">Defenses intersect every stage</text>
+    <!-- Tooling reference -->
+    <a href="tooling/">
+      <text class="ks-annotation" x="450" y="220" text-anchor="middle" text-decoration="underline">Tooling &amp; Automation</text>
+    </a>
+  </svg>
+  <p class="ks-figure-caption">Each stage links to a section of this knowledge base. Click any box to begin.</p>
+</div>
 
-<div class="driver-grid">
+<hr class="ks-divider">
 
-<a class="driver-card" href="driver-types/filesystem/">
-  <span class="card-icon">&#x1F4C1;</span>
-  <span class="card-title">File System Drivers</span>
-  <span class="card-drivers">ntfs.sys &middot; fastfat.sys</span>
-  <span class="card-desc">On-disk structure parsing, MFT records, FAT bitmaps. VHD mount gives unprivileged local access.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>2</strong> CVEs</span>
-    <span class="stat">Buffer Overflow &middot; Integer Overflow</span>
-  </span>
+## The Analysis Pipeline
+
+<ol class="ks-pipeline-list" markdown>
+<li markdown>
+<strong><a href="driver-types/">Driver Types</a></strong>
+<p>Identify the kernel component — file system, network stack, Win32k, core kernel — and understand its role, IRP patterns, and historical vulnerability profile. 9 categories covering 16 unique drivers.</p>
+</li>
+<li markdown>
+<strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
+<p>Map how user-mode code reaches the driver — IOCTL handlers, filesystem IRPs, ALPC, shared memory. Determines what an attacker can control.</p>
+</li>
+<li markdown>
+<strong><a href="vuln-classes/">Vulnerability Classes</a></strong>
+<p>Classify the bug — buffer overflow, type confusion, TOCTOU, use-after-free — and understand the corruption it enables. 10 classes with typical primitives gained.</p>
+</li>
+<li markdown>
+<strong><a href="primitives/">Primitives</a></strong>
+<p>Convert the bug into a capability — arbitrary read/write, pool spray, token swap. 19 techniques split between arb R/W primitives and exploitation building blocks.</p>
+</li>
+<li markdown>
+<strong><a href="case-studies/">Case Studies</a></strong>
+<p>Walk through the full chain for 28 real CVEs — root cause, exploitation path, patch analysis, and AutoPiff detection rules. 14 exploited in the wild.</p>
+</li>
+<li markdown>
+<strong><a href="mitigations/">Mitigations</a></strong>
+<p>Understand the defenses — SMEP/SMAP, kCFG/kCET, VBS/HVCI, pool hardening — and which primitives they block. Cross-cuts every pipeline stage.</p>
+</li>
+<li markdown>
+<strong><a href="tooling/">Tooling</a></strong>
+<p>Static analysis, fuzzing, kernel debugging, and AutoPiff integration for automated vulnerability detection across driver patches.</p>
+</li>
+</ol>
+
+<hr class="ks-divider--dots">
+
+## Corpus
+
+<div class="ks-stats-box" markdown>
+<span class="ks-stat-num">28</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">16</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">14</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">2</span> remotely exploitable<br>
+<span class="ks-stat-num">9</span> driver type categories &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">46</span> technique pages &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">66</span> AutoPiff detection rules
+</div>
+
+## Recommended Paths
+
+<div class="ks-paths" markdown>
+
+<a class="ks-path-card" href="driver-types/">
+  <strong>New to kernel exploitation</strong>
+  <span>Start with Driver Types to understand the landscape, then follow the pipeline left-to-right.</span>
 </a>
 
-<a class="driver-card" href="driver-types/minifilter/">
-  <span class="card-icon">&#x1F50D;</span>
-  <span class="card-title">File System Minifilters</span>
-  <span class="card-drivers">cldflt.sys</span>
-  <span class="card-desc">Pre/post-operation callbacks, reparse data parsing, context reference management.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>2</strong> CVEs</span>
-    <span class="stat">Heap Overflow</span>
-  </span>
+<a class="ks-path-card" href="case-studies/">
+  <strong>Researching a specific driver</strong>
+  <span>Jump to Case Studies and filter by driver name. Each CVE links back to relevant pipeline stages.</span>
 </a>
 
-<a class="driver-card" href="driver-types/log-transaction/">
-  <span class="card-icon">&#x1F4D3;</span>
-  <span class="card-title">Log / Transaction</span>
-  <span class="card-drivers">clfs.sys</span>
-  <span class="card-desc">CLFS base log metadata parsing &mdash; the most exploited single driver. User-reachable via CreateLogFile.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>4</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-itw">3 ITW</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/network-stack/">
-  <span class="card-icon">&#x1F310;</span>
-  <span class="card-title">Network Stack</span>
-  <span class="card-drivers">tcpip.sys &middot; afd.sys &middot; http.sys</span>
-  <span class="card-desc">TCP/IP packet processing, Winsock kernel helper, HTTP protocol stack. Includes remote attack surface.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>5</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-remote">2 Remote</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/kernel-streaming/">
-  <span class="card-icon">&#x1F3AC;</span>
-  <span class="card-title">Kernel Streaming</span>
-  <span class="card-drivers">ks.sys &middot; mskssrv.sys &middot; ksthunk.sys</span>
-  <span class="card-desc">KS IOCTL dispatch, WOW64 thunking, MDL operations, rendezvous server context management.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>6</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-itw">2 ITW</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/win32k/">
-  <span class="card-icon">&#x1F5A5;</span>
-  <span class="card-title">Win32k Subsystem</span>
-  <span class="card-drivers">win32k.sys &middot; win32kbase.sys &middot; win32kfull.sys</span>
-  <span class="card-desc">~1200 NtUser/NtGdi syscall handlers, GDI objects, window and menu management.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>3</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-itw">2 ITW</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/core-kernel/">
-  <span class="card-icon">&#x2699;</span>
-  <span class="card-title">Core Kernel</span>
-  <span class="card-drivers">ntoskrnl.exe</span>
-  <span class="card-desc">Security reference monitor, VBS transitions, process/thread management. Highest impact bugs.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>4</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-itw">2 ITW</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/security-policy/">
-  <span class="card-icon">&#x1F6E1;</span>
-  <span class="card-title">Security / Policy</span>
-  <span class="card-drivers">appid.sys &middot; ci.sys</span>
-  <span class="card-desc">AppLocker, Code Integrity, WDAC enforcement. Lazarus Group ITW exploitation.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>1</strong> CVE</span>
-    <span class="stat"><span class="badge badge-itw">ITW</span></span>
-  </span>
-</a>
-
-<a class="driver-card" href="driver-types/storage-caching/">
-  <span class="card-icon">&#x1F4BE;</span>
-  <span class="card-title">Storage / Caching</span>
-  <span class="card-drivers">csc.sys</span>
-  <span class="card-desc">Client-Side Caching, Offline Files. Logic bugs in access control enforcement.</span>
-  <span class="card-stats">
-    <span class="stat"><strong>1</strong> CVE</span>
-    <span class="stat">Logic Bug</span>
-  </span>
+<a class="ks-path-card" href="tooling/autopiff-integration/">
+  <strong>Building detection automation</strong>
+  <span>See how AutoPiff integrates with this knowledge base to detect vulnerability patterns at scale.</span>
 </a>
 
 </div>
-
-<h2 class="section-header">Explore by Topic</h2>
-
-<div class="nav-pills">
-  <a class="nav-pill" href="attack-surfaces/">Attack Surfaces</a>
-  <a class="nav-pill" href="vuln-classes/">Vulnerability Classes</a>
-  <a class="nav-pill" href="primitives/">Primitives</a>
-  <a class="nav-pill" href="mitigations/">Mitigations</a>
-  <a class="nav-pill" href="case-studies/">Case Studies (28 CVEs)</a>
-  <a class="nav-pill" href="tooling/">Tooling</a>
-</div>
-
-## At a Glance
-
-| | |
-|---|---|
-| **28** CVE case studies | **16** unique drivers |
-| **12** exploited in the wild | **2** remotely exploitable |
-| **9** driver type categories | **46** technique pages |
-| **66** AutoPiff detection rules | Automated collector monitors 6+ feeds |
