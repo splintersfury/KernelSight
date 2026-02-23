@@ -79,7 +79,7 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 | [Core Kernel](core-kernel.md) | ntoskrnl.exe | 4 | Syscall handlers, security subsystem, VBS |
 | [Security / Policy Drivers](security-policy.md) | appid.sys | 1 | IOCTL access control, policy enforcement |
 | [Storage / Caching Drivers](storage-caching.md) | csc.sys | 1 | IOCTL handlers, file caching |
-| [Vendor Utility](vendor-utility.md) | DBUtil, RTCore64, gdrv, iqvw64e, HW.sys, ATSZIO64, AsIO3, etc. | 12 | Physical memory R/W, MSR access, I/O port |
+| [Vendor Utility](vendor-utility.md) | DBUtil, RTCore64, gdrv, iqvw64e, HW.sys, ATSZIO64, AsIO3, WinRing0, etc. | 14 | Physical memory R/W, MSR access, I/O port |
 | [Performance & GPU](performance-gpu.md) | AMDRyzenMasterDriver.sys, ThrottleStop.sys, nvlddmkm.sys | 4 | MSR write, GPU memory mapping, MMIO |
 | [Third-Party Security](third-party-security.md) | Capcom.sys, echo_driver.sys, viragt64.sys, Truesight.sys, amsdk.sys | 5 | Ring-0 exec, callback manipulation, process termination |
 
@@ -189,11 +189,11 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 <a class="driver-card" href="vendor-utility/">
   <span class="card-icon">&#x1F527;</span>
   <span class="card-title">Vendor Utility</span>
-  <span class="card-drivers">DBUtil &middot; RTCore64 &middot; gdrv &middot; iqvw64e &middot; HW.sys &middot; +7 more</span>
+  <span class="card-drivers">DBUtil &middot; RTCore64 &middot; gdrv &middot; iqvw64e &middot; HW.sys &middot; WinRing0 &middot; +8 more</span>
   <span class="card-desc">OEM hardware utility and diagnostic drivers. Expose physical memory R/W, MSR, I/O port access. Canonical BYOVD targets.</span>
   <span class="card-stats">
-    <span class="stat"><strong>12</strong> CVEs</span>
-    <span class="stat"><span class="badge badge-itw">8 ITW</span></span>
+    <span class="stat"><strong>14</strong> CVEs</span>
+    <span class="stat"><span class="badge badge-itw">9 ITW</span></span>
   </span>
 </a>
 
@@ -234,7 +234,7 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 | Core Kernel | | | | ■■ | | ■ | ■ |
 | Security / Policy | | | | | | | ■ |
 | Storage / Caching | | | | | | | ■ |
-| Vendor Utility | | | | | | | ■■■■■■■■■■■■ |
+| Vendor Utility | | | | | | | ■■■■■■■■■■■■■■ |
 | Performance & GPU | | | | | | ■ | ■■■ |
 | Third-Party Security | | | | | | | ■■■■■ |
 

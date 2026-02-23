@@ -75,7 +75,7 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 <ol class="ks-pipeline-list" markdown>
 <li markdown>
 <strong><a href="driver-types/">Driver Types</a></strong>
-<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 39 unique drivers.</p>
+<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 41 unique drivers.</p>
 </li>
 <li markdown>
 <strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
@@ -91,7 +91,7 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 52 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 29 exploited in the wild, including 21 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 54 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 29 exploited in the wild, including 21 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -108,9 +108,9 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">52</span> CVE case studies &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">39</span> unique drivers &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">29</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">54</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">41</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">30</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">56</span> technique pages &nbsp;&middot;&nbsp;

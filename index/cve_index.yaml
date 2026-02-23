@@ -907,3 +907,33 @@ cves:
       poc: ""
     case_study: "docs/case-studies/amsdk-sys.md"
 
+  - cve_id: "CVE-2023-1048"
+    driver: "WinRing0x64.sys"
+    vendor: "OpenLibSys"
+    description: "OpenLibSys WinRing0 — MSR write, physical memory R/W, I/O port, PCI config space via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1048"
+      poc: "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1048"
+    case_study: "docs/case-studies/CVE-2023-1048.md"
+
+  - cve_id: "CVE-2023-1676"
+    driver: "mydrivers64.sys"
+    vendor: "DriverGenius"
+    description: "DriverGenius — arbitrary MSR write and physical memory R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "9.2.707.1214"
+    status: "still_loadable"
+    references:
+      writeup: "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1676"
+      poc: "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1676"
+    case_study: "docs/case-studies/CVE-2023-1676.md"
+

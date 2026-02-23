@@ -5,7 +5,7 @@ OEM hardware utility, diagnostic, and management drivers — the canonical BYOVD
 ## Architecture
 
 - **Driver model**: WDM, typically loaded as a kernel-mode service
-- **Key drivers**: `DBUtil_2_3.sys` (Dell), `RTCore64.sys` (MSI), `gdrv.sys` (Gigabyte), `HW.sys` (Marvin Test), `iqvw64e.sys` (Intel), `LenovoDiagnosticsDriver.sys` (Lenovo), `ATSZIO64.sys` (ASUS), `AsIO3.sys` (ASRock/ASUS), Viper RGB driver (Patriot), LG LSB driver (LG), `iREC.sys` (iREC), `NeacController.sys` (NEAC)
+- **Key drivers**: `DBUtil_2_3.sys` (Dell), `RTCore64.sys` (MSI), `gdrv.sys` (Gigabyte), `HW.sys` (Marvin Test), `iqvw64e.sys` (Intel), `LenovoDiagnosticsDriver.sys` (Lenovo), `ATSZIO64.sys` (ASUS), `AsIO3.sys` (ASRock/ASUS), `WinRing0x64.sys` (OpenLibSys), `mydrivers64.sys` (DriverGenius), Viper RGB driver (Patriot), LG LSB driver (LG), `iREC.sys` (iREC), `NeacController.sys` (NEAC)
 - **IOCTL interface**: Physical memory R/W, MSR access, I/O port access, PCI configuration space access via DeviceIoControl
 - **Privilege**: Originally designed for hardware management utilities; most run with full kernel privileges but provide world-accessible device objects
 
@@ -43,6 +43,8 @@ OEM hardware utility, diagnostic, and management drivers — the canonical BYOVD
 | [CVE-2025-45737](../case-studies/CVE-2025-45737.md) | `NeacController.sys` | NEAC — arbitrary R/W | Arbitrary R/W | No |
 | [ATSZIO64.sys](../case-studies/ATSZIO64-sys.md) | `ATSZIO64.sys` | ASUS — physical memory R/W | Arbitrary R/W | Yes |
 | [AsIO3.sys](../case-studies/AsIO3-sys.md) | `AsIO3.sys` | ASRock/ASUS — physical mem R/W, SMM | Arbitrary R/W | Yes |
+| [CVE-2023-1048](../case-studies/CVE-2023-1048.md) | `WinRing0x64.sys` | OpenLibSys — MSR write, phys mem R/W, I/O port | Arbitrary R/W | Yes |
+| [CVE-2023-1676](../case-studies/CVE-2023-1676.md) | `mydrivers64.sys` | DriverGenius — MSR write, phys mem R/W | Arbitrary R/W | No |
 
 ## Key Drivers
 

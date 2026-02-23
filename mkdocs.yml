@@ -159,6 +159,8 @@ nav:
     - viragt64.sys: case-studies/viragt64-sys.md
     - Truesight.sys: case-studies/Truesight-sys.md
     - amsdk.sys: case-studies/amsdk-sys.md
+    - CVE-2023-1048: case-studies/CVE-2023-1048.md
+    - CVE-2023-1676: case-studies/CVE-2023-1676.md
   - Defenses:
     - mitigations/index.md
     - SMEP / SMAP: mitigations/smep-smap.md

@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 52 CVEs across 39 unique drivers, with 29 exploited in the wild — including 21 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 54 CVEs across 41 unique drivers, with 30 exploited in the wild — including 23 third-party BYOVD driver case studies.
 
 ## CVE Index
 
@@ -60,6 +60,8 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [CVE-2025-45737](CVE-2025-45737.md) | `NeacController.sys` | NEAC | Arbitrary R/W | No | Still loadable |
 | [ATSZIO64.sys](ATSZIO64-sys.md) | `ATSZIO64.sys` | ASUS | Arbitrary R/W | Yes | Blocklisted |
 | [AsIO3.sys](AsIO3-sys.md) | `AsIO3.sys` | ASRock/ASUS | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2023-1048](CVE-2023-1048.md) | `WinRing0x64.sys` | OpenLibSys / TechPowerUp / Razer / many | MSR Write / Phys Mem R/W | Yes | Blocklisted |
+| [CVE-2023-1676](CVE-2023-1676.md) | `mydrivers64.sys` | DriverGenius | MSR Write / Phys Mem R/W | No | Still loadable |
 
 ### Performance & GPU Drivers
 
@@ -248,6 +250,14 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 
 - [amsdk.sys](amsdk-sys.md) — WatchDog — process termination
 
+### `WinRing0x64.sys`
+
+- [CVE-2023-1048](CVE-2023-1048.md) — OpenLibSys — MSR write, physical memory R/W, I/O port access
+
+### `mydrivers64.sys`
+
+- [CVE-2023-1676](CVE-2023-1676.md) — DriverGenius — MSR write (0x9C402088), physical memory R/W (0x9C406104/0x9C40A108)
+
 ## By Exploitation Status
 
 ### Exploited in the Wild
@@ -281,3 +291,4 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [viragt64.sys](viragt64-sys.md) — `viragt64.sys` — TG Soft — process termination (Kasseika ransomware)
 - [Truesight.sys](Truesight-sys.md) — `Truesight.sys` — Adlice — EDR bypass
 - [amsdk.sys](amsdk-sys.md) — `amsdk.sys` — WatchDog — process termination (Silver Fox APT)
+- [CVE-2023-1048](CVE-2023-1048.md) — `WinRing0x64.sys` — OpenLibSys — MSR write and physical memory R/W
