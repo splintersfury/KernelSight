@@ -79,6 +79,9 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 | [Core Kernel](core-kernel.md) | ntoskrnl.exe | 4 | Syscall handlers, security subsystem, VBS |
 | [Security / Policy Drivers](security-policy.md) | appid.sys | 1 | IOCTL access control, policy enforcement |
 | [Storage / Caching Drivers](storage-caching.md) | csc.sys | 1 | IOCTL handlers, file caching |
+| [Vendor Utility](vendor-utility.md) | DBUtil, RTCore64, gdrv, iqvw64e, HW.sys, ATSZIO64, AsIO3, etc. | 12 | Physical memory R/W, MSR access, I/O port |
+| [Performance & GPU](performance-gpu.md) | AMDRyzenMasterDriver.sys, ThrottleStop.sys, nvlddmkm.sys | 4 | MSR write, GPU memory mapping, MMIO |
+| [Third-Party Security](third-party-security.md) | Capcom.sys, echo_driver.sys, viragt64.sys, Truesight.sys, amsdk.sys | 5 | Ring-0 exec, callback manipulation, process termination |
 
 ## Browse by Driver Type
 
@@ -183,6 +186,39 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
   </span>
 </a>
 
+<a class="driver-card" href="vendor-utility/">
+  <span class="card-icon">&#x1F527;</span>
+  <span class="card-title">Vendor Utility</span>
+  <span class="card-drivers">DBUtil &middot; RTCore64 &middot; gdrv &middot; iqvw64e &middot; HW.sys &middot; +7 more</span>
+  <span class="card-desc">OEM hardware utility and diagnostic drivers. Expose physical memory R/W, MSR, I/O port access. Canonical BYOVD targets.</span>
+  <span class="card-stats">
+    <span class="stat"><strong>12</strong> CVEs</span>
+    <span class="stat"><span class="badge badge-itw">8 ITW</span></span>
+  </span>
+</a>
+
+<a class="driver-card" href="performance-gpu/">
+  <span class="card-icon">&#x1F3AE;</span>
+  <span class="card-title">Performance & GPU</span>
+  <span class="card-drivers">AMDRyzenMaster &middot; ThrottleStop &middot; nvlddmkm &middot; AMD chipset</span>
+  <span class="card-desc">CPU tuning, GPU, and chipset drivers. Expose MSR writes, GPU memory mapping, MMIO register access.</span>
+  <span class="card-stats">
+    <span class="stat"><strong>4</strong> CVEs</span>
+    <span class="stat"><span class="badge badge-itw">1 ITW</span></span>
+  </span>
+</a>
+
+<a class="driver-card" href="third-party-security/">
+  <span class="card-icon">&#x1F6A8;</span>
+  <span class="card-title">Third-Party Security</span>
+  <span class="card-drivers">Capcom.sys &middot; echo_driver.sys &middot; viragt64.sys &middot; Truesight.sys &middot; amsdk.sys</span>
+  <span class="card-desc">AV/EDR/anti-cheat kernel modules. Abused for process termination, callback manipulation, ring-0 code execution.</span>
+  <span class="card-stats">
+    <span class="stat"><strong>5</strong> CVEs</span>
+    <span class="stat"><span class="badge badge-itw">4 ITW</span></span>
+  </span>
+</a>
+
 </div>
 
 ## Driver Type vs. Vulnerability Class Heatmap
@@ -198,6 +234,9 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 | Core Kernel | | | | ■■ | | ■ | ■ |
 | Security / Policy | | | | | | | ■ |
 | Storage / Caching | | | | | | | ■ |
+| Vendor Utility | | | | | | | ■■■■■■■■■■■■ |
+| Performance & GPU | | | | | | ■ | ■■■ |
+| Third-Party Security | | | | | | | ■■■■■ |
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../attack-surfaces/">Attack Surfaces</a> &rarr; How does user-mode code reach these drivers?

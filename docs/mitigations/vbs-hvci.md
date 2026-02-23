@@ -69,6 +69,18 @@ VBS and HVCI represent the strongest architectural defense in modern Windows. Th
 
 The VBS attack surface itself has become a research focus, as demonstrated by the "Windows Downdate" attack (CVE-2024-21302), which targeted the VTL 1 update mechanism rather than trying to break through VBS protections directly.
 
+## BYOVD Blocking
+
+VBS/HVCI plays a critical role in the BYOVD defense model:
+
+- **Vulnerable Driver Blocklist enforcement**: On HVCI-enabled systems, the Microsoft Vulnerable Driver Blocklist (`DriverSiPolicy.p7b`) is enforced at the hypervisor level, preventing known-vulnerable drivers from loading even if an attacker has administrator privileges
+- **Capcom.sys neutralized**: HVCI prevents Capcom.sys from disabling SMEP (CR4 modification blocked by hypervisor) and from executing user-mode code pages in ring 0 (W^X enforcement) — see [Capcom.sys](../case-studies/Capcom-sys.md)
+- **Physical memory mapping restricted**: Drivers that call `MmMapIoSpace` with user-controlled parameters are blocked if they appear on the blocklist — affects [RTCore64.sys](../case-studies/CVE-2019-16098.md), [gdrv.sys](../case-studies/CVE-2018-19320.md), [ATSZIO64.sys](../case-studies/ATSZIO64-sys.md), [AsIO3.sys](../case-studies/AsIO3-sys.md), and others
+- **Data-only attacks still viable**: HVCI does not prevent BYOVD drivers from performing data-only operations (token swap, callback manipulation) — [viragt64.sys](../case-studies/viragt64-sys.md) (process termination) and [Truesight.sys](../case-studies/Truesight-sys.md) (handle duplication) attacks work regardless of HVCI status if the driver is not blocklisted
+- **Unblocklisted drivers**: Drivers like [NVDrv](../case-studies/NVDrv.md) (NVIDIA GPU) cannot be blocklisted without breaking display functionality, representing a gap in the HVCI BYOVD defense
+
+See [BYOVD Reference](../reference/byovd.md) for the full BYOVD landscape.
+
 ## Cross-References
 
 - [Kernel Data Protection (KDP)](kdp.md) -- builds on VBS to protect specific data structures

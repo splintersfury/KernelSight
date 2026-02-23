@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 31 CVEs across 18 unique drivers, with 16 exploited in the wild.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 52 CVEs across 39 unique drivers, with 29 exploited in the wild — including 21 third-party BYOVD driver case studies.
 
 ## CVE Index
 
@@ -41,6 +41,44 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [CVE-2022-37969](CVE-2022-37969.md) | `clfs.sys` | Buffer Overflow / Bounds Check | Yes | `10.0.22621.1` → `10.0.22621.521` |
 | [CVE-2022-21907](CVE-2022-21907.md) | `http.sys` | String Handling | No | `10.0.22621.1` → `10.0.22621.382` |
 | [CVE-2022-21882](CVE-2022-21882.md) | `win32kbase.sys` | Type Confusion | Yes | `10.0.22621.1` → `10.0.22621.382` |
+
+## Third-Party Drivers
+
+### Vendor Utility Drivers
+
+| CVE / ID | Driver | Vendor | Class | ITW | Status |
+|----------|--------|--------|-------|-----|--------|
+| [CVE-2021-21551](CVE-2021-21551.md) | `DBUtil_2_3.sys` | Dell | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2019-16098](CVE-2019-16098.md) | `RTCore64.sys` | MSI | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2018-19320](CVE-2018-19320.md) | `gdrv.sys` | Gigabyte | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2015-2291](CVE-2015-2291.md) | `iqvw64e.sys` | Intel | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2020-15368](CVE-2020-15368.md) | `HW.sys` | Marvin Test | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2022-3699](CVE-2022-3699.md) | `LenovoDiagnosticsDriver.sys` | Lenovo | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2019-18845](CVE-2019-18845.md) | Viper RGB driver | Patriot | Arbitrary R/W | No | Withdrawn |
+| [CVE-2019-8372](CVE-2019-8372.md) | LG LSB driver | LG | Arbitrary Write | No | Withdrawn |
+| [CVE-2023-41444](CVE-2023-41444.md) | `iREC.sys` | iREC | Arbitrary R/W | No | Still loadable |
+| [CVE-2025-45737](CVE-2025-45737.md) | `NeacController.sys` | NEAC | Arbitrary R/W | No | Still loadable |
+| [ATSZIO64.sys](ATSZIO64-sys.md) | `ATSZIO64.sys` | ASUS | Arbitrary R/W | Yes | Blocklisted |
+| [AsIO3.sys](AsIO3-sys.md) | `AsIO3.sys` | ASRock/ASUS | Arbitrary R/W | Yes | Blocklisted |
+
+### Performance & GPU Drivers
+
+| CVE / ID | Driver | Vendor | Class | ITW | Status |
+|----------|--------|--------|-------|-----|--------|
+| [CVE-2020-12928](CVE-2020-12928.md) | `AMDRyzenMasterDriver.sys` | AMD | Arbitrary R/W | No | Patched |
+| [CVE-2023-20598](CVE-2023-20598.md) | AMD chipset driver | AMD | Info Disclosure | No | Patched |
+| [CVE-2025-7771](CVE-2025-7771.md) | `ThrottleStop.sys` | ThrottleStop | MSR Write | Yes | Blocklisted |
+| [NVDrv](NVDrv.md) | `nvlddmkm.sys` | NVIDIA | GPU Memory R/W | No | Still loadable |
+
+### Anti-Cheat & Security Product Drivers
+
+| CVE / ID | Driver | Vendor | Class | ITW | Status |
+|----------|--------|--------|-------|-----|--------|
+| [Capcom.sys](Capcom-sys.md) | `Capcom.sys` | Capcom | Ring-0 Code Exec | Yes | Withdrawn / Blocklisted |
+| [echo_driver.sys](echo-driver-sys.md) | `echo_driver.sys` | Echo AC | Callback Manipulation | No | Still loadable |
+| [viragt64.sys](viragt64-sys.md) | `viragt64.sys` | TG Soft | Process Termination | Yes | Blocklisted |
+| [Truesight.sys](Truesight-sys.md) | `Truesight.sys` | Adlice | EDR Bypass | Yes | Blocklisted |
+| [amsdk.sys](amsdk-sys.md) | `amsdk.sys` | WatchDog | Process Termination | Yes | Blocklisted |
 
 ## By Driver
 
@@ -126,6 +164,90 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 
 - [CVE-2023-29336](CVE-2023-29336.md) — Win32k — use-after-free from unlocked nested menu object allows EoP
 
+### `DBUtil_2_3.sys`
+
+- [CVE-2021-21551](CVE-2021-21551.md) — Dell BIOS utility — arbitrary R/W via IOCTL
+
+### `RTCore64.sys`
+
+- [CVE-2019-16098](CVE-2019-16098.md) — MSI Afterburner — physical mem R/W, MSR, I/O port
+
+### `gdrv.sys`
+
+- [CVE-2018-19320](CVE-2018-19320.md) — Gigabyte — arbitrary kernel R/W, MSR access
+
+### `iqvw64e.sys`
+
+- [CVE-2015-2291](CVE-2015-2291.md) — Intel Ethernet diagnostics — arbitrary R/W via IOCTL
+
+### `HW.sys`
+
+- [CVE-2020-15368](CVE-2020-15368.md) — Marvin Test — physical memory R/W
+
+### `LenovoDiagnosticsDriver.sys`
+
+- [CVE-2022-3699](CVE-2022-3699.md) — Lenovo Diagnostics — arbitrary R/W
+
+### Viper RGB driver
+
+- [CVE-2019-18845](CVE-2019-18845.md) — Patriot — physical memory R/W
+
+### LG LSB driver
+
+- [CVE-2019-8372](CVE-2019-8372.md) — LG — arbitrary write
+
+### `iREC.sys`
+
+- [CVE-2023-41444](CVE-2023-41444.md) — iREC — arbitrary R/W
+
+### `NeacController.sys`
+
+- [CVE-2025-45737](CVE-2025-45737.md) — NEAC — arbitrary R/W
+
+### `ATSZIO64.sys`
+
+- [ATSZIO64.sys](ATSZIO64-sys.md) — ASUS — physical memory R/W
+
+### `AsIO3.sys`
+
+- [AsIO3.sys](AsIO3-sys.md) — ASRock/ASUS — physical mem R/W, SMM
+
+### `AMDRyzenMasterDriver.sys`
+
+- [CVE-2020-12928](CVE-2020-12928.md) — AMD Ryzen Master — arbitrary R/W via IOCTL
+
+### AMD chipset driver
+
+- [CVE-2023-20598](CVE-2023-20598.md) — AMD — info disclosure / MMIO
+
+### `ThrottleStop.sys`
+
+- [CVE-2025-7771](CVE-2025-7771.md) — ThrottleStop — MSR write / AV killer
+
+### `nvlddmkm.sys`
+
+- [NVDrv](NVDrv.md) — NVIDIA — GPU memory R/W
+
+### `Capcom.sys`
+
+- [Capcom.sys](Capcom-sys.md) — Capcom — ring-0 code exec, SMEP bypass
+
+### `echo_driver.sys`
+
+- [echo_driver.sys](echo-driver-sys.md) — Echo AC — kernel callback manipulation
+
+### `viragt64.sys`
+
+- [viragt64.sys](viragt64-sys.md) — TG Soft — process termination
+
+### `Truesight.sys`
+
+- [Truesight.sys](Truesight-sys.md) — Adlice RogueKiller — EDR bypass
+
+### `amsdk.sys`
+
+- [amsdk.sys](amsdk-sys.md) — WatchDog — process termination
+
 ## By Exploitation Status
 
 ### Exploited in the Wild
@@ -146,3 +268,16 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2025-21333](CVE-2025-21333.md) — `vsp.sys` — Hyper-V Virtual Service Provider — heap-based buffer overflow
 - [CVE-2025-24993](CVE-2025-24993.md) — `ntfs.sys` — NTFS — MFT metadata heap buffer overflow via crafted VHD allows RCE
 - [CVE-2025-29824](CVE-2025-29824.md) — `clfs.sys` — Common Log File System — elevation of privilege via log file metadata corruption
+- [CVE-2021-21551](CVE-2021-21551.md) — `DBUtil_2_3.sys` — Dell — arbitrary R/W via IOCTL
+- [CVE-2019-16098](CVE-2019-16098.md) — `RTCore64.sys` — MSI — physical mem R/W, MSR, I/O port
+- [CVE-2018-19320](CVE-2018-19320.md) — `gdrv.sys` — Gigabyte — arbitrary kernel R/W, MSR access
+- [CVE-2015-2291](CVE-2015-2291.md) — `iqvw64e.sys` — Intel — arbitrary R/W via IOCTL
+- [CVE-2020-15368](CVE-2020-15368.md) — `HW.sys` — Marvin Test — physical memory R/W
+- [CVE-2022-3699](CVE-2022-3699.md) — `LenovoDiagnosticsDriver.sys` — Lenovo — arbitrary R/W
+- [ATSZIO64.sys](ATSZIO64-sys.md) — `ATSZIO64.sys` — ASUS — physical memory R/W
+- [AsIO3.sys](AsIO3-sys.md) — `AsIO3.sys` — ASRock/ASUS — physical mem R/W, SMM
+- [CVE-2025-7771](CVE-2025-7771.md) — `ThrottleStop.sys` — ThrottleStop — MSR write / AV killer
+- [Capcom.sys](Capcom-sys.md) — `Capcom.sys` — Capcom — ring-0 code exec, SMEP bypass
+- [viragt64.sys](viragt64-sys.md) — `viragt64.sys` — TG Soft — process termination (Kasseika ransomware)
+- [Truesight.sys](Truesight-sys.md) — `Truesight.sys` — Adlice — EDR bypass
+- [amsdk.sys](amsdk-sys.md) — `amsdk.sys` — WatchDog — process termination (Silver Fox APT)

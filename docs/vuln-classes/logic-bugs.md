@@ -67,6 +67,7 @@ Logic bugs are also notable for their persistence. Because they are not detected
 | [CVE-2024-21338](../case-studies/CVE-2024-21338.md) | `appid.sys` | Logic flaw allows arbitrary kernel callback invocation from user mode |
 | [CVE-2023-28252](../case-studies/CVE-2023-28252.md) | `clfs.sys` | Logic error in base log record validation enabling controlled memory corruption |
 | [CVE-2023-28218](../case-studies/CVE-2023-28218.md) | `win32k.sys` | Missing privilege check in window management operation |
+| [Capcom.sys](../case-studies/Capcom-sys.md) | `Capcom.sys` | Intentional ring-0 code execution from user-supplied function pointer — the quintessential logic bug |
 
 ## AutoPiff Detection
 

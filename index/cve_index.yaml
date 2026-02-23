@@ -589,3 +589,321 @@ cves:
       - "added_struct_size_validation"
     case_study: "docs/case-studies/CVE-2025-24993.md"
 
+  # Third-Party BYOVD Drivers — Vendor Utility
+  - cve_id: "CVE-2021-21551"
+    driver: "DBUtil_2_3.sys"
+    vendor: "Dell"
+    description: "Dell BIOS utility — arbitrary kernel R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "2.3"
+    status: "blocklisted"
+    references:
+      writeup: "https://attackerkb.com/topics/zAHZGAFaQX/cve-2021-21551"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2021-21551.md"
+
+  - cve_id: "CVE-2019-16098"
+    driver: "RTCore64.sys"
+    vendor: "MSI"
+    description: "MSI Afterburner — physical mem R/W, MSR, I/O port via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "4.6.2"
+    status: "blocklisted"
+    references:
+      writeup: "https://swapcontext.blogspot.com/2020/01/unwinding-rtcore.html"
+      poc: "https://github.com/Barakat/CVE-2019-16098"
+    case_study: "docs/case-studies/CVE-2019-16098.md"
+
+  - cve_id: "CVE-2018-19320"
+    driver: "gdrv.sys"
+    vendor: "Gigabyte"
+    description: "Gigabyte — arbitrary kernel R/W and MSR access via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://seclists.org/fulldisclosure/2018/Dec/39"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2018-19320.md"
+
+  - cve_id: "CVE-2015-2291"
+    driver: "iqvw64e.sys"
+    vendor: "Intel"
+    description: "Intel Ethernet diagnostics — arbitrary R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "1.03.0.7"
+    status: "blocklisted"
+    references:
+      writeup: "https://www.exploit-db.com/exploits/36392"
+      poc: "https://www.exploit-db.com/exploits/36392"
+    case_study: "docs/case-studies/CVE-2015-2291.md"
+
+  - cve_id: "CVE-2020-15368"
+    driver: "HW.sys"
+    vendor: "Marvin Test Solutions"
+    description: "Marvin Test — physical memory R/W via unrestricted MmMapIoSpace"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "4.8.0"
+    status: "blocklisted"
+    references:
+      writeup: ""
+      poc: "https://github.com/stong/CVE-2020-15368"
+    case_study: "docs/case-studies/CVE-2020-15368.md"
+
+  - cve_id: "CVE-2022-3699"
+    driver: "LenovoDiagnosticsDriver.sys"
+    vendor: "Lenovo"
+    description: "Lenovo Diagnostics — arbitrary kernel R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "pre-4.0.0.0"
+    status: "blocklisted"
+    references:
+      writeup: ""
+      poc: "https://github.com/alfarom256/CVE-2022-3699"
+    case_study: "docs/case-studies/CVE-2022-3699.md"
+
+  - cve_id: "CVE-2019-18845"
+    driver: "Viper RGB driver"
+    vendor: "Patriot Memory"
+    description: "Patriot Viper RGB — physical memory R/W via unrestricted IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "1.0"
+    status: "withdrawn"
+    references:
+      writeup: "https://www.activecyber.us/activelabs/viper-rgb-driver-local-privilege-escalation-cve-2019-18845"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2019-18845.md"
+
+  - cve_id: "CVE-2019-8372"
+    driver: "LG LSB driver"
+    vendor: "LG Electronics"
+    description: "LG Device Manager — arbitrary kernel write via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "multiple"
+    status: "withdrawn"
+    references:
+      writeup: "http://www.jackson-t.ca/lg-driver-lpe.html"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2019-8372.md"
+
+  - cve_id: "CVE-2023-41444"
+    driver: "iREC.sys"
+    vendor: "iREC"
+    description: "iREC — arbitrary kernel R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "1.0.0.0"
+    status: "still_loadable"
+    references:
+      writeup: "https://blog.dru1d.ninja/windows-driver-exploit-development-irec-sys-a5eb45093945"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2023-41444.md"
+
+  - cve_id: "CVE-2025-45737"
+    driver: "NeacController.sys"
+    vendor: "NEAC"
+    description: "NEAC — arbitrary kernel R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "1.0.0.0"
+    status: "still_loadable"
+    references:
+      writeup: ""
+      poc: "https://github.com/smallzhong/NeacController"
+    case_study: "docs/case-studies/CVE-2025-45737.md"
+
+  - cve_id: "ATSZIO64-sys"
+    driver: "ATSZIO64.sys"
+    vendor: "ASUS"
+    description: "ASUS — physical memory R/W via unrestricted MmMapIoSpace"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://github.com/LimiQS/AsusDriversPrivEscala"
+      poc: "https://github.com/DOGSHITD/SciDetectorApp"
+    case_study: "docs/case-studies/ATSZIO64-sys.md"
+
+  - cve_id: "AsIO3-sys"
+    driver: "AsIO3.sys"
+    vendor: "ASRock/ASUS"
+    description: "ASRock/ASUS — physical mem R/W and potential SMM access"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://swapcontext.blogspot.com/2021/04/kdu-v11-release-and-bonus-asio3sys.html"
+      poc: ""
+    case_study: "docs/case-studies/AsIO3-sys.md"
+
+  # Third-Party BYOVD Drivers — Performance & GPU
+  - cve_id: "CVE-2020-12928"
+    driver: "AMDRyzenMasterDriver.sys"
+    vendor: "AMD"
+    description: "AMD Ryzen Master — arbitrary physical memory R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "pre-2.2.0.0"
+    status: "patched"
+    references:
+      writeup: "https://h0mbre.github.io/RyzenMaster_CVE/"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2020-12928.md"
+
+  - cve_id: "CVE-2023-20598"
+    driver: "AMD chipset driver"
+    vendor: "AMD"
+    description: "AMD chipset — information disclosure via MMIO register access"
+    vuln_class: "uninitialized-memory"
+    third_party: true
+    byovd: false
+    itw: false
+    abused_version: "pre-6.05.28.016"
+    status: "patched"
+    references:
+      writeup: "https://www.amd.com/en/resources/product-security/bulletin/amd-sb-6009.html"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2023-20598.md"
+
+  - cve_id: "CVE-2025-7771"
+    driver: "ThrottleStop.sys"
+    vendor: "ThrottleStop"
+    description: "ThrottleStop — MSR write primitive abused as AV/EDR killer"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "9.6"
+    status: "blocklisted"
+    references:
+      writeup: "https://securelist.com/av-killer-exploiting-throttlestop-sys/117026/"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2025-7771.md"
+
+  - cve_id: "NVDrv"
+    driver: "nvlddmkm.sys"
+    vendor: "NVIDIA"
+    description: "NVIDIA — GPU memory mapping exposes kernel R/W primitive"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "multiple"
+    status: "still_loadable"
+    references:
+      writeup: ""
+      poc: "https://github.com/zer0condition/NVDrv"
+    case_study: "docs/case-studies/NVDrv.md"
+
+  # Third-Party BYOVD Drivers — Anti-Cheat & Security
+  - cve_id: "Capcom-sys"
+    driver: "Capcom.sys"
+    vendor: "Capcom"
+    description: "Capcom anti-cheat — ring-0 code exec with SMEP bypass"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "1.0.0.4"
+    status: "blocklisted"
+    references:
+      writeup: "https://www.fuzzysecurity.com/tutorials/28.html"
+      poc: ""
+    case_study: "docs/case-studies/Capcom-sys.md"
+
+  - cve_id: "echo-driver-sys"
+    driver: "echo_driver.sys"
+    vendor: "Echo AC"
+    description: "Echo anti-cheat — kernel callback manipulation via IOCTL"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "1.0.0.0"
+    status: "still_loadable"
+    references:
+      writeup: ""
+      poc: "https://github.com/kite03/echoac-poc/"
+    case_study: "docs/case-studies/echo-driver-sys.md"
+
+  - cve_id: "viragt64-sys"
+    driver: "viragt64.sys"
+    vendor: "TG Soft"
+    description: "TG Soft VirIT — process termination IOCTL abused by Kasseika ransomware"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://www.trendmicro.com/en_us/research/24/a/kasseika-ransomware-deploys-byovd-attack-abuses-psexec.html"
+      poc: ""
+    case_study: "docs/case-studies/viragt64-sys.md"
+
+  - cve_id: "Truesight-sys"
+    driver: "Truesight.sys"
+    vendor: "Adlice"
+    description: "Adlice RogueKiller — EDR bypass via handle duplication and process termination"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "pre-3.4.0"
+    status: "blocklisted"
+    references:
+      writeup: "https://research.checkpoint.com/"
+      poc: ""
+    case_study: "docs/case-studies/Truesight-sys.md"
+
+  - cve_id: "amsdk-sys"
+    driver: "amsdk.sys"
+    vendor: "WatchDog Development"
+    description: "WatchDog — process termination abused by Silver Fox APT"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    abused_version: "multiple"
+    status: "blocklisted"
+    references:
+      writeup: "https://research.checkpoint.com/"
+      poc: ""
+    case_study: "docs/case-studies/amsdk-sys.md"
+

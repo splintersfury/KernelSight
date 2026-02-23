@@ -17,6 +17,11 @@ Some drivers intentionally expose IOCTLs for diagnostics, hardware access, or fi
 | CVE | Driver | Description |
 |-----|--------|-------------|
 | [CVE-2024-21338](../../case-studies/CVE-2024-21338.md) | `appid.sys` | IOCTL 0x22A018 missing access control |
+| [CVE-2021-21551](../../case-studies/CVE-2021-21551.md) | `DBUtil_2_3.sys` | Dell BIOS utility — 5 IOCTLs for kernel R/W |
+| [CVE-2019-16098](../../case-studies/CVE-2019-16098.md) | `RTCore64.sys` | MSI Afterburner — physical mem, MSR, I/O port |
+| [CVE-2018-19320](../../case-studies/CVE-2018-19320.md) | `gdrv.sys` | Gigabyte — kernel R/W and MSR access |
+| [CVE-2015-2291](../../case-studies/CVE-2015-2291.md) | `iqvw64e.sys` | Intel — physical and virtual memory R/W |
+| [CVE-2020-15368](../../case-studies/CVE-2020-15368.md) | `HW.sys` | Marvin Test — physical memory via MmMapIoSpace |
 
 ## AutoPiff Detection
 

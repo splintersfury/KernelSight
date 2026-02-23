@@ -67,6 +67,11 @@ BYOVD (Bring Your Own Vulnerable Driver) attacks have made this vulnerability cl
 | [CVE-2024-26229](../case-studies/CVE-2024-26229.md) | `csc.sys` | Missing access check enabling arbitrary IOCTL access |
 | [CVE-2024-35250](../case-studies/CVE-2024-35250.md) | `ks.sys` | Kernel streaming untrusted pointer dereference |
 | [CVE-2023-28252](../case-studies/CVE-2023-28252.md) | `clfs.sys` | Arbitrary write via corrupted log file base block |
+| [CVE-2021-21551](../case-studies/CVE-2021-21551.md) | `DBUtil_2_3.sys` | Direct IOCTL R/W — Dell BIOS utility driver |
+| [CVE-2019-16098](../case-studies/CVE-2019-16098.md) | `RTCore64.sys` | Physical memory R/W via MmMapIoSpace |
+| [CVE-2018-19320](../case-studies/CVE-2018-19320.md) | `gdrv.sys` | Physical memory R/W via MmMapIoSpace |
+| [CVE-2015-2291](../case-studies/CVE-2015-2291.md) | `iqvw64e.sys` | Direct IOCTL R/W — Intel diagnostics driver |
+| [CVE-2020-12928](../case-studies/CVE-2020-12928.md) | `AMDRyzenMasterDriver.sys` | Physical memory R/W via MmMapIoSpace |
 
 ## AutoPiff Detection
 

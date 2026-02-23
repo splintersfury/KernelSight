@@ -54,6 +54,9 @@ nav:
     - Core Kernel: driver-types/core-kernel.md
     - Security / Policy: driver-types/security-policy.md
     - Storage / Caching: driver-types/storage-caching.md
+    - Vendor Utility: driver-types/vendor-utility.md
+    - Performance & GPU: driver-types/performance-gpu.md
+    - Third-Party Security: driver-types/third-party-security.md
   - Surfaces:
     - attack-surfaces/index.md
     - IOCTL Handlers: attack-surfaces/ioctl-handlers.md
@@ -135,6 +138,27 @@ nav:
     - CVE-2022-37969: case-studies/CVE-2022-37969.md
     - CVE-2022-21907: case-studies/CVE-2022-21907.md
     - CVE-2022-21882: case-studies/CVE-2022-21882.md
+    - CVE-2021-21551: case-studies/CVE-2021-21551.md
+    - CVE-2019-16098: case-studies/CVE-2019-16098.md
+    - CVE-2018-19320: case-studies/CVE-2018-19320.md
+    - CVE-2015-2291: case-studies/CVE-2015-2291.md
+    - CVE-2020-15368: case-studies/CVE-2020-15368.md
+    - CVE-2022-3699: case-studies/CVE-2022-3699.md
+    - CVE-2019-18845: case-studies/CVE-2019-18845.md
+    - CVE-2019-8372: case-studies/CVE-2019-8372.md
+    - CVE-2023-41444: case-studies/CVE-2023-41444.md
+    - CVE-2025-45737: case-studies/CVE-2025-45737.md
+    - ATSZIO64.sys: case-studies/ATSZIO64-sys.md
+    - AsIO3.sys: case-studies/AsIO3-sys.md
+    - CVE-2020-12928: case-studies/CVE-2020-12928.md
+    - CVE-2023-20598: case-studies/CVE-2023-20598.md
+    - CVE-2025-7771: case-studies/CVE-2025-7771.md
+    - NVDrv: case-studies/NVDrv.md
+    - Capcom.sys: case-studies/Capcom-sys.md
+    - echo_driver.sys: case-studies/echo-driver-sys.md
+    - viragt64.sys: case-studies/viragt64-sys.md
+    - Truesight.sys: case-studies/Truesight-sys.md
+    - amsdk.sys: case-studies/amsdk-sys.md
   - Defenses:
     - mitigations/index.md
     - SMEP / SMAP: mitigations/smep-smap.md

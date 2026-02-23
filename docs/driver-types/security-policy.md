@@ -47,3 +47,6 @@ Security driver bugs are particularly impactful because:
 - They often provide **direct privilege escalation** without needing a memory corruption primitive
 - The Lazarus Group's use of CVE-2024-21338 shows nation-state interest in this attack surface
 - AppLocker IOCTL bugs give **admin-to-kernel** escalation, which is valuable for bypassing security software
+
+!!! note "Third-Party Security Drivers"
+    For third-party AV, EDR, anti-rootkit, and anti-cheat kernel drivers (Capcom.sys, viragt64.sys, Truesight.sys, etc.), see [Third-Party Security Drivers](third-party-security.md). This page covers only Microsoft's built-in security enforcement drivers.

@@ -66,3 +66,19 @@ AutoPiff detects IOCTL hardening patches with these rules:
 - `device_acl_hardening` -- Device object security descriptor or ACL hardened
 - `new_ioctl_handler` -- New IOCTL handler function detected (attack surface expansion rule)
 - `ioctl_output_buffer_zeroed` -- Output buffer zeroed before use to prevent kernel information disclosure
+
+### Third-Party IOCTL Examples
+
+Third-party vendor utility drivers are among the most exploited IOCTL-based attack surfaces. Unlike Microsoft inbox drivers where the vulnerability is a missing check, these drivers intentionally expose powerful IOCTLs:
+
+| Driver | Vendor | IOCTLs Exposed | Case Study |
+|--------|--------|---------------|------------|
+| `DBUtil_2_3.sys` | Dell | Physical/virtual memory R/W, MSR R/W | [CVE-2021-21551](../case-studies/CVE-2021-21551.md) |
+| `RTCore64.sys` | MSI | Physical memory R/W, MSR, I/O port | [CVE-2019-16098](../case-studies/CVE-2019-16098.md) |
+| `gdrv.sys` | Gigabyte | Kernel memory R/W, MSR | [CVE-2018-19320](../case-studies/CVE-2018-19320.md) |
+| `iqvw64e.sys` | Intel | Physical/virtual memory R/W | [CVE-2015-2291](../case-studies/CVE-2015-2291.md) |
+| `HW.sys` | Marvin Test | Physical memory R/W, I/O port | [CVE-2020-15368](../case-studies/CVE-2020-15368.md) |
+| `AMDRyzenMasterDriver.sys` | AMD | Physical memory R/W | [CVE-2020-12928](../case-studies/CVE-2020-12928.md) |
+| `Capcom.sys` | Capcom | Ring-0 code execution | [Capcom.sys](../case-studies/Capcom-sys.md) |
+
+See [Vendor Utility Drivers](../driver-types/vendor-utility.md) for the full category overview.
