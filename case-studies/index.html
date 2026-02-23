@@ -1,0 +1,6207 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Windows Kernel Driver Exploitation Knowledge Base">
+      
+      
+      
+        <link rel="canonical" href="https://splintersfury.github.io/KernelSight/case-studies/">
+      
+      
+        <link rel="prev" href="../primitives/exploitation/primitive-matrix/">
+      
+      
+        <link rel="next" href="clfs-deep-dive/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Case Studies - KernelSight</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <script>
+    (function() {
+      var m = location.pathname.match(
+        /\/(driver-types|attack-surfaces|vuln-classes|primitives|case-studies|mitigations|tooling|reference)\b/
+      );
+      var map = {
+        'driver-types': 'drivers',
+        'attack-surfaces': 'surfaces',
+        'vuln-classes': 'vulns',
+        'primitives': 'primitives',
+        'case-studies': 'cases',
+        'mitigations': 'mitigations',
+        'tooling': 'tooling',
+        'reference': 'tooling'
+      };
+      document.documentElement.setAttribute(
+        'data-ks-section', m ? map[m[1]] : 'home'
+      );
+    })();
+  </script>
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#case-studies" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="KernelSight" class="md-header__button md-logo" aria-label="KernelSight" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KernelSight
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Case Studies
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/splintersfury/KernelSight" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../driver-types/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Drivers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../attack-surfaces/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Surfaces
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../vuln-classes/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vulns
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../primitives/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Primitives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  CVEs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../mitigations/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Defenses
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tooling/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Tools
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="KernelSight" class="md-nav__button md-logo" aria-label="KernelSight" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    KernelSight
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/splintersfury/KernelSight" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../driver-types/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drivers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/filesystem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File System Drivers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/minifilter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File System Minifilters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/log-transaction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Log / Transaction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/network-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/kernel-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/win32k/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Win32k Subsystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/core-kernel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/security-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security / Policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/storage-caching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage / Caching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/vendor-utility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor Utility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/performance-gpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance & GPU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../driver-types/third-party-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Third-Party Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../attack-surfaces/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Surfaces
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Surfaces
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/ioctl-handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IOCTL Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/filesystem-irps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem IRPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/ndis-network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDIS / Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/pnp-power/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PnP & Power
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/wdf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WDF / KMDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/registry-callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registry Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/alpc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/shared-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attack-surfaces/wmi-etw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WMI / ETW
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../vuln-classes/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vulns
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vulns
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/buffer-overflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buffer Overflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/integer-overflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integer Overflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/type-confusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Type Confusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/toctou-double-fetch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TOCTOU / Double-Fetch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/use-after-free/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use-After-Free
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/race-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Race Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/uninitialized-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uninitialized Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/arbitrary-rw-primitives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arbitrary R/W Primitives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/null-deref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NULL Deref
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vuln-classes/logic-bugs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logic Bugs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../primitives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Primitives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arbitrary R/W
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Arbitrary R/W
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/direct-ioctl-rw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Direct IOCTL R/W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/pool-overflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pool Overflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/mdl-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDL Mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/arb-increment-decrement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arb Increment/Decrement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/write-what-where/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Write-What-Where
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/registry-based/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registry-Based
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/dma-mmio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DMA / MMIO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/pipe-attributes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipe Attributes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/token-manipulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Token Manipulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/arw/pte-manipulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PTE Manipulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exploitation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Exploitation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/pool-spray-feng-shui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pool Spray / Feng Shui
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/named-pipe-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Named Pipe Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/io-ring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O Ring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/wnf-state-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WNF State Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/palette-bitmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Palette / Bitmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/kuser-shared-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KUSER_SHARED_DATA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/previous-mode-manipulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PreviousMode Manipulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/token-swapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Token Swapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/acl-sd-manipulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACL / SD Manipulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../primitives/exploitation/primitive-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitive Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./" class="md-nav__link md-nav__link--active">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVEs
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link md-nav__link--active" for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CVEs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="clfs-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLFS Deep-Dive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-29824/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-29824
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-24993/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-24993
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-24985/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-24985
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-21333/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-21333
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-49138/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-49138
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-49114/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-49114
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38256/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38256
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38238/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38238
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38193/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38193
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38106/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38106
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38063/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38063
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-38054/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-38054
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-35250/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-35250
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-30089/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-30089
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-30088/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-30088
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-30085/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-30085
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-26229/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-26229
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-21338/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-21338
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2024-21302/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2024-21302
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-36802/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-36802
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-36424/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-36424
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-36036/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-36036
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-32019/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-32019
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-29360/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-29360
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-29336/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-29336
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-28252/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-28252
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-28218/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-28218
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-21768/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-21768
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2022-37969/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2022-37969
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2022-21907/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2022-21907
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2022-21882/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2022-21882
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2021-21551/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2021-21551
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2019-16098/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2019-16098
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2018-19320/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2018-19320
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2015-2291/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2015-2291
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2020-15368/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2020-15368
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2022-3699/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2022-3699
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2019-18845/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2019-18845
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2019-8372/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2019-8372
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-41444/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-41444
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-45737/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-45737
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ATSZIO64-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ATSZIO64.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="AsIO3-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AsIO3.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2020-12928/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2020-12928
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-20598/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-20598
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2025-7771/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2025-7771
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="NVDrv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVDrv
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Capcom-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capcom.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="echo-driver-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    echo_driver.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="viragt64-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    viragt64.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Truesight-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Truesight.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="amsdk-sys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    amsdk.sys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-1048/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-1048
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CVE-2023-1676/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVE-2023-1676
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../mitigations/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defenses
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Defenses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/smep-smap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SMEP / SMAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/kcfg-kcet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    kCFG / kCET
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/vbs-hvci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VBS / HVCI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/kdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KDP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/pool-hardening/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pool Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/secure-pool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Secure Pool
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/acg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/kaslr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KASLR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mitigations/kaslr-bypasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KASLR Bypasses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../tooling/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/static-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Static Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/fuzzing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fuzzing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/patch-diffing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patch Diffing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/autopiff-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoPiff Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/byovd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BYOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cve-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CVE Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#third-party-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Third-Party Drivers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Third-Party Drivers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vendor-utility-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vendor Utility Drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-gpu-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance &amp; GPU Drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anti-cheat-security-product-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-Cheat &amp; Security Product Drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#by-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        By Driver
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="By Driver">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#afdsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        afd.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#appidsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        appid.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cldfltsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cldflt.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clfssys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clfs.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cscsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        csc.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fastfatsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fastfat.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#httpsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        http.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kssys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ks.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ksthunksys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ksthunk.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mskssrvsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mskssrv.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntfssys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ntfs.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntoskrnlexe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ntoskrnl.exe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vspsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vsp.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpipsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tcpip.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#win32ksys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        win32k.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#win32kbasesys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        win32kbase.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#win32kfullsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        win32kfull.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dbutil_2_3sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DBUtil_2_3.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rtcore64sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RTCore64.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gdrvsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gdrv.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iqvw64esys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iqvw64e.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hwsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HW.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lenovodiagnosticsdriversys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LenovoDiagnosticsDriver.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viper-rgb-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viper RGB driver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lg-lsb-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LG LSB driver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#irecsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iREC.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neaccontrollersys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NeacController.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atszio64sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ATSZIO64.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asio3sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AsIO3.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amdryzenmasterdriversys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMDRyzenMasterDriver.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amd-chipset-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMD chipset driver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#throttlestopsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ThrottleStop.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nvlddmkmsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nvlddmkm.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capcomsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capcom.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#echo_driversys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        echo_driver.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viragt64sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viragt64.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#truesightsys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Truesight.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amsdksys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        amsdk.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#winring0x64sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WinRing0x64.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mydrivers64sys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mydrivers64.sys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#by-exploitation-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        By Exploitation Status
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="By Exploitation Status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exploited-in-the-wild" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploited in the Wild
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="case-studies">Case Studies</h1>
+<div class="ks-pipeline-pos">
+  Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
+</div>
+
+<p>Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 54 CVEs across 41 unique drivers, with 30 exploited in the wild — including 23 third-party BYOVD driver case studies.</p>
+<h2 id="cve-index">CVE Index</h2>
+<table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>Driver</th>
+<th>Class</th>
+<th>ITW</th>
+<th>Build (Vuln → Fix)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="CVE-2025-29824/">CVE-2025-29824</a></td>
+<td><code>clfs.sys</code></td>
+<td>Use-After-Free / Logic Bug</td>
+<td>Yes</td>
+<td><code>10.0.26100.3476</code> → <code>10.0.26100.3775</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2025-24993/">CVE-2025-24993</a></td>
+<td><code>ntfs.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>Yes</td>
+<td><code>10.0.22621.4830</code> → <code>10.0.22621.4890</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2025-24985/">CVE-2025-24985</a></td>
+<td><code>fastfat.sys</code></td>
+<td>Integer Overflow</td>
+<td>Yes</td>
+<td><code>10.0.22621.4830</code> → <code>10.0.22621.5037</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2025-21333/">CVE-2025-21333</a></td>
+<td><code>vsp.sys</code></td>
+<td>Buffer Overflow</td>
+<td>Yes</td>
+<td><code>10.0.26100.2605</code> → <code>10.0.26100.2894</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-49138/">CVE-2024-49138</a></td>
+<td><code>clfs.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>Yes</td>
+<td><code>10.0.22621.4541</code> → <code>10.0.22621.4601</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-49114/">CVE-2024-49114</a></td>
+<td><code>cldflt.sys</code></td>
+<td>Buffer Overflow</td>
+<td>No</td>
+<td><code>10.0.22621.4460</code> → <code>10.0.22621.4602</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38256/">CVE-2024-38256</a></td>
+<td><code>win32k.sys</code></td>
+<td>Information Disclosure</td>
+<td>No</td>
+<td><code>10.0.22621.3958</code> → <code>10.0.22621.4169</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38238/">CVE-2024-38238</a></td>
+<td><code>ksthunk.sys</code></td>
+<td>MDL Handling</td>
+<td>No</td>
+<td><code>10.0.22621.4036</code> → <code>10.0.22621.4169</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38193/">CVE-2024-38193</a></td>
+<td><code>afd.sys</code></td>
+<td>Use-After-Free / Lifetime</td>
+<td>Yes</td>
+<td><code>10.0.22621.3672</code> → <code>10.0.22621.4036</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38106/">CVE-2024-38106</a></td>
+<td><code>ntoskrnl.exe</code></td>
+<td>Race Condition / TOCTOU</td>
+<td>Yes</td>
+<td><code>10.0.22621.3958</code> → <code>10.0.22621.4169</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38063/">CVE-2024-38063</a></td>
+<td><code>tcpip.sys</code></td>
+<td>Integer Overflow</td>
+<td>No</td>
+<td><code>10.0.22621.3958</code> → <code>10.0.22621.4036</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-38054/">CVE-2024-38054</a></td>
+<td><code>ksthunk.sys</code></td>
+<td>IOCTL Hardening</td>
+<td>No</td>
+<td><code>10.0.22621.3733</code> → <code>10.0.22621.3880</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-35250/">CVE-2024-35250</a></td>
+<td><code>ks.sys</code></td>
+<td>IOCTL Hardening</td>
+<td>Yes</td>
+<td><code>10.0.22621.3672</code> → <code>10.0.22621.3733</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-30089/">CVE-2024-30089</a></td>
+<td><code>mskssrv.sys</code></td>
+<td>Use-After-Free / Lifetime</td>
+<td>No</td>
+<td><code>10.0.22621.2506</code> → <code>10.0.22621.3733</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-30088/">CVE-2024-30088</a></td>
+<td><code>ntoskrnl.exe</code></td>
+<td>Race Condition / TOCTOU</td>
+<td>Yes</td>
+<td><code>10.0.22621.3672</code> → <code>10.0.22621.3733</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-30085/">CVE-2024-30085</a></td>
+<td><code>cldflt.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>No</td>
+<td><code>10.0.22621.3672</code> → <code>10.0.22621.3733</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-26229/">CVE-2024-26229</a></td>
+<td><code>csc.sys</code></td>
+<td>Authorization / Access Check</td>
+<td>No</td>
+<td><code>10.0.22621.1</code> → <code>10.0.22621.3447</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-21338/">CVE-2024-21338</a></td>
+<td><code>appid.sys</code></td>
+<td>IOCTL Hardening</td>
+<td>Yes</td>
+<td><code>10.0.22621.2506</code> → <code>10.0.22621.3155</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2024-21302/">CVE-2024-21302</a></td>
+<td><code>ntoskrnl.exe</code></td>
+<td>State Hardening</td>
+<td>No</td>
+<td><code>10.0.22621.3958</code> → <code>10.0.22621.4169</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-36802/">CVE-2023-36802</a></td>
+<td><code>mskssrv.sys</code></td>
+<td>Type Confusion</td>
+<td>Yes</td>
+<td><code>10.0.22621.1848</code> → <code>10.0.22621.2283</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-36424/">CVE-2023-36424</a></td>
+<td><code>clfs.sys</code></td>
+<td>Pool Hardening</td>
+<td>No</td>
+<td><code>10.0.22621.2506</code> → <code>10.0.22621.2715</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-36036/">CVE-2023-36036</a></td>
+<td><code>cldflt.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>Yes</td>
+<td><code>10.0.22621.2506</code> → <code>10.0.22621.2715</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-32019/">CVE-2023-32019</a></td>
+<td><code>ntoskrnl.exe</code></td>
+<td>Information Disclosure</td>
+<td>No</td>
+<td><code>10.0.22621.1702</code> → <code>10.0.22621.1848</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-29360/">CVE-2023-29360</a></td>
+<td><code>mskssrv.sys</code></td>
+<td>MDL Handling</td>
+<td>No</td>
+<td><code>10.0.22621.1702</code> → <code>10.0.22621.1848</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-29336/">CVE-2023-29336</a></td>
+<td><code>win32kfull.sys</code></td>
+<td>Object Management</td>
+<td>Yes</td>
+<td><code>10.0.22621.1555</code> → <code>10.0.22621.1635</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-28252/">CVE-2023-28252</a></td>
+<td><code>clfs.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>Yes</td>
+<td><code>10.0.22621.1265</code> → <code>10.0.22621.1555</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-28218/">CVE-2023-28218</a></td>
+<td><code>afd.sys</code></td>
+<td>Integer Overflow</td>
+<td>No</td>
+<td><code>10.0.22621.1344</code> → <code>10.0.22621.1555</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2023-21768/">CVE-2023-21768</a></td>
+<td><code>afd.sys</code></td>
+<td>User Boundary Validation</td>
+<td>No</td>
+<td><code>10.0.22621.608</code> → <code>10.0.22621.1105</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2022-37969/">CVE-2022-37969</a></td>
+<td><code>clfs.sys</code></td>
+<td>Buffer Overflow / Bounds Check</td>
+<td>Yes</td>
+<td><code>10.0.22621.1</code> → <code>10.0.22621.521</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2022-21907/">CVE-2022-21907</a></td>
+<td><code>http.sys</code></td>
+<td>String Handling</td>
+<td>No</td>
+<td><code>10.0.22621.1</code> → <code>10.0.22621.382</code></td>
+</tr>
+<tr>
+<td><a href="CVE-2022-21882/">CVE-2022-21882</a></td>
+<td><code>win32kbase.sys</code></td>
+<td>Type Confusion</td>
+<td>Yes</td>
+<td><code>10.0.22621.1</code> → <code>10.0.22621.382</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="third-party-drivers">Third-Party Drivers</h2>
+<h3 id="vendor-utility-drivers">Vendor Utility Drivers</h3>
+<table>
+<thead>
+<tr>
+<th>CVE / ID</th>
+<th>Driver</th>
+<th>Vendor</th>
+<th>Class</th>
+<th>ITW</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="CVE-2021-21551/">CVE-2021-21551</a></td>
+<td><code>DBUtil_2_3.sys</code></td>
+<td>Dell</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2019-16098/">CVE-2019-16098</a></td>
+<td><code>RTCore64.sys</code></td>
+<td>MSI</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2018-19320/">CVE-2018-19320</a></td>
+<td><code>gdrv.sys</code></td>
+<td>Gigabyte</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2015-2291/">CVE-2015-2291</a></td>
+<td><code>iqvw64e.sys</code></td>
+<td>Intel</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2020-15368/">CVE-2020-15368</a></td>
+<td><code>HW.sys</code></td>
+<td>Marvin Test</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2022-3699/">CVE-2022-3699</a></td>
+<td><code>LenovoDiagnosticsDriver.sys</code></td>
+<td>Lenovo</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2019-18845/">CVE-2019-18845</a></td>
+<td>Viper RGB driver</td>
+<td>Patriot</td>
+<td>Arbitrary R/W</td>
+<td>No</td>
+<td>Withdrawn</td>
+</tr>
+<tr>
+<td><a href="CVE-2019-8372/">CVE-2019-8372</a></td>
+<td>LG LSB driver</td>
+<td>LG</td>
+<td>Arbitrary Write</td>
+<td>No</td>
+<td>Withdrawn</td>
+</tr>
+<tr>
+<td><a href="CVE-2023-41444/">CVE-2023-41444</a></td>
+<td><code>iREC.sys</code></td>
+<td>iREC</td>
+<td>Arbitrary R/W</td>
+<td>No</td>
+<td>Still loadable</td>
+</tr>
+<tr>
+<td><a href="CVE-2025-45737/">CVE-2025-45737</a></td>
+<td><code>NeacController.sys</code></td>
+<td>NEAC</td>
+<td>Arbitrary R/W</td>
+<td>No</td>
+<td>Still loadable</td>
+</tr>
+<tr>
+<td><a href="ATSZIO64-sys/">ATSZIO64.sys</a></td>
+<td><code>ATSZIO64.sys</code></td>
+<td>ASUS</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="AsIO3-sys/">AsIO3.sys</a></td>
+<td><code>AsIO3.sys</code></td>
+<td>ASRock/ASUS</td>
+<td>Arbitrary R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2023-1048/">CVE-2023-1048</a></td>
+<td><code>WinRing0x64.sys</code></td>
+<td>OpenLibSys / TechPowerUp / Razer / many</td>
+<td>MSR Write / Phys Mem R/W</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="CVE-2023-1676/">CVE-2023-1676</a></td>
+<td><code>mydrivers64.sys</code></td>
+<td>DriverGenius</td>
+<td>MSR Write / Phys Mem R/W</td>
+<td>No</td>
+<td>Still loadable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="performance-gpu-drivers">Performance &amp; GPU Drivers</h3>
+<table>
+<thead>
+<tr>
+<th>CVE / ID</th>
+<th>Driver</th>
+<th>Vendor</th>
+<th>Class</th>
+<th>ITW</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="CVE-2020-12928/">CVE-2020-12928</a></td>
+<td><code>AMDRyzenMasterDriver.sys</code></td>
+<td>AMD</td>
+<td>Arbitrary R/W</td>
+<td>No</td>
+<td>Patched</td>
+</tr>
+<tr>
+<td><a href="CVE-2023-20598/">CVE-2023-20598</a></td>
+<td>AMD chipset driver</td>
+<td>AMD</td>
+<td>Info Disclosure</td>
+<td>No</td>
+<td>Patched</td>
+</tr>
+<tr>
+<td><a href="CVE-2025-7771/">CVE-2025-7771</a></td>
+<td><code>ThrottleStop.sys</code></td>
+<td>ThrottleStop</td>
+<td>MSR Write</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="NVDrv/">NVDrv</a></td>
+<td><code>nvlddmkm.sys</code></td>
+<td>NVIDIA</td>
+<td>GPU Memory R/W</td>
+<td>No</td>
+<td>Still loadable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="anti-cheat-security-product-drivers">Anti-Cheat &amp; Security Product Drivers</h3>
+<table>
+<thead>
+<tr>
+<th>CVE / ID</th>
+<th>Driver</th>
+<th>Vendor</th>
+<th>Class</th>
+<th>ITW</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Capcom-sys/">Capcom.sys</a></td>
+<td><code>Capcom.sys</code></td>
+<td>Capcom</td>
+<td>Ring-0 Code Exec</td>
+<td>Yes</td>
+<td>Withdrawn / Blocklisted</td>
+</tr>
+<tr>
+<td><a href="echo-driver-sys/">echo_driver.sys</a></td>
+<td><code>echo_driver.sys</code></td>
+<td>Echo AC</td>
+<td>Callback Manipulation</td>
+<td>No</td>
+<td>Still loadable</td>
+</tr>
+<tr>
+<td><a href="viragt64-sys/">viragt64.sys</a></td>
+<td><code>viragt64.sys</code></td>
+<td>TG Soft</td>
+<td>Process Termination</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="Truesight-sys/">Truesight.sys</a></td>
+<td><code>Truesight.sys</code></td>
+<td>Adlice</td>
+<td>EDR Bypass</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+<tr>
+<td><a href="amsdk-sys/">amsdk.sys</a></td>
+<td><code>amsdk.sys</code></td>
+<td>WatchDog</td>
+<td>Process Termination</td>
+<td>Yes</td>
+<td>Blocklisted</td>
+</tr>
+</tbody>
+</table>
+<h2 id="by-driver">By Driver</h2>
+<h3 id="afdsys"><code>afd.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-21768/">CVE-2023-21768</a> — AFD WinSock — missing ProbeForWrite allows kernel write-what-where via IO ring</li>
+<li><a href="CVE-2023-28218/">CVE-2023-28218</a> — AFD WinSock — integer overflow in AfdCopyCMSGBuffer allows EoP</li>
+<li><a href="CVE-2024-38193/">CVE-2024-38193</a> — AFD — use-after-free race on Registered I/O buffers allows EoP</li>
+</ul>
+<h3 id="appidsys"><code>appid.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-21338/">CVE-2024-21338</a> — AppLocker — IOCTL 0x22A018 missing access control allows kernel code execution</li>
+</ul>
+<h3 id="cldfltsys"><code>cldflt.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-36036/">CVE-2023-36036</a> — Cloud Files Mini Filter — heap overflow via crafted reparse data</li>
+<li><a href="CVE-2024-30085/">CVE-2024-30085</a> — Cloud Files Mini Filter — missing size check before memcpy leads to heap overflow</li>
+<li><a href="CVE-2024-49114/">CVE-2024-49114</a> — Cloud Files Mini-Filter — elevation of privilege via buffer overflow</li>
+</ul>
+<h3 id="clfssys"><code>clfs.sys</code></h3>
+<ul>
+<li><a href="CVE-2022-37969/">CVE-2022-37969</a> — Common Log File System — SignaturesOffset OOB write via corrupted cbSymbolZone</li>
+<li><a href="CVE-2023-28252/">CVE-2023-28252</a> — Common Log File System — OOB write via corrupted base log offset</li>
+<li><a href="CVE-2023-36424/">CVE-2023-36424</a> — Common Log File System — pool overflow from unvalidated reparse data</li>
+<li><a href="CVE-2024-49138/">CVE-2024-49138</a> — Common Log File System — heap overflow in LoadContainerQ allows EoP</li>
+<li><a href="CVE-2025-29824/">CVE-2025-29824</a> — Common Log File System — elevation of privilege via log file metadata corruption</li>
+</ul>
+<h3 id="cscsys"><code>csc.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-26229/">CVE-2024-26229</a> — Client-Side Caching — missing access check allows EoP</li>
+</ul>
+<h3 id="fastfatsys"><code>fastfat.sys</code></h3>
+<ul>
+<li><a href="CVE-2025-24985/">CVE-2025-24985</a> — FAT File System — cluster count overflow in FAT bitmap allocation allows RCE</li>
+</ul>
+<h3 id="httpsys"><code>http.sys</code></h3>
+<ul>
+<li><a href="CVE-2022-21907/">CVE-2022-21907</a> — HTTP Protocol Stack — uninitialized tracker struct via crafted HTTP headers allows RCE</li>
+</ul>
+<h3 id="kssys"><code>ks.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-35250/">CVE-2024-35250</a> — Kernel Streaming — untrusted pointer dereference in IOCTL dispatch allows EoP</li>
+</ul>
+<h3 id="ksthunksys"><code>ksthunk.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-38054/">CVE-2024-38054</a> — Kernel Streaming WOW64 Thunk — integer overflow in KSSTREAM_HEADER thunking allows EoP</li>
+<li><a href="CVE-2024-38238/">CVE-2024-38238</a> — Kernel Streaming WOW64 Thunk — MmMapLockedPages without MmProbeAndLockPages in frame handling</li>
+</ul>
+<h3 id="mskssrvsys"><code>mskssrv.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-29360/">CVE-2023-29360</a> — Kernel Streaming Server — MmProbeAndLockPages called with KernelMode on user MDL</li>
+<li><a href="CVE-2023-36802/">CVE-2023-36802</a> — Kernel Streaming Server — FsContextReg/FsStreamReg object type confusion leads to EoP</li>
+<li><a href="CVE-2024-30089/">CVE-2024-30089</a> — Kernel Streaming Server — ref-count logic error causes use-after-free EoP</li>
+</ul>
+<h3 id="ntfssys"><code>ntfs.sys</code></h3>
+<ul>
+<li><a href="CVE-2025-24993/">CVE-2025-24993</a> — NTFS — MFT metadata heap buffer overflow via crafted VHD allows RCE</li>
+</ul>
+<h3 id="ntoskrnlexe"><code>ntoskrnl.exe</code></h3>
+<ul>
+<li><a href="CVE-2023-32019/">CVE-2023-32019</a> — NT Kernel — kernel heap memory leak to user process via thread info query</li>
+<li><a href="CVE-2024-21302/">CVE-2024-21302</a> — NT Kernel — secure kernel version downgrade bypass via unvalidated version state</li>
+<li><a href="CVE-2024-30088/">CVE-2024-30088</a> — NT Kernel — TOCTOU race in AuthzBasepCopyoutInternalSecurityAttributes</li>
+<li><a href="CVE-2024-38106/">CVE-2024-38106</a> — NT Kernel — missing lock around VslpEnterIumSecureMode causes race condition EoP</li>
+</ul>
+<h3 id="vspsys"><code>vsp.sys</code></h3>
+<ul>
+<li><a href="CVE-2025-21333/">CVE-2025-21333</a> — Hyper-V Virtual Service Provider — heap-based buffer overflow</li>
+</ul>
+<h3 id="tcpipsys"><code>tcpip.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-38063/">CVE-2024-38063</a> — TCP/IP stack — integer underflow in IPv6 packet reassembly allows RCE</li>
+</ul>
+<h3 id="win32ksys"><code>win32k.sys</code></h3>
+<ul>
+<li><a href="CVE-2024-38256/">CVE-2024-38256</a> — Win32k — uninitialized resource usage leaks kernel memory to user mode</li>
+</ul>
+<h3 id="win32kbasesys"><code>win32kbase.sys</code></h3>
+<ul>
+<li><a href="CVE-2022-21882/">CVE-2022-21882</a> — Win32k — ConsoleWindow flag misinterprets WndExtra causing type confusion EoP</li>
+</ul>
+<h3 id="win32kfullsys"><code>win32kfull.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-29336/">CVE-2023-29336</a> — Win32k — use-after-free from unlocked nested menu object allows EoP</li>
+</ul>
+<h3 id="dbutil_2_3sys"><code>DBUtil_2_3.sys</code></h3>
+<ul>
+<li><a href="CVE-2021-21551/">CVE-2021-21551</a> — Dell BIOS utility — arbitrary R/W via IOCTL</li>
+</ul>
+<h3 id="rtcore64sys"><code>RTCore64.sys</code></h3>
+<ul>
+<li><a href="CVE-2019-16098/">CVE-2019-16098</a> — MSI Afterburner — physical mem R/W, MSR, I/O port</li>
+</ul>
+<h3 id="gdrvsys"><code>gdrv.sys</code></h3>
+<ul>
+<li><a href="CVE-2018-19320/">CVE-2018-19320</a> — Gigabyte — arbitrary kernel R/W, MSR access</li>
+</ul>
+<h3 id="iqvw64esys"><code>iqvw64e.sys</code></h3>
+<ul>
+<li><a href="CVE-2015-2291/">CVE-2015-2291</a> — Intel Ethernet diagnostics — arbitrary R/W via IOCTL</li>
+</ul>
+<h3 id="hwsys"><code>HW.sys</code></h3>
+<ul>
+<li><a href="CVE-2020-15368/">CVE-2020-15368</a> — Marvin Test — physical memory R/W</li>
+</ul>
+<h3 id="lenovodiagnosticsdriversys"><code>LenovoDiagnosticsDriver.sys</code></h3>
+<ul>
+<li><a href="CVE-2022-3699/">CVE-2022-3699</a> — Lenovo Diagnostics — arbitrary R/W</li>
+</ul>
+<h3 id="viper-rgb-driver">Viper RGB driver</h3>
+<ul>
+<li><a href="CVE-2019-18845/">CVE-2019-18845</a> — Patriot — physical memory R/W</li>
+</ul>
+<h3 id="lg-lsb-driver">LG LSB driver</h3>
+<ul>
+<li><a href="CVE-2019-8372/">CVE-2019-8372</a> — LG — arbitrary write</li>
+</ul>
+<h3 id="irecsys"><code>iREC.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-41444/">CVE-2023-41444</a> — iREC — arbitrary R/W</li>
+</ul>
+<h3 id="neaccontrollersys"><code>NeacController.sys</code></h3>
+<ul>
+<li><a href="CVE-2025-45737/">CVE-2025-45737</a> — NEAC — arbitrary R/W</li>
+</ul>
+<h3 id="atszio64sys"><code>ATSZIO64.sys</code></h3>
+<ul>
+<li><a href="ATSZIO64-sys/">ATSZIO64.sys</a> — ASUS — physical memory R/W</li>
+</ul>
+<h3 id="asio3sys"><code>AsIO3.sys</code></h3>
+<ul>
+<li><a href="AsIO3-sys/">AsIO3.sys</a> — ASRock/ASUS — physical mem R/W, SMM</li>
+</ul>
+<h3 id="amdryzenmasterdriversys"><code>AMDRyzenMasterDriver.sys</code></h3>
+<ul>
+<li><a href="CVE-2020-12928/">CVE-2020-12928</a> — AMD Ryzen Master — arbitrary R/W via IOCTL</li>
+</ul>
+<h3 id="amd-chipset-driver">AMD chipset driver</h3>
+<ul>
+<li><a href="CVE-2023-20598/">CVE-2023-20598</a> — AMD — info disclosure / MMIO</li>
+</ul>
+<h3 id="throttlestopsys"><code>ThrottleStop.sys</code></h3>
+<ul>
+<li><a href="CVE-2025-7771/">CVE-2025-7771</a> — ThrottleStop — MSR write / AV killer</li>
+</ul>
+<h3 id="nvlddmkmsys"><code>nvlddmkm.sys</code></h3>
+<ul>
+<li><a href="NVDrv/">NVDrv</a> — NVIDIA — GPU memory R/W</li>
+</ul>
+<h3 id="capcomsys"><code>Capcom.sys</code></h3>
+<ul>
+<li><a href="Capcom-sys/">Capcom.sys</a> — Capcom — ring-0 code exec, SMEP bypass</li>
+</ul>
+<h3 id="echo_driversys"><code>echo_driver.sys</code></h3>
+<ul>
+<li><a href="echo-driver-sys/">echo_driver.sys</a> — Echo AC — kernel callback manipulation</li>
+</ul>
+<h3 id="viragt64sys"><code>viragt64.sys</code></h3>
+<ul>
+<li><a href="viragt64-sys/">viragt64.sys</a> — TG Soft — process termination</li>
+</ul>
+<h3 id="truesightsys"><code>Truesight.sys</code></h3>
+<ul>
+<li><a href="Truesight-sys/">Truesight.sys</a> — Adlice RogueKiller — EDR bypass</li>
+</ul>
+<h3 id="amsdksys"><code>amsdk.sys</code></h3>
+<ul>
+<li><a href="amsdk-sys/">amsdk.sys</a> — WatchDog — process termination</li>
+</ul>
+<h3 id="winring0x64sys"><code>WinRing0x64.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-1048/">CVE-2023-1048</a> — OpenLibSys — MSR write, physical memory R/W, I/O port access</li>
+</ul>
+<h3 id="mydrivers64sys"><code>mydrivers64.sys</code></h3>
+<ul>
+<li><a href="CVE-2023-1676/">CVE-2023-1676</a> — DriverGenius — MSR write (0x9C402088), physical memory R/W (0x9C406104/0x9C40A108)</li>
+</ul>
+<h2 id="by-exploitation-status">By Exploitation Status</h2>
+<h3 id="exploited-in-the-wild">Exploited in the Wild</h3>
+<ul>
+<li><a href="CVE-2022-21882/">CVE-2022-21882</a> — <code>win32kbase.sys</code> — Win32k — ConsoleWindow flag misinterprets WndExtra causing type confusion EoP</li>
+<li><a href="CVE-2022-37969/">CVE-2022-37969</a> — <code>clfs.sys</code> — Common Log File System — SignaturesOffset OOB write via corrupted cbSymbolZone</li>
+<li><a href="CVE-2023-28252/">CVE-2023-28252</a> — <code>clfs.sys</code> — Common Log File System — OOB write via corrupted base log offset</li>
+<li><a href="CVE-2023-29336/">CVE-2023-29336</a> — <code>win32kfull.sys</code> — Win32k — use-after-free from unlocked nested menu object allows EoP</li>
+<li><a href="CVE-2023-36036/">CVE-2023-36036</a> — <code>cldflt.sys</code> — Cloud Files Mini Filter — heap overflow via crafted reparse data</li>
+<li><a href="CVE-2023-36802/">CVE-2023-36802</a> — <code>mskssrv.sys</code> — Kernel Streaming Server — FsContextReg/FsStreamReg object type confusion leads to EoP</li>
+<li><a href="CVE-2024-21338/">CVE-2024-21338</a> — <code>appid.sys</code> — AppLocker — IOCTL 0x22A018 missing access control allows kernel code execution</li>
+<li><a href="CVE-2024-30088/">CVE-2024-30088</a> — <code>ntoskrnl.exe</code> — NT Kernel — TOCTOU race in AuthzBasepCopyoutInternalSecurityAttributes</li>
+<li><a href="CVE-2024-35250/">CVE-2024-35250</a> — <code>ks.sys</code> — Kernel Streaming — untrusted pointer dereference in IOCTL dispatch allows EoP</li>
+<li><a href="CVE-2024-38106/">CVE-2024-38106</a> — <code>ntoskrnl.exe</code> — NT Kernel — missing lock around VslpEnterIumSecureMode causes race condition EoP</li>
+<li><a href="CVE-2024-38193/">CVE-2024-38193</a> — <code>afd.sys</code> — AFD — use-after-free race on Registered I/O buffers allows EoP</li>
+<li><a href="CVE-2024-49138/">CVE-2024-49138</a> — <code>clfs.sys</code> — Common Log File System — heap overflow in LoadContainerQ allows EoP</li>
+<li><a href="CVE-2025-24985/">CVE-2025-24985</a> — <code>fastfat.sys</code> — FAT File System — cluster count overflow in FAT bitmap allocation allows RCE</li>
+<li><a href="CVE-2025-21333/">CVE-2025-21333</a> — <code>vsp.sys</code> — Hyper-V Virtual Service Provider — heap-based buffer overflow</li>
+<li><a href="CVE-2025-24993/">CVE-2025-24993</a> — <code>ntfs.sys</code> — NTFS — MFT metadata heap buffer overflow via crafted VHD allows RCE</li>
+<li><a href="CVE-2025-29824/">CVE-2025-29824</a> — <code>clfs.sys</code> — Common Log File System — elevation of privilege via log file metadata corruption</li>
+<li><a href="CVE-2021-21551/">CVE-2021-21551</a> — <code>DBUtil_2_3.sys</code> — Dell — arbitrary R/W via IOCTL</li>
+<li><a href="CVE-2019-16098/">CVE-2019-16098</a> — <code>RTCore64.sys</code> — MSI — physical mem R/W, MSR, I/O port</li>
+<li><a href="CVE-2018-19320/">CVE-2018-19320</a> — <code>gdrv.sys</code> — Gigabyte — arbitrary kernel R/W, MSR access</li>
+<li><a href="CVE-2015-2291/">CVE-2015-2291</a> — <code>iqvw64e.sys</code> — Intel — arbitrary R/W via IOCTL</li>
+<li><a href="CVE-2020-15368/">CVE-2020-15368</a> — <code>HW.sys</code> — Marvin Test — physical memory R/W</li>
+<li><a href="CVE-2022-3699/">CVE-2022-3699</a> — <code>LenovoDiagnosticsDriver.sys</code> — Lenovo — arbitrary R/W</li>
+<li><a href="ATSZIO64-sys/">ATSZIO64.sys</a> — <code>ATSZIO64.sys</code> — ASUS — physical memory R/W</li>
+<li><a href="AsIO3-sys/">AsIO3.sys</a> — <code>AsIO3.sys</code> — ASRock/ASUS — physical mem R/W, SMM</li>
+<li><a href="CVE-2025-7771/">CVE-2025-7771</a> — <code>ThrottleStop.sys</code> — ThrottleStop — MSR write / AV killer</li>
+<li><a href="Capcom-sys/">Capcom.sys</a> — <code>Capcom.sys</code> — Capcom — ring-0 code exec, SMEP bypass</li>
+<li><a href="viragt64-sys/">viragt64.sys</a> — <code>viragt64.sys</code> — TG Soft — process termination (Kasseika ransomware)</li>
+<li><a href="Truesight-sys/">Truesight.sys</a> — <code>Truesight.sys</code> — Adlice — EDR bypass</li>
+<li><a href="amsdk-sys/">amsdk.sys</a> — <code>amsdk.sys</code> — WatchDog — process termination (Silver Fox APT)</li>
+<li><a href="CVE-2023-1048/">CVE-2023-1048</a> — <code>WinRing0x64.sys</code> — OpenLibSys — MSR write and physical memory R/W</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
