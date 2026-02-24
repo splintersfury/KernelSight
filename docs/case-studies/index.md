@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 54 CVEs across 41 unique drivers, with 30 exploited in the wild — including 23 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 55 CVEs across 41 unique drivers, with 30 exploited in the wild — including 23 third-party BYOVD driver case studies.
 
 ## CVE Index
 
@@ -18,6 +18,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [CVE-2024-49114](CVE-2024-49114.md) | `cldflt.sys` | Buffer Overflow | No | `10.0.22621.4460` → `10.0.22621.4602` |
 | [CVE-2024-38256](CVE-2024-38256.md) | `win32k.sys` | Information Disclosure | No | `10.0.22621.3958` → `10.0.22621.4169` |
 | [CVE-2024-38238](CVE-2024-38238.md) | `ksthunk.sys` | MDL Handling | No | `10.0.22621.4036` → `10.0.22621.4169` |
+| [CVE-2026-21241](CVE-2026-21241.md) | `afd.sys` | Use-After-Free / Race Condition | No | |
 | [CVE-2024-38193](CVE-2024-38193.md) | `afd.sys` | Use-After-Free / Lifetime | Yes | `10.0.22621.3672` → `10.0.22621.4036` |
 | [CVE-2024-38106](CVE-2024-38106.md) | `ntoskrnl.exe` | Race Condition / TOCTOU | Yes | `10.0.22621.3958` → `10.0.22621.4169` |
 | [CVE-2024-38063](CVE-2024-38063.md) | `tcpip.sys` | Integer Overflow | No | `10.0.22621.3958` → `10.0.22621.4036` |
@@ -89,6 +90,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2023-21768](CVE-2023-21768.md) — AFD WinSock — missing ProbeForWrite allows kernel write-what-where via IO ring
 - [CVE-2023-28218](CVE-2023-28218.md) — AFD WinSock — integer overflow in AfdCopyCMSGBuffer allows EoP
 - [CVE-2024-38193](CVE-2024-38193.md) — AFD — use-after-free race on Registered I/O buffers allows EoP
+- [CVE-2026-21241](CVE-2026-21241.md) — AFD — race condition in AfdNotifyPostEvents spinlock release causes use-after-free EoP
 
 ### `appid.sys`
 

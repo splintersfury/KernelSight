@@ -6,8 +6,17 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 52 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 55 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
+
+## Recent Updates
+
+| Date | What's New |
+|------|------------|
+| **2026-02-25** | [CVE-2026-21241](case-studies/CVE-2026-21241.md) — afd.sys notification UAF. Full 7-stage exploit chain: NPNX pool spray, `_IO_MINI_COMPLETION_PACKET_USER` callback abuse, RtlSetBit/RtlClearAllBits [bit-manipulation primitive](primitives/exploitation/bit-manipulation.md), SepMediumDaclSd DACL corruption, WIL feature flag bypass, token privilege escalation. |
+| **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md) — using `RtlSetBit`/`RtlClearAllBits` as kCFG-compliant kernel exploitation primitives. |
+| **2026-02-25** | Expanded: [ACL / SD Manipulation](primitives/exploitation/acl-sd-manipulation.md) — SepMediumDaclSd corruption and SE_SACL_PRESENT bit-flip techniques for KASLR bypass. |
+| **2026-02-25** | Expanded: [KASLR Bypasses](mitigations/kaslr-bypasses.md) — prefetch side-channel (EntryBleed for Windows), security descriptor corruption section, WIL feature flag bypass. |
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_001 — The Exploitation Pipeline</span>
@@ -91,7 +100,7 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 54 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 29 exploited in the wild, including 21 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 55 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 30 exploited in the wild, including 21 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -108,12 +117,12 @@ A structured knowledge base for Windows kernel driver exploitation — organized
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">54</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">55</span> CVE case studies &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">41</span> unique drivers &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">30</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">56</span> technique pages &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">57</span> technique pages &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">80+</span> AutoPiff detection rules
 </div>
 
