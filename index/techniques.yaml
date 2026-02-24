@@ -158,8 +158,8 @@ techniques:
     description: "Dangling pointer dereference after object or pool chunk has been freed."
     autopiff_categories: [lifetime_fix]
     tags: [uaf, use_after_free, dangling, ExFreePool, refcount]
-    cves: [CVE-2024-38193, CVE-2024-30089, CVE-2023-29336]
-    related: [pool-spray-feng-shui, named-pipe-objects, token-swapping]
+    cves: [CVE-2024-38193, CVE-2024-30089, CVE-2023-29336, CVE-2026-21241]
+    related: [pool-spray-feng-shui, named-pipe-objects, token-swapping, bit-manipulation]
     status: stub
 
   - slug: race-conditions
@@ -169,7 +169,7 @@ techniques:
     description: "Concurrency bugs — missing locks, broken synchronization, IRQ-level races."
     autopiff_categories: [race_condition]
     tags: [race, spinlock, mutex, concurrency, KeAcquireSpinLock, ExAcquireFastMutex]
-    cves: [CVE-2024-30088, CVE-2024-38106, CVE-2024-38193]
+    cves: [CVE-2024-30088, CVE-2024-38106, CVE-2024-38193, CVE-2026-21241]
     related: [toctou-double-fetch, use-after-free]
     status: stub
 
@@ -419,16 +419,27 @@ techniques:
     related: [token-manipulation, write-what-where, previous-mode-manipulation]
     status: stub
 
+  - slug: bit-manipulation
+    title: "Bit-Manipulation Primitives"
+    section: primitives/exploitation
+    path: docs/primitives/exploitation/bit-manipulation.md
+    description: "Using RtlSetBit/RtlClearAllBits as kCFG-compliant primitives for surgical kernel data modification."
+    autopiff_categories: [race_condition, lifetime_fix]
+    tags: [RtlSetBit, RtlClearBit, RtlClearAllBits, RTL_BITMAP, kCFG, bit_manipulation, callback]
+    cves: [CVE-2026-21241]
+    related: [acl-sd-manipulation, token-manipulation, pool-spray-feng-shui, kcfg-kcet]
+    status: complete
+
   - slug: acl-sd-manipulation
     title: "ACL / Security Descriptor Manipulation"
     section: primitives/exploitation
     path: docs/primitives/exploitation/acl-sd-manipulation.md
     description: "Modifying ACLs or security descriptors on kernel objects to escalate access."
     autopiff_categories: [authorization]
-    tags: [acl, security_descriptor, DACL, SACL, SeAccessCheck]
-    cves: []
-    related: [token-manipulation, logic-bugs, previous-mode-manipulation]
-    status: stub
+    tags: [acl, security_descriptor, DACL, SACL, SeAccessCheck, SepMediumDaclSd]
+    cves: [CVE-2026-21241]
+    related: [token-manipulation, logic-bugs, previous-mode-manipulation, bit-manipulation]
+    status: complete
 
   # ── Mitigations ──────────────────────────────────────────────────────
 
@@ -515,7 +526,7 @@ techniques:
     path: docs/mitigations/kaslr.md
     description: "Kernel Address Space Layout Randomization — base address and pool randomization."
     autopiff_categories: [info_disclosure]
-    tags: [kaslr, aslr, randomization, base_address, NtQuerySystemInformation, info_leak]
-    cves: [CVE-2023-32019, CVE-2024-38256]
-    related: [uninitialized-memory, kuser-shared-data]
-    status: stub
+    tags: [kaslr, aslr, randomization, base_address, NtQuerySystemInformation, info_leak, WIL, SepMediumDaclSd]
+    cves: [CVE-2023-32019, CVE-2024-38256, CVE-2026-21241]
+    related: [uninitialized-memory, kuser-shared-data, acl-sd-manipulation, bit-manipulation]
+    status: complete

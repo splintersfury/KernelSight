@@ -103,10 +103,12 @@ nav:
       - PreviousMode Manipulation: primitives/exploitation/previous-mode-manipulation.md
       - Token Swapping: primitives/exploitation/token-swapping.md
       - ACL / SD Manipulation: primitives/exploitation/acl-sd-manipulation.md
+      - Bit-Manipulation Primitives: primitives/exploitation/bit-manipulation.md
       - Primitive Matrix: primitives/exploitation/primitive-matrix.md
   - CVEs:
     - case-studies/index.md
     - CLFS Deep-Dive: case-studies/clfs-deep-dive.md
+    - CVE-2026-21241: case-studies/CVE-2026-21241.md
     - CVE-2025-29824: case-studies/CVE-2025-29824.md
     - CVE-2025-24993: case-studies/CVE-2025-24993.md
     - CVE-2025-24985: case-studies/CVE-2025-24985.md

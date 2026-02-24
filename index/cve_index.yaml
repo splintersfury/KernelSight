@@ -484,6 +484,22 @@ cves:
       - "added_null_check_before_deref"
     case_study: "docs/case-studies/CVE-2024-38193.md"
 
+  - cve_id: "CVE-2026-21241"
+    driver: "afd.sys"
+    description: "AFD — race condition in AfdNotifyPostEvents spinlock release causes use-after-free EoP"
+    vuln_class: "use-after-free"
+    autopiff_category: "race_condition"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21241"
+      writeup: "https://jle-k.com/blog/Exploiting+CVE-2026-21241"
+      poc: ""
+    autopiff_rules:
+      - "spinlock_acquisition_added"
+      - "added_refcount_guard"
+      - "added_use_after_free_guard"
+    case_study: "docs/case-studies/CVE-2026-21241.md"
+
   - cve_id: "CVE-2024-38238"
     driver: "ksthunk.sys"
     description: "Kernel Streaming WOW64 Thunk — MmMapLockedPages without MmProbeAndLockPages in frame handling"

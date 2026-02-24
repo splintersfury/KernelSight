@@ -54,6 +54,8 @@ See the dedicated [KASLR Bypasses](kaslr-bypasses.md) page for a comprehensive b
 
 - **NtQuerySystemInformation (pre-20H1):** `SystemModuleInformation`, `SystemExtendedHandleInformation`, and `SystemBigPoolInformation` classes returned kernel pointers to any caller. This was the easiest and most common KASLR bypass for years. Progressively restricted starting in 20H1.
 - **NtQuerySystemInformation (post-20H1):** Still available to Medium IL processes. Sandbox escapes that elevate to Medium IL can still use this API. Full restriction has not been implemented due to application compatibility.
+- **SepMediumDaclSd corruption:** The integrity level restriction on `NtQuerySystemInformation` is enforced via a DACL check against the global `SepMediumDaclSd` security descriptor. An attacker with a write or [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) can zero the DACL (e.g., via `RtlClearAllBits`), removing the restriction entirely and allowing Low IL processes to query kernel module addresses. Used in [CVE-2026-21241](../case-studies/CVE-2026-21241.md). See [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md).
+- **WIL Feature Flag bypass (`Feature_RestrictKernelAddressLeaks`):** Even after the DACL check passes, Microsoft added a secondary gate via the Windows Implementation Library (WIL) feature flag system. The runtime flag `Feature_RestrictKernelAddressLeaks__private_featureState` controls whether kernel addresses are scrubbed from `NtQuerySystemInformation` output. This flag is stored in kernel memory as a simple integer, and an attacker with a [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) (e.g., `RtlSetBit`) can flip the flag's state bits to disable the scrubbing. Combined with `SepMediumDaclSd` corruption, this two-step approach fully defeats the `NtQuerySystemInformation` restrictions on modern Windows. Demonstrated in [CVE-2026-21241](../case-studies/CVE-2026-21241.md).
 - **Driver-specific info disclosure:** Individual driver vulnerabilities that leak uninitialized stack or pool data containing kernel pointers. These are patched individually as they are discovered (e.g., CVE-2023-32019, CVE-2024-38256).
 - **Timing side-channels:** Microarchitectural side-channels (cache timing, TLB state) can be used to infer kernel page mappings. These attacks are low-bandwidth but do not require any software vulnerability.
 - **ETW-based leaks:** Event Tracing for Windows providers that log kernel pointers in event data. Microsoft has been progressively sanitizing ETW output.
@@ -91,6 +93,9 @@ See the dedicated [KASLR Bypasses](kaslr-bypasses.md) page for a comprehensive b
 - [Pool Hardening](pool-hardening.md) -- pool address randomization is part of KASLR
 - [SMEP / SMAP](smep-smap.md) -- SMEP/SMAP enforcement is independent of address knowledge
 - [Write-What-Where](../primitives/arw/write-what-where.md) -- requires known addresses, making KASLR a prerequisite bypass
+- [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md) -- SepMediumDaclSd corruption bypasses NtQuerySystemInformation DACL check
+- [Bit-Manipulation Primitives](../primitives/exploitation/bit-manipulation.md) -- RtlSetBit used to flip WIL feature flags
 - [CVE-2023-32019](../case-studies/CVE-2023-32019.md) -- kernel heap info disclosure
 - [CVE-2024-38256](../case-studies/CVE-2024-38256.md) -- uninitialized memory info disclosure
 - [CVE-2024-21338](../case-studies/CVE-2024-21338.md) -- appid.sys exploit that requires KASLR bypass as first step
+- [CVE-2026-21241](../case-studies/CVE-2026-21241.md) -- SepMediumDaclSd + WIL feature flag bypass chain

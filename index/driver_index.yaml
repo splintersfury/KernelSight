@@ -8,6 +8,7 @@ drivers:
       - "CVE-2023-21768"
       - "CVE-2023-28218"
       - "CVE-2024-38193"
+      - "CVE-2026-21241"
 
   - name: "appid.sys"
     cves:
