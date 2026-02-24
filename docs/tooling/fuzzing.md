@@ -1,10 +1,10 @@
 # Fuzzing
 
-Automated vulnerability discovery through intelligent input generation for Windows kernel drivers.
+Automated vulnerability discovery through input generation and mutation for Windows kernel drivers.
 
 ## Overview
 
-Kernel fuzzing discovers vulnerabilities by feeding malformed inputs to driver interfaces and monitoring for crashes (BSODs, assertions, memory corruption). Kernel fuzzing is more complex than user-mode fuzzing due to several factors: a crash means a full system reboot, coverage feedback requires hypervisor or hardware tracing support, and reproducing race conditions requires precise scheduling control. Despite these challenges, fuzzing remains one of the most effective ways to find bugs that manual analysis misses.
+Kernel fuzzing discovers vulnerabilities by feeding malformed inputs to driver interfaces and monitoring for crashes (BSODs, assertions, memory corruption). It is more complex than user-mode fuzzing: a crash means a full system reboot, coverage feedback requires hypervisor or hardware tracing support, and reproducing race conditions requires precise scheduling control. Fuzzing finds bugs that manual analysis misses.
 
 ## kAFL (Kernel AFL)
 
@@ -30,7 +30,7 @@ Kernel fuzzing discovers vulnerabilities by feeding malformed inputs to driver i
 
 - Practice vulnerable driver with intentional bugs across many vulnerability classes
 - Includes: stack buffer overflow, pool overflow, use-after-free, type confusion, integer overflow, null pointer dereference, double fetch, uninitialized memory, and more
-- Ideal for: learning exploitation techniques, testing fuzzer effectiveness, developing and validating harnesses
+- Useful for: learning exploitation techniques, testing fuzzer effectiveness, developing and validating harnesses
 - Each vulnerability type has a separate IOCTL code, making it easy to target specific bug classes
 - Available on GitHub with full source code and documentation
 
@@ -65,4 +65,4 @@ Kernel fuzzing discovers vulnerabilities by feeding malformed inputs to driver i
 - **Driver Verifier**: enable Windows Driver Verifier on the target driver for enhanced runtime checking (pool tracking, IRQL checks, deadlock detection)
 - **Special Pool**: enable for target driver to catch off-by-one pool overflows with guard pages placed immediately after allocations
 - **Hypervisor considerations**: nested virtualization may be required when running `kAFL` inside a VM -- check that your host CPU and hypervisor support this
-- **Resource management**: kernel fuzzing consumes significant resources; allocate dedicated machines or VMs with sufficient RAM for full memory snapshots
+- **Resource management**: kernel fuzzing is resource-intensive; allocate dedicated machines or VMs with sufficient RAM for full memory snapshots

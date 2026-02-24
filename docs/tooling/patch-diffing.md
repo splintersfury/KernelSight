@@ -4,14 +4,14 @@ Methodology and tools for identifying security-relevant changes between Windows 
 
 ## Overview
 
-Patch diffing is the practice of comparing two versions of a binary -- typically the pre-patch and post-patch builds of a Windows kernel component -- to identify the exact code changes that constitute a security fix. By reverse-engineering what Microsoft changed, researchers can determine the root cause of the vulnerability, often before any public writeup or proof-of-concept exists.
+Patch diffing compares two versions of a binary -- typically the pre-patch and post-patch builds of a Windows kernel component -- to identify the code changes that constitute a security fix. By reverse-engineering what changed, the root cause of the vulnerability can be determined, often before any public writeup or PoC exists.
 
 ## Why Patch Diffing Matters
 
-- **Reveals exact root cause** of vulnerabilities from patch data alone, often weeks or months before public technical analysis
-- **Enables 1-day exploit development** from Patch Tuesday advisories, making the patch-to-exploit window a critical security metric
-- **Critical for defensive teams** to understand exposure windows, prioritize patching, and build targeted detections
-- **Foundation for automated vulnerability detection** pipelines that can scale analysis across hundreds of patched binaries per month
+- Reveals root cause of vulnerabilities from patch data alone, often before public technical analysis
+- Enables 1-day exploit development from Patch Tuesday advisories
+- Helps defensive teams understand exposure windows, prioritize patching, and build targeted detections
+- Supports automated vulnerability detection pipelines across hundreds of patched binaries per month
 
 ## Tools
 
@@ -53,7 +53,7 @@ WinBIndex (winbindex.m417z.com) is an index of Windows Update packages that allo
 
 - Indexes all major Windows components across all public builds
 - Enables downloading exact pre-patch and post-patch binaries given KB article numbers
-- Critical for reproducible analysis since the same CVE fix may differ across Windows versions (10 vs. 11, different feature updates)
+- Required for reproducible analysis since the same CVE fix may differ across Windows versions (10 vs. 11, different feature updates)
 - Supports searching by file name, build number, or update KB identifier
 
 ## Patch Diffing Workflow

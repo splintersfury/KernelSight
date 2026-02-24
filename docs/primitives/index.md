@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study
 </div>
 
-A vulnerability class describes what went wrong; a primitive describes what the attacker gains. This section catalogs the exploitation building blocks — the controlled capabilities that convert a memory corruption bug into reliable privilege escalation. Primitives split into two families: techniques that achieve arbitrary kernel read/write, and techniques that leverage that R/W for exploitation.
+A vulnerability class describes what went wrong; a primitive describes what is gained. This section catalogs the exploitation building blocks -- controlled capabilities that convert a memory corruption bug into privilege escalation. Primitives split into two families: techniques that achieve arbitrary kernel read/write, and techniques that leverage that R/W for exploitation.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_005 — Primitive Taxonomy</span>

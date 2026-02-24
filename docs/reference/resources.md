@@ -1,6 +1,6 @@
 # Community Resources
 
-Essential researchers, tools, and learning resources for Windows kernel security research.
+Researchers, tools, and learning resources for Windows kernel security research.
 
 ## Key Researchers
 
@@ -35,7 +35,7 @@ Essential researchers, tools, and learning resources for Windows kernel security
 
 ### Analysis and Reverse Engineering
 
-- **IDA Pro** -- Industry standard disassembler with HexRays decompiler for C pseudocode output
+- **IDA Pro** -- Disassembler with HexRays decompiler for C pseudocode output
 - **Ghidra** -- NSA open-source reverse engineering suite with decompilation and scripting
 - **WinDbg** -- Microsoft kernel debugger (Preview version recommended for modern UI and TTD support)
 - **x64dbg** -- Open-source user-mode debugger for Windows with plugin ecosystem
@@ -69,19 +69,19 @@ Essential researchers, tools, and learning resources for Windows kernel security
 
 ### Books
 
-- *Windows Internals* (7th Edition) by Yosifovich, Ionescu, Russinovich, Solomon -- Definitive reference for Windows kernel architecture
-- *A Guide to Kernel Exploitation* by Perla, Oldani -- Foundational kernel exploitation concepts across operating systems
+- *Windows Internals* (7th Edition) by Yosifovich, Ionescu, Russinovich, Solomon -- Windows kernel architecture reference
+- *A Guide to Kernel Exploitation* by Perla, Oldani -- Kernel exploitation concepts across operating systems
 - *Practical Reverse Engineering* by Dang, Gazet, Bachaalany -- x86/x64 and ARM reverse engineering with Windows kernel focus
 
 ### Video Resources
 
-- OffensiveCon presentations -- Annual conference with consistently high-quality Windows kernel exploitation talks
+- OffensiveCon presentations -- Annual conference with Windows kernel exploitation talks
 - BlueHat IL -- Microsoft-hosted security conference recordings covering offensive and defensive research
 - Hexacon -- European offensive security conference with kernel exploitation content
 
 ## Conferences
 
-- **OffensiveCon** -- Primary venue for cutting-edge Windows kernel exploitation research presentations
+- **OffensiveCon** -- Windows kernel exploitation research presentations
 - **BlueHat** -- Microsoft security conference bridging internal and external security research
 - **Hexacon** -- European offensive security conference with strong binary exploitation track
 - **TyphoonCon** -- Korean offensive security conference with strong Windows kernel track

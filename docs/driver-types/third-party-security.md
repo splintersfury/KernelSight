@@ -69,10 +69,4 @@ Anti-virus, EDR, anti-rootkit, and anti-cheat kernel modules — abused for proc
 
 ## Research Notes
 
-Third-party security drivers present a unique irony in the BYOVD ecosystem:
-- They are **designed to interact with security-sensitive kernel objects** (process callbacks, object callbacks, image load notifications)
-- Their **legitimate functionality** (process termination, callback management) is exactly what attackers need for EDR evasion
-- The "vulnerability" is often **insufficient access control** on powerful IOCTLs, not a memory corruption bug
-- Anti-cheat drivers like Capcom.sys represent the extreme case: **intentional ring-0 code execution** from user mode
-- **PPL (Protected Process Light)** bypass is a key capability — these drivers can often open handles to protected processes
-- Attackers increasingly target **AV vendor drivers** specifically to kill the security product before deploying malware
+Third-party security drivers are designed to interact with security-sensitive kernel objects (process callbacks, object callbacks, image load notifications), and their legitimate functionality (process termination, callback management) is exactly what attackers need for EDR evasion. The "vulnerability" is often insufficient access control on IOCTLs, not a memory corruption bug. Anti-cheat drivers like Capcom.sys are the extreme case: intentional ring-0 code execution from user mode. PPL bypass is a key capability, as these drivers can often open handles to protected processes. Attackers increasingly target AV vendor drivers to kill security products before deploying malware.

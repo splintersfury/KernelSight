@@ -31,7 +31,7 @@
 
 `echo_driver.sys` is a kernel driver for the Echo anti-cheat system. The driver provides IOCTLs for managing kernel notification callbacks — functionality intended for anti-cheat integrity verification. However, the IOCTLs allow enumerating and removing process creation notification callbacks registered by other kernel drivers, including security products.
 
-kite03 published a PoC on GitHub demonstrating how the callback manipulation IOCTLs can be used to blind EDR products. By removing the `PsSetCreateProcessNotifyRoutine` callbacks registered by security drivers, the attacker prevents EDR products from receiving process creation notifications, effectively disabling their monitoring capability.
+kite03 published a PoC on GitHub demonstrating how the callback manipulation IOCTLs can be used to blind EDR products. Removing the `PsSetCreateProcessNotifyRoutine` callbacks registered by security drivers prevents EDR products from receiving process creation notifications.
 
 ## Exploitation
 

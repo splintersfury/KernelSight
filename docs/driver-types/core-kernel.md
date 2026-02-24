@@ -36,9 +36,6 @@ The NT kernel executive (`ntoskrnl.exe`) implements process/thread management, m
 
 ## Research Notes
 
-ntoskrnl.exe bugs are high-value because:
-- **Universal impact**: Every Windows system runs the same kernel
-- **Direct exploitation**: Security subsystem bugs often directly yield token manipulation
-- **VBS bypass**: Bugs in VTL transition code can undermine the strongest Windows mitigations
+ntoskrnl.exe bugs have wide impact: every Windows system runs the same kernel. Security subsystem bugs often yield token manipulation directly, and VTL transition bugs can undermine VBS mitigations.
 
-CVE-2024-30088 (Pwn2Own 2024) demonstrates the pattern — a TOCTOU race in the security attribute copy-out path leads directly to token manipulation and SYSTEM.
+CVE-2024-30088 (Pwn2Own 2024) demonstrates the pattern: a TOCTOU race in the security attribute copy-out path leads to token manipulation and SYSTEM.

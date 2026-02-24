@@ -1,12 +1,12 @@
 # Secure Pool
 
-VBS-backed kernel pool that provides hypervisor-enforced integrity for critical allocations, isolating them from corruption by VTL 0 kernel exploits.
+VBS-backed kernel pool that provides hypervisor-enforced integrity for selected allocations, isolating them from corruption by VTL 0 kernel exploits.
 
 ## Overview
 
-Microsoft introduced the Secure Pool in Windows 10 21H2 (build 19044) as a specialized memory allocator that leverages Virtualization-Based Security to provide stronger guarantees than the standard kernel pool. Where standard pool hardening relies on software checks (cookies, safe unlinking) that can be bypassed with sufficient primitives, Secure Pool protections are enforced at the hypervisor level through VTL 1 and Second Level Address Translation (SLAT). Critical kernel data structures allocated in the Secure Pool are isolated from adjacent memory corruption and have their metadata stored in the Secure Kernel's address space, making them immune to the pool overflow and use-after-free exploitation techniques that remain effective against the standard pool.
+Microsoft introduced the Secure Pool in Windows 10 21H2 (build 19044) as a specialized memory allocator that uses VBS to provide stronger guarantees than the standard kernel pool. Standard pool hardening relies on software checks (cookies, safe unlinking) that can be bypassed with sufficient primitives. Secure Pool protections are enforced at the hypervisor level through VTL 1 and SLAT. Allocations in the Secure Pool are isolated from adjacent memory corruption and have their metadata stored in the Secure Kernel's address space, making them immune to pool overflow and use-after-free techniques that remain effective against the standard pool.
 
-The Secure Pool represents the strongest form of heap protection available in Windows, but its effectiveness is fundamentally limited by adoption: only a small fraction of kernel objects are allocated from it.
+The Secure Pool is the strongest form of heap protection available in Windows, but its effectiveness is limited by adoption: only a small fraction of kernel objects are allocated from it.
 
 ## Mechanism
 
@@ -45,7 +45,7 @@ The Secure Pool represents the strongest form of heap protection available in Wi
 
 ## Bypass History
 
-- **Limited adoption (primary bypass, ongoing):** The most significant weakness of Secure Pool is that very few kernel objects currently use it. The vast majority of kernel allocations -- including security-critical structures like `_TOKEN`, `_EPROCESS`, `_OBJECT_HEADER`, and driver-specific objects -- remain in the standard kernel pool. Attackers simply target the much larger population of unprotected objects. Until adoption reaches critical mass, this mitigation protects only a narrow subset of the kernel attack surface.
+- **Limited adoption (primary bypass, ongoing):** Very few kernel objects currently use Secure Pool. The vast majority of kernel allocations -- including `_TOKEN`, `_EPROCESS`, `_OBJECT_HEADER`, and driver-specific objects -- remain in the standard kernel pool. Exploits simply target unprotected objects. Until adoption reaches critical mass, this mitigation covers only a narrow subset of the kernel attack surface.
 - **VTL 0 access still permitted for reads/writes (by design):** The kernel needs to read and write Secure Pool allocations during normal operation. This means an attacker with an arbitrary read/write primitive can still read and modify the contents of a Secure Pool allocation if they know its address. The protection is against adjacent corruption and metadata manipulation, not against direct content modification of a known allocation.
 - **VBS dependency:** On systems where VBS is not enabled (or has been disabled), Secure Pool APIs may still succeed but without hypervisor-backed enforcement, reducing to standard pool semantics with no additional security benefit.
 - **Interaction with standard pool objects:** Secure Pool objects often contain pointers to standard pool objects and vice versa. An attacker can corrupt the standard pool object that a Secure Pool object references, achieving an indirect attack.
@@ -64,9 +64,9 @@ Requires VBS to be enabled and active. Without VBS, Secure Pool provides no addi
 
 ## Impact on Exploit Development
 
-Secure Pool is a forward-looking mitigation whose impact depends heavily on adoption rate. Currently, its effect on real-world exploitation is minimal because attackers can simply choose targets that are not in the Secure Pool. However, as Microsoft moves more security-critical objects into Secure Pool (particularly tokens, security descriptors, and process objects), the pool overflow and use-after-free vulnerability classes will become significantly harder to exploit. The long-term vision is that all security-sensitive kernel allocations will reside in Secure Pool, making pool corruption vulnerabilities exploitable only for denial-of-service rather than privilege escalation.
+Secure Pool's real-world impact depends on adoption rate. Currently, exploits can simply choose targets that are not in the Secure Pool. As Microsoft moves more objects into Secure Pool (tokens, security descriptors, process objects), pool overflow and use-after-free exploitation will become harder. The long-term goal is for all security-sensitive kernel allocations to reside in Secure Pool, reducing pool corruption vulnerabilities to denial-of-service rather than privilege escalation.
 
-For exploit developers, the practical impact today is that certain new kernel objects may be unexpectedly resistant to pool-based techniques. It is important to verify whether a target object type uses Secure Pool before investing effort in a pool corruption strategy against it.
+In practice, certain newer kernel objects may be unexpectedly resistant to pool-based techniques. Verify whether a target object type uses Secure Pool before pursuing a pool corruption strategy against it.
 
 ## Cross-References
 

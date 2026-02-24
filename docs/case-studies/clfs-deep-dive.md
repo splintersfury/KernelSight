@@ -1,10 +1,10 @@
 # CLFS Attack Surface Deep-Dive
 
-Comprehensive analysis of the Common Log File System as the most exploited Windows kernel attack surface.
+Analysis of the Common Log File System, the most exploited Windows kernel attack surface.
 
 ## Overview
 
-The Common Log File System (`clfs.sys`) is a general-purpose logging subsystem in the Windows kernel. It manages Base Log Files (BLF) and log containers for transactional logging, supporting applications like Active Directory, NTFS transactions, and the Windows Update client. Between 2018 and 2025, CLFS accumulated over 30 CVEs, making it the single most targeted kernel component in Windows. Multiple CLFS vulnerabilities have been exploited in the wild by ransomware groups and nation-state actors.
+The Common Log File System (`clfs.sys`) is a general-purpose logging subsystem in the Windows kernel. It manages Base Log Files (BLF) and log containers for transactional logging, supporting applications like Active Directory, NTFS transactions, and the Windows Update client. Between 2018 and 2025, CLFS accumulated over 30 CVEs. Multiple CLFS vulnerabilities have been exploited in the wild by ransomware groups and nation-state actors.
 
 ## BLF File Format
 
@@ -44,15 +44,15 @@ Containers are separate files that hold actual log record data. A single log can
 
 ## Why CLFS Is The #1 Target
 
-1. **Complex file format parsing** -- BLF metadata parsing involves extensive pointer arithmetic derived from on-disk offsets. Every offset is an opportunity for corruption if validation is insufficient.
+1. **Complex file format parsing** -- BLF metadata parsing involves extensive pointer arithmetic derived from on-disk offsets. Every offset is a corruption opportunity if validation is insufficient.
 
-2. **User-controllable on-disk structures** -- Any user can create a log file with `CreateLogFile()` and manipulate the resulting BLF on disk. The kernel then reparses this user-modified file, trusting embedded offsets to navigate structures.
+2. **User-controllable on-disk structures** -- Any user can create a log file with `CreateLogFile()` and manipulate the resulting BLF on disk. The kernel reparses this user-modified file, trusting embedded offsets to navigate structures.
 
-3. **Rich kernel state manipulation** -- Corrupted offsets in the BLF cause the CLFS parser to read or write relative to the base record's pool allocation, reaching into adjacent kernel pool memory.
+3. **Kernel state reachability** -- Corrupted offsets cause the CLFS parser to read or write relative to the base record's pool allocation, reaching into adjacent kernel pool memory.
 
-4. **Consistent exploitation pattern** -- The same fundamental corruption technique (offset manipulation in BLF metadata) works across dozens of different CVEs. Once an attacker understands the BLF format, each new CLFS CVE is a variation on the same theme.
+4. **Consistent exploitation pattern** -- The same corruption technique (offset manipulation in BLF metadata) works across dozens of CVEs. Each new CLFS CVE is a variation on the same theme.
 
-5. **Slow patching cycle** -- A true fix would require redesigning the BLF parser with comprehensive bounds checking or sandboxing. Microsoft has instead opted for incremental patches, fixing individual offset validations one at a time, leaving the structural weakness intact.
+5. **Incremental patching** -- A structural fix would require redesigning the BLF parser with bounds checking or sandboxing. Microsoft has instead patched individual offset validations one at a time, leaving the underlying weakness intact.
 
 ## CVE Timeline
 
@@ -76,7 +76,7 @@ Containers are separate files that hold actual log record data. A single log can
 
 ### Offset Manipulation
 
-The attacker crafts a BLF where `ClientContextOffset` or `ContainerContextOffset` points outside the base record boundary into adjacent pool memory. When CLFS dereferences this offset relative to the base record allocation, it reads or writes kernel memory that belongs to a different object.
+A crafted BLF where `ClientContextOffset` or `ContainerContextOffset` points outside the base record boundary into adjacent pool memory. When CLFS dereferences this offset relative to the base record allocation, it reads or writes kernel memory belonging to a different object.
 
 ### Container Count Mismatch
 
@@ -84,7 +84,7 @@ The `cContainers` field is set larger than the actual container descriptor array
 
 ### Symbol Table Corruption
 
-Symbol table entries with invalid offsets cause the BLF parser to dereference pointers that land outside the base record allocation. This provides a flexible primitive since the symbol table is processed during multiple CLFS operations.
+Symbol table entries with invalid offsets cause the BLF parser to dereference pointers outside the base record allocation. The symbol table is processed during multiple CLFS operations, giving flexibility in triggering the corruption.
 
 ### Checksum Bypass
 
@@ -111,7 +111,7 @@ Microsoft introduced CLFS Isolation in Windows 11 24H2 as a structural hardening
 - Added integrity verification for base record structures during log open and recovery
 - Metadata blocks use enhanced validation during reparsing operations
 
-This is not a complete redesign of the CLFS parser. The fundamental architecture -- parsing on-disk offsets for kernel memory access -- remains. Incremental hardening continues with each Patch Tuesday as new bypass vectors are discovered.
+This is not a complete redesign. The underlying architecture (parsing on-disk offsets for kernel memory access) remains. Incremental hardening continues with each Patch Tuesday as new bypass vectors are discovered.
 
 ## AutoPiff Detection
 

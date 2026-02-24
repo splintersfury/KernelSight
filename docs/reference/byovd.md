@@ -4,15 +4,15 @@ Technique where attackers load a legitimately signed but vulnerable driver to ga
 
 ## Concept
 
-Windows enforces driver signing, requiring all kernel-mode drivers to be signed by a trusted certificate authority. However, this policy does not prevent loading old, signed drivers that contain known vulnerabilities. In a BYOVD attack, the adversary ships a legitimately signed but vulnerable driver alongside their malware payload. Because the driver carries a valid signature, Windows loads it without complaint, giving the attacker a reliable path from user-mode to kernel-mode access.
+Windows enforces driver signing, requiring all kernel-mode drivers to be signed by a trusted certificate authority. However, this policy does not prevent loading old, signed drivers that contain known vulnerabilities. In a BYOVD attack, the adversary ships a signed but vulnerable driver alongside their malware payload. Because the driver carries a valid signature, Windows loads it, giving a path from user-mode to kernel-mode access.
 
 ## How BYOVD Works
 
 1. Attacker identifies a signed driver with a known kernel vulnerability (arbitrary read/write, physical memory mapping, or process termination capability)
 2. The vulnerable driver is deployed to the target system, typically through initial access malware or a dropper
 3. The driver is loaded using `sc.exe create` and `sc.exe start`, `NtLoadDriver`, or an exploitation framework such as KDU
-4. The attacker exploits the known vulnerability in the loaded driver to obtain kernel read/write or code execution
-5. Kernel access is used for high-impact post-exploitation: disabling EDR kernel callbacks, installing rootkits, dumping credentials from LSASS, or manipulating security tokens
+4. The known vulnerability in the loaded driver is exploited to obtain kernel read/write or code execution
+5. Kernel access is used for post-exploitation: disabling EDR kernel callbacks, installing rootkits, dumping credentials from LSASS, or manipulating security tokens
 
 ## Commonly Abused Drivers
 
@@ -28,7 +28,7 @@ Windows enforces driver signing, requiring all kernel-mode drivers to be signed 
 
 ## LOLDrivers Project
 
-The Living Off The Land Drivers (LOLDrivers) project is a community-maintained catalog of known vulnerable, malicious, and abused drivers. Hosted at loldrivers.io, the project serves as the definitive reference for BYOVD defense.
+The Living Off The Land Drivers (LOLDrivers) project is a community-maintained catalog of known vulnerable, malicious, and abused drivers, hosted at loldrivers.io.
 
 - Catalogs over 700 known vulnerable drivers with SHA256 hashes, vendor information, and vulnerability descriptions
 - Provides YARA rules and Sigma detection rules for each driver
@@ -48,7 +48,7 @@ BlackByte operators used `RTCore64.sys` (MSI Afterburner's kernel-mode component
 
 ### Cuba Ransomware
 
-The Cuba ransomware group deployed a custom BYOVD variant using `ApcHelper.sys`, combined with the BIRDDOG backdoor for initial access. This campaign demonstrated that threat actors are willing to invest in finding or commissioning new vulnerable drivers rather than relying solely on publicly known ones.
+The Cuba ransomware group deployed a custom BYOVD variant using `ApcHelper.sys`, combined with the BIRDDOG backdoor for initial access. This showed that threat actors invest in finding or commissioning new vulnerable drivers rather than relying solely on publicly known ones.
 
 ## Detection Strategies
 
@@ -79,11 +79,11 @@ Several open-source tools automate BYOVD exploitation:
 
 ### GhostEmperor
 
-The GhostEmperor APT, documented by [Kaspersky in 2021](https://securelist.com/ghostemperor-from-proxylogon-to-kernel-mode/104407/), used a sophisticated BYOVD chain to load an unsigned rootkit on targeted systems. The campaign exploited ProxyLogon for initial access and deployed a custom BYOVD loader that loaded a signed vulnerable driver to bypass Driver Signature Enforcement, then used the driver's kernel R/W capabilities to load an unsigned rootkit payload.
+The GhostEmperor APT, documented by [Kaspersky in 2021](https://securelist.com/ghostemperor-from-proxylogon-to-kernel-mode/104407/), used a BYOVD chain to load an unsigned rootkit on targeted systems. The campaign exploited ProxyLogon for initial access, loaded a signed vulnerable driver to bypass Driver Signature Enforcement, then used the driver's kernel R/W capabilities to load an unsigned rootkit payload.
 
 ## LOLDrivers Integration
 
-The [LOLDrivers project](https://www.loldrivers.io/) provides the definitive catalog of known vulnerable and malicious drivers. KernelSight case studies cross-reference LOLDrivers entries for each documented driver. For comprehensive driver hash databases, YARA rules, and Sigma detection rules beyond what KernelSight provides, LOLDrivers should be the primary reference.
+The [LOLDrivers project](https://www.loldrivers.io/) catalogs known vulnerable and malicious drivers. KernelSight case studies cross-reference LOLDrivers entries for each documented driver. For driver hash databases, YARA rules, and Sigma detection rules beyond what KernelSight provides, see LOLDrivers.
 
 ## References
 

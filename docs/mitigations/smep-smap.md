@@ -6,9 +6,9 @@ Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Preventio
 
 SMEP and SMAP are hardware mitigations implemented at the CPU level to enforce strict separation between supervisor (ring-0) and user (ring-3) memory access. Intel introduced SMEP with the Ivy Bridge microarchitecture in 2012 and SMAP with Broadwell in 2014. AMD added support for both in their Zen architecture. On the Windows side, Microsoft enabled SMEP enforcement starting with Windows 8.1 and SMAP enforcement starting with Windows 10 RS1 (Anniversary Update, build 14393). Both features are controlled via bits in the CR4 control register and are enforced by the CPU's page fault logic in conjunction with page table entry flags.
 
-Prior to these mitigations, a common kernel exploitation technique was "ret2user" -- corrupting a kernel function pointer to redirect execution to attacker-controlled shellcode mapped in user-mode memory. SMEP and SMAP made this class of attacks significantly more difficult by introducing hardware-level enforcement of the user/kernel boundary.
+Before these mitigations, a common kernel exploitation technique was "ret2user" -- corrupting a kernel function pointer to redirect execution to attacker-controlled shellcode mapped in user-mode memory. SMEP and SMAP blocked this by introducing hardware-level enforcement of the user/kernel boundary.
 
-SMEP and SMAP are among the most impactful kernel mitigations ever deployed because they eliminated an entire class of trivially reliable exploitation techniques. Before SMEP, kernel exploits could simply allocate executable memory in user space, write shellcode, and redirect a kernel function pointer to it. The exploit was deterministic and required no heap manipulation, no ROP chain, and no information disclosure. SMAP extended this protection to data references, closing the follow-up technique of placing fake kernel structures in user-mode memory.
+SMEP and SMAP eliminated an entire class of trivially reliable exploitation techniques. Before SMEP, kernel exploits could allocate executable memory in user space, write shellcode, and redirect a kernel function pointer to it. The exploit was deterministic and required no heap manipulation, no ROP chain, and no information disclosure. SMAP extended this to data references, closing the follow-up technique of placing fake kernel structures in user-mode memory.
 
 ## Mechanism
 
@@ -16,7 +16,7 @@ SMEP and SMAP are among the most impactful kernel mitigations ever deployed beca
 
 **SMAP (CR4 bit 21):** When enabled, the processor generates a page fault if code running at CPL 0 attempts to read from or write to a page marked as User in the page table entries, unless the EFLAGS.AC (Alignment Check) flag is explicitly set. The kernel uses the `STAC` (Set AC Flag) and `CLAC` (Clear AC Flag) instructions to temporarily enable and disable user-mode access in controlled code paths such as `copy_from_user` equivalents (e.g., `ProbeForRead`/`ProbeForWrite` and the `Mm` copy routines). The AC flag window is kept as narrow as possible to minimize the attack surface during legitimate user-mode access.
 
-The enforcement depends on the U/S bit in the page table hierarchy. A page is considered "user-mode" if any level of the page table walk has the U/S bit set to User. This is a critical implementation detail because it means the protection is based on page table metadata, not on virtual address ranges.
+The enforcement depends on the U/S bit in the page table hierarchy. A page is considered "user-mode" if any level of the page table walk has the U/S bit set to User. This means the protection is based on page table metadata, not on virtual address ranges.
 
 **CR4 Register Protection:**
 
@@ -58,7 +58,7 @@ Feature detection is performed via CPUID: SMEP support is indicated by CPUID.(EA
 
 ## Impact on Exploit Development
 
-SMEP and SMAP fundamentally changed the landscape of Windows kernel exploitation. Before these mitigations, kernel exploits were often trivially reliable one-shot attacks. After their introduction, exploits must either:
+SMEP and SMAP changed the landscape of Windows kernel exploitation. Before these mitigations, kernel exploits were often trivially reliable one-shot attacks. After their introduction, exploits must either:
 
 1. Construct ROP/JOP chains within kernel code to achieve code execution (blocked by kCFG/kCET on modern systems)
 2. Use PTE remapping to create supervisor-mode aliases for user pages (requires ARW + PTE base leak)

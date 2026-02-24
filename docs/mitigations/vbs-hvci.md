@@ -1,10 +1,10 @@
 # VBS / HVCI
 
-Virtualization-Based Security (VBS) and Hypervisor-Protected Code Integrity (HVCI) use the hypervisor to create an isolated security boundary that enforces kernel code integrity and protects critical security assets from ring-0 compromise.
+Virtualization-Based Security (VBS) and Hypervisor-Protected Code Integrity (HVCI) use the hypervisor to create an isolated security boundary that enforces kernel code integrity and protects security assets from ring-0 compromise.
 
 ## Overview
 
-Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional features and made them enabled by default on new Windows 11 devices meeting hardware requirements. VBS leverages the Hyper-V hypervisor to create Virtual Trust Levels (VTLs), establishing a security boundary that cannot be crossed even by kernel-mode code. HVCI, also known as Memory Integrity, uses this hypervisor enforcement to apply a strict W^X (Write XOR Execute) policy on all kernel memory, preventing the execution of unsigned or dynamically generated code in ring 0. Together, they represent the most significant architectural change to Windows kernel security since the introduction of kernel-mode code signing.
+Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional features and made them enabled by default on new Windows 11 devices meeting hardware requirements. VBS uses the Hyper-V hypervisor to create Virtual Trust Levels (VTLs), establishing a security boundary that cannot be crossed by kernel-mode code. HVCI (also called Memory Integrity) uses this hypervisor enforcement to apply a W^X (Write XOR Execute) policy on all kernel memory, preventing execution of unsigned or dynamically generated code in ring 0.
 
 ## Mechanism
 
@@ -42,7 +42,7 @@ Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional f
 - **Data-only attacks (always viable):** Since HVCI only prevents code execution and code modification, attacks that manipulate data structures (token swapping, `PreviousMode`, ACL/SD modification) bypass HVCI entirely. This has driven the modern shift toward data-only exploitation.
 - **CVE-2024-21302 "Windows Downdate" (2024):** A vulnerability in the Windows Update Secure Kernel component allowed downgrading VTL 1 components to older vulnerable versions, effectively undoing VBS protections. Demonstrated by SafeBreach researcher Alon Leviev.
 - **Living-off-the-land signed code:** Using existing signed kernel code paths (system calls, documented APIs) to achieve exploitation goals without needing custom code execution.
-- **I/O Ring exploitation chain:** The I/O Ring primitive provides powerful kernel read/write without requiring code execution, making HVCI irrelevant for this attack path.
+- **I/O Ring exploitation chain:** The I/O Ring primitive provides kernel read/write without requiring code execution, making HVCI irrelevant for this attack path.
 - **VTL 0 secure call interface abuse (theoretical):** The interface between VTL 0 and VTL 1 presents attack surface, though no public exploits have demonstrated full VTL 1 compromise through this vector.
 
 ## Related CVEs
@@ -65,16 +65,16 @@ Requirements: CPU with VT-x (Intel) or AMD-V, SLAT (EPT/NPT), TPM 2.0, UEFI Secu
 
 ## Impact on Exploit Development
 
-VBS and HVCI represent the strongest architectural defense in modern Windows. Their presence forces exploit developers to adopt entirely data-only strategies: no shellcode, no ROP-to-code, no driver patching. Combined with kCFG/kCET and SMEP/SMAP, HVCI completes a defense-in-depth model where no memory on the system can be both written to and executed by the attacker, and control flow cannot be arbitrarily redirected. The result is that modern exploitation research focuses almost exclusively on data-structure manipulation (token swapping, `PreviousMode`, I/O Ring primitives) rather than code execution.
+VBS and HVCI force exploit developers to adopt entirely data-only strategies: no shellcode, no ROP-to-code, no driver patching. Combined with kCFG/kCET and SMEP/SMAP, HVCI completes a defense-in-depth model where no memory on the system can be both written to and executed, and control flow cannot be arbitrarily redirected. Modern exploitation research focuses almost exclusively on data-structure manipulation (token swapping, `PreviousMode`, I/O Ring primitives) rather than code execution.
 
-The VBS attack surface itself has become a research focus, as demonstrated by the "Windows Downdate" attack (CVE-2024-21302), which targeted the VTL 1 update mechanism rather than trying to break through VBS protections directly.
+The VBS attack surface itself has become a research target, as demonstrated by the "Windows Downdate" attack (CVE-2024-21302), which targeted the VTL 1 update mechanism rather than breaking through VBS protections directly.
 
 ## BYOVD Blocking
 
-VBS/HVCI plays a critical role in the BYOVD defense model:
+VBS/HVCI plays a direct role in the BYOVD defense model:
 
 - **Vulnerable Driver Blocklist enforcement**: On HVCI-enabled systems, the Microsoft Vulnerable Driver Blocklist (`DriverSiPolicy.p7b`) is enforced at the hypervisor level, preventing known-vulnerable drivers from loading even if an attacker has administrator privileges
-- **Capcom.sys neutralized**: HVCI prevents Capcom.sys from disabling SMEP (CR4 modification blocked by hypervisor) and from executing user-mode code pages in ring 0 (W^X enforcement) — see [Capcom.sys](../case-studies/Capcom-sys.md)
+- **Capcom.sys neutralized**: HVCI prevents Capcom.sys from disabling SMEP (CR4 modification blocked by hypervisor) and from executing user-mode code pages in ring 0 (W^X enforcement). See [Capcom.sys](../case-studies/Capcom-sys.md)
 - **Physical memory mapping restricted**: Drivers that call `MmMapIoSpace` with user-controlled parameters are blocked if they appear on the blocklist — affects [RTCore64.sys](../case-studies/CVE-2019-16098.md), [gdrv.sys](../case-studies/CVE-2018-19320.md), [ATSZIO64.sys](../case-studies/ATSZIO64-sys.md), [AsIO3.sys](../case-studies/AsIO3-sys.md), and others
 - **Data-only attacks still viable**: HVCI does not prevent BYOVD drivers from performing data-only operations (token swap, callback manipulation) — [viragt64.sys](../case-studies/viragt64-sys.md) (process termination) and [Truesight.sys](../case-studies/Truesight-sys.md) (handle duplication) attacks work regardless of HVCI status if the driver is not blocklisted
 - **Unblocklisted drivers**: Drivers like [NVDrv](../case-studies/NVDrv.md) (NVIDIA GPU) cannot be blocklisted without breaking display functionality, representing a gap in the HVCI BYOVD defense

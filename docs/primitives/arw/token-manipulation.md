@@ -4,7 +4,7 @@ Overwriting or corrupting kernel token structures to escalate privileges.
 
 ## Description
 
-The `_TOKEN` structure contains privilege bitmasks and integrity levels. An arbitrary write primitive targeting the token's `Privileges.Enabled` field can grant `SeDebugPrivilege` or other powerful privileges, enabling full system compromise.
+The `_TOKEN` structure contains privilege bitmasks and integrity levels. An arbitrary write primitive targeting the token's `Privileges.Enabled` field can grant `SeDebugPrivilege` or other elevated privileges, enabling system compromise.
 
 ## Related CVEs
 

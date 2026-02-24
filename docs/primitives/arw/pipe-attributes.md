@@ -1,14 +1,14 @@
 # Pipe Attribute Primitives
 
-Named pipe extended attributes used as arbitrary read/write primitives through controlled kernel pool allocations with attacker-specified size and content.
+Named pipe extended attributes used as arbitrary read/write primitives through controlled kernel pool allocations.
 
 ## Description
 
-Named pipe extended attributes are key-value pairs managed by the Named Pipe File System driver (`npfs.sys`) through the `NtFsControlFile` API. When an attribute is set with `FSCTL_PIPE_SET_ATTRIBUTE`, the kernel allocates a pool buffer to store the attribute name and value data. When an attribute is read with `FSCTL_PIPE_GET_ATTRIBUTE`, the kernel copies the stored data back to user mode. By corrupting an attribute entry's value pointer or length field, an attacker gains controlled read-back from arbitrary kernel addresses.
+Named pipe extended attributes are key-value pairs managed by the Named Pipe File System driver (`npfs.sys`) through the `NtFsControlFile` API. When an attribute is set with `FSCTL_PIPE_SET_ATTRIBUTE`, the kernel allocates a pool buffer to store the attribute name and value data. When read with `FSCTL_PIPE_GET_ATTRIBUTE`, the kernel copies the stored data back to user mode. Corrupting an attribute entry's value pointer or length field yields controlled read-back from arbitrary kernel addresses.
 
-Pipe attributes are allocated in PagedPool with a total size of approximately `sizeof(header) + name_length + value_length`, giving fine-grained control over which pool bucket the allocation lands in. The attribute value content is fully attacker-controlled, making pipe attributes an effective spray primitive. Multiple attributes can be set on a single pipe handle, each producing a separate pool allocation, and individual attributes can be deleted to create precise holes in the pool layout.
+Pipe attributes are allocated in PagedPool with a total size of approximately `sizeof(header) + name_length + value_length`, giving control over which pool bucket the allocation lands in. The attribute value content is fully attacker-controlled. Multiple attributes can be set on a single pipe handle, each producing a separate pool allocation, and individual attributes can be deleted to create holes in the pool layout.
 
-The pipe attribute technique is widely used in modern Windows kernel exploits as both a spray primitive for pool grooming and as a read-back primitive for information leaks. It complements the [named pipe data queue entry](../exploitation/named-pipe-objects.md) technique, which operates in NonPagedPoolNx, by providing similar capabilities for PagedPool targets. Together, pipe data queue entries and pipe attributes give an attacker spray coverage across both major pool types.
+The technique is common in modern Windows kernel exploits as both a spray primitive for pool grooming and a read-back primitive for information leaks. It complements the [named pipe data queue entry](../exploitation/named-pipe-objects.md) technique (NonPagedPoolNx) by providing similar capabilities for PagedPool targets. Together, pipe data queue entries and pipe attributes cover both major pool types.
 
 ## Key Structures
 
@@ -71,7 +71,7 @@ Alternatively, if the corruption can overwrite the `AttributeValue` pointer dire
 - **Pool type**: Pipe attribute allocations are made from PagedPool. This makes them suitable for grooming vulnerabilities in PagedPool but not for NonPagedPoolNx targets (use [named pipe data queue entries](../exploitation/named-pipe-objects.md) for NonPagedPoolNx).
 - **Attribute name contributes to allocation size**: The name string is stored inline in the allocation. Exploits typically use short, fixed-length names (e.g., `"A"`) and vary the value size for precise bucket targeting.
 - **Multiple attributes per pipe**: A single pipe can hold multiple attributes, each in a separate pool allocation. This allows creating allocations of different sizes from a single pipe handle.
-- **LIST_ENTRY corruption is fatal**: The attribute linked list pointers are walked during pipe cleanup. If `Flink` or `Blink` is corrupted, the kernel follows an invalid pointer and causes a BSOD. Robust exploits either avoid corrupting the list entry fields or restore them before closing the pipe.
+- **LIST_ENTRY corruption is fatal**: The attribute linked list pointers are walked during pipe cleanup. If `Flink` or `Blink` is corrupted, the kernel follows an invalid pointer and causes a BSOD. Exploits must either avoid corrupting the list entry fields or restore them before closing the pipe.
 - **Segment heap considerations**: On Windows 11 with segment heap, pipe attribute allocations may be isolated by pool tag from other allocation types, limiting cross-object spray effectiveness. Tag-matched spray (finding objects with the same pool tag as the target) can bypass this.
 - **Combined with DATA_QUEUE_ENTRY**: Many exploits use pipe attributes for PagedPool spray and `DATA_QUEUE_ENTRY` for NonPagedPoolNx spray in the same exploit chain, covering both pool types.
 - **Cleanup order matters**: Close pipe handles in a controlled order to avoid triggering linked list traversal on corrupted entries. Some exploits intentionally leak handles rather than closing them.
@@ -80,7 +80,7 @@ Alternatively, if the corruption can overwrite the `AttributeValue` pointer dire
 
 - **Pool header cookies**: Overflows that damage pool chunk headers are detected and cause BSOD. The corruption must target the attribute entry's data fields, not the pool header.
 - **Segment Heap pool tag isolation** (Windows 11): Pipe attribute allocations may be isolated from other pool tag types, reducing cross-object spray effectiveness.
-- **No integrity check on attribute fields**: The kernel does not validate that `ValueLength` or `AttributeValue` have not been tampered with before performing the read-back. This is the fundamental weakness that enables the read primitive.
+- **No integrity check on attribute fields**: The kernel does not validate that `ValueLength` or `AttributeValue` have been tampered with before performing the read-back. This is the weakness that enables the read primitive.
 - **PagedPool only**: Pipe attributes cannot be used to groom NonPagedPoolNx targets. Exploits targeting NonPagedPoolNx drivers must use alternative spray objects.
 - **KASLR**: Leaked pointers must be interpreted relative to the randomized kernel base. The pipe attribute read primitive is often used specifically to defeat KASLR by disclosing kernel pointers from adjacent allocations.
 

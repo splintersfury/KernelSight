@@ -4,9 +4,9 @@ Kernel Address Space Layout Randomization randomizes the base addresses of the k
 
 ## Overview
 
-Microsoft introduced basic kernel address randomization in Windows Vista and has significantly improved it across subsequent releases. KASLR forces attackers to obtain a kernel address leak before they can construct reliable exploits, because kernel image base addresses, driver load addresses, pool regions, and kernel stack addresses all vary between boots. Windows 8 improved entropy and randomized driver load order. Windows 10 progressively restricted the APIs that could leak kernel addresses (particularly `NtQuerySystemInformation`), and Windows 11 22H2/24H2 added further entropy and restricted additional information disclosure vectors.
+Microsoft introduced basic kernel address randomization in Windows Vista and has improved it across subsequent releases. KASLR forces exploits to obtain a kernel address leak first, because kernel image base addresses, driver load addresses, pool regions, and kernel stack addresses all vary between boots. Windows 8 improved entropy and randomized driver load order. Windows 10 progressively restricted the APIs that could leak kernel addresses (particularly `NtQuerySystemInformation`), and Windows 11 22H2/24H2 added further entropy and restricted additional information disclosure vectors.
 
-KASLR is foundational: nearly every kernel exploit requires defeating KASLR as a prerequisite step, making information disclosure vulnerabilities (or KASLR bypass techniques) a critical component of exploit chains.
+Nearly every kernel exploit requires defeating KASLR as a prerequisite, making information disclosure vulnerabilities (or KASLR bypass techniques) a necessary component of exploit chains.
 
 ## Mechanism
 

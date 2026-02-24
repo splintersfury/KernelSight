@@ -4,16 +4,16 @@ Tools and techniques for analyzing Windows kernel drivers without execution.
 
 ## Overview
 
-Static analysis is the foundation of driver vulnerability research. It encompasses disassembly, decompilation, and automated semantic code analysis to identify vulnerability patterns in kernel binaries. Because kernel drivers run at the highest privilege level, static analysis allows researchers to study dangerous code paths without risking system stability -- every potential bug can be examined in a disassembler before committing to a debugging session or exploit attempt.
+Static analysis encompasses disassembly, decompilation, and automated semantic code analysis to identify vulnerability patterns in kernel binaries. Because kernel drivers run at ring 0, static analysis allows studying dangerous code paths without risking system stability -- every potential bug can be examined in a disassembler before committing to a debugging session or exploit attempt.
 
 ## IDA Pro / HexRays
 
-- Industry-standard disassembler and decompiler
+- Commercial disassembler and decompiler
 - HexRays decompiler produces C pseudocode from x86/x64 binaries
 - Extensive plugin ecosystem (`BinDiff`, `Diaphora`, FLIRT signatures)
 - Key for: manual reverse engineering, understanding driver logic, analyzing IOCTL dispatch
 - Workflow: Load driver -> identify `DriverEntry` -> trace IRP dispatch table -> analyze IOCTL handlers
-- FLIRT signatures for Windows DDK improve function identification significantly, resolving many library calls automatically
+- FLIRT signatures for Windows DDK improve function identification, resolving many library calls automatically
 - Cost: Commercial license required (~$1,500+ for named license)
 
 ## Ghidra
@@ -52,14 +52,14 @@ Static analysis is the foundation of driver vulnerability research. It encompass
 - Identifies: buffer overflows, integer overflows, null pointer dereferences in IOCTL handlers
 - Produces ranked vulnerability reports with severity and location details
 - Can be pointed at a directory of driver binaries for batch scanning
-- Particularly effective at finding shallow bugs in IOCTL handler dispatch logic
+- Effective at finding shallow bugs in IOCTL handler dispatch logic
 
 ## Binary Diffing
 
 - **`BinDiff`** -- Google's binary diffing tool for matched function comparison between two versions of a binary
 - **`Diaphora`** -- Open-source binary diffing plugin for `IDA Pro` with advanced heuristics
 - **`ghidriff`** -- `Ghidra`-based binary diffing that works in headless mode
-- These tools are critical for patch analysis: comparing a pre-patch and post-patch driver reveals exactly which functions were modified and what checks were added
+- Used for patch analysis: comparing a pre-patch and post-patch driver reveals which functions were modified and what checks were added
 
 ## Pattern Matching
 
@@ -69,7 +69,7 @@ Static analysis is the foundation of driver vulnerability research. It encompass
 
 ## Practical Workflow
 
-A typical static analysis session for a Windows kernel driver follows these steps:
+A typical static analysis session for a Windows kernel driver:
 
 1. Acquire target driver binary (from the running system or via `WinBIndex` for specific builds)
 2. Load in `IDA`/`Ghidra` -- let auto-analysis complete fully before manual review

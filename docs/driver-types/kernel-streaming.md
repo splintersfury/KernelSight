@@ -49,7 +49,7 @@ Kernel Streaming (KS) drivers handle multimedia data flow — audio, video, and 
 ### mskssrv.sys (Kernel Streaming Server)
 - **Role**: Cross-process multimedia streaming rendezvous server
 - **Attack vector**: Create KS server/client connections
-- **Note**: 3 CVEs — type confusion, MDL abuse, and refcount UAF. The rendezvous context object management is a rich attack surface
+- **Note**: 3 CVEs — type confusion, MDL abuse, and refcount UAF, all in rendezvous context object management
 
 ### ksthunk.sys (Kernel Streaming WOW64 Thunk)
 - **Role**: Translates 32-bit KS structures to 64-bit for WOW64 processes
@@ -58,10 +58,4 @@ Kernel Streaming (KS) drivers handle multimedia data flow — audio, video, and 
 
 ## Research Notes
 
-Kernel Streaming is one of the most productive attack surfaces in recent Windows kernel research. The combination of:
-- Large IOCTL surface in ks.sys
-- Complex object management in mskssrv.sys
-- Integer-sensitive thunking in ksthunk.sys
-- Direct MDL manipulation
-
-...makes it a high-priority target. DevCore's Pwn2Own 2024 entry used ks.sys, and multiple researchers have found independent bugs in the KS stack.
+Kernel Streaming has produced a steady stream of bugs due to its large IOCTL surface (ks.sys), complex object management (mskssrv.sys), integer-sensitive thunking (ksthunk.sys), and direct MDL manipulation. DevCore's Pwn2Own 2024 entry used ks.sys, and multiple researchers have found independent bugs in the KS stack.

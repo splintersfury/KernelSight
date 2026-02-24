@@ -1,6 +1,6 @@
 # Security / Policy Drivers
 
-Security and policy enforcement drivers implement access control, code integrity, and application whitelisting. Their privileged position makes them high-value targets — a bypass here undermines the security model.
+Security and policy enforcement drivers implement access control, code integrity, and application whitelisting. A bypass in these drivers undermines the security model.
 
 ## Architecture
 
@@ -43,10 +43,7 @@ Security and policy enforcement drivers implement access control, code integrity
 
 ## Research Notes
 
-Security driver bugs are particularly impactful because:
-- They often provide **direct privilege escalation** without needing a memory corruption primitive
-- The Lazarus Group's use of CVE-2024-21338 shows nation-state interest in this attack surface
-- AppLocker IOCTL bugs give **admin-to-kernel** escalation, which is valuable for bypassing security software
+Security driver bugs often provide direct privilege escalation without needing a memory corruption primitive. Lazarus Group's use of CVE-2024-21338 demonstrates nation-state interest in this attack surface. AppLocker IOCTL bugs give admin-to-kernel escalation, useful for bypassing security software.
 
 !!! note "Third-Party Security Drivers"
     For third-party AV, EDR, anti-rootkit, and anti-cheat kernel drivers (Capcom.sys, viragt64.sys, Truesight.sys, etc.), see [Third-Party Security Drivers](third-party-security.md). This page covers only Microsoft's built-in security enforcement drivers.

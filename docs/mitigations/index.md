@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &nbsp;|&nbsp; <span class="ks-active">Mitigations</span>
 </div>
 
-Mitigations are cross-cutting defenses that intersect every stage of the exploitation pipeline. Rather than fixing individual bugs, they raise the cost of exploitation by breaking assumptions that exploitation primitives rely on — preventing code execution from data pages, randomizing kernel addresses, or isolating critical structures in hypervisor-protected memory.
+Mitigations are cross-cutting defenses that intersect every stage of the exploitation pipeline. Rather than fixing individual bugs, they raise the cost of exploitation by breaking assumptions that primitives rely on: preventing code execution from data pages, randomizing kernel addresses, or isolating structures in hypervisor-protected memory.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_006 — Defense-in-Depth Stack</span>

@@ -1,10 +1,10 @@
 # Kernel Data Protection (KDP)
 
-VBS-backed mechanism that marks critical kernel data structures as read-only after initialization, preventing modification even by ring-0 code.
+VBS-backed mechanism that marks kernel data structures as read-only after initialization, preventing modification even by ring-0 code.
 
 ## Overview
 
-Microsoft introduced Kernel Data Protection in Windows 10 version 20H1 (May 2020 Update, build 19041). KDP uses the Hyper-V hypervisor and VBS infrastructure to enforce read-only protections on specific kernel data at the Second Level Address Translation (SLAT) level. Unlike traditional memory protection that can be bypassed by kernel-mode code modifying page table entries, KDP protections are enforced by the hypervisor in VTL 1, making them immune to any VTL 0 modification attempt. The feature was designed to protect security-critical kernel variables from tampering, even after a full kernel compromise in the normal world.
+Microsoft introduced Kernel Data Protection in Windows 10 version 20H1 (May 2020 Update, build 19041). KDP uses the Hyper-V hypervisor and VBS infrastructure to enforce read-only protections on specific kernel data at the Second Level Address Translation (SLAT) level. Unlike traditional memory protection that can be bypassed by kernel-mode code modifying page table entries, KDP protections are enforced by the hypervisor in VTL 1, making them immune to VTL 0 modification. The feature protects security-relevant kernel variables from tampering, even after a kernel compromise in VTL 0.
 
 KDP comes in two forms: Static KDP for protecting entire driver data sections, and Dynamic KDP for protecting individual pool allocations. Both rely on the same underlying hypervisor mechanism but target different use cases. The design philosophy is "initialize then lock" -- the protected data is writable during setup and becomes permanently read-only once the component signals it is fully configured.
 
@@ -50,8 +50,8 @@ KDP comes in two forms: Static KDP for protecting entire driver data sections, a
 
 ## Bypass History
 
-- **Targeting unprotected data (always viable):** KDP is an opt-in mechanism. Only data structures that are explicitly registered for protection are secured. The vast majority of kernel allocations and global variables, including `_EPROCESS`, `_TOKEN`, `_OBJECT_HEADER`, and most pool allocations, are NOT KDP-protected. Attackers simply target unprotected structures. This is the most common and reliable bypass.
-- **Limited adoption (ongoing):** As of Windows 11 24H2, relatively few kernel components and drivers use KDP. The `_TOKEN` structure, which is the primary target for privilege escalation, remains in standard pool memory. Microsoft has been incrementally adding KDP protection to more components, but coverage remains incomplete.
+- **Targeting unprotected data (always viable):** KDP is opt-in. Only data structures explicitly registered for protection are secured. The vast majority of kernel allocations and global variables, including `_EPROCESS`, `_TOKEN`, `_OBJECT_HEADER`, and most pool allocations, are NOT KDP-protected. Exploits simply target unprotected structures.
+- **Limited adoption (ongoing):** As of Windows 11 24H2, few kernel components and drivers use KDP. The `_TOKEN` structure, the primary target for privilege escalation, remains in standard pool memory. Microsoft has been incrementally adding KDP protection to more components, but coverage remains incomplete.
 - **Initialization-phase attacks (theoretical):** If an attacker can trigger a vulnerability during the window between allocation and protection lockdown, the data can be modified before KDP is applied. This requires precise timing and a vulnerability that can be triggered early in the initialization sequence.
 - **Read-based exfiltration (by design):** KDP does not prevent reading protected data. An attacker can read CI policy state, security configuration, or any KDP-protected variable. Only write access is blocked.
 

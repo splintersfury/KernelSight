@@ -6,7 +6,7 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation — organized as an exploitation pipeline from driver identification through privilege escalation, grounded in 55 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 55 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates

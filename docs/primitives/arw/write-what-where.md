@@ -4,7 +4,7 @@ Classic write-what-where condition — controlled address and controlled value w
 
 ## Description
 
-A write-what-where primitive allows writing an attacker-controlled value to an attacker-controlled kernel address. This is the most powerful single-operation primitive and can directly modify any kernel data structure.
+A write-what-where primitive allows writing a controlled value to a controlled kernel address. It can directly modify any kernel data structure in a single operation.
 
 ## Common Sources
 

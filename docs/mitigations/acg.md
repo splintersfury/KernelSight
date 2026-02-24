@@ -1,10 +1,10 @@
 # Arbitrary Code Guard (ACG)
 
-Process-level mitigation that enforces a strict W^X policy on process memory, preventing dynamic code generation and modification in protected processes.
+Process-level mitigation that enforces a W^X policy on process memory, preventing dynamic code generation and modification in protected processes.
 
 ## Overview
 
-Microsoft introduced Arbitrary Code Guard in Windows 10 RS2 (Creators Update, build 15063) as part of the Windows Defender Exploit Guard mitigation suite. ACG prevents a process from allocating memory that is simultaneously writable and executable, or from changing existing memory page permissions from writable to executable. While ACG is primarily a user-mode mitigation, it is directly relevant to kernel exploitation because many kernel exploit chains culminate in injecting code into a user-mode process (often a privileged or protected one) for post-exploitation. ACG is also a critical component of the Protected Process Light (PPL) and Code Integrity Guard (CIG) security models, which restrict which processes can be injected into and what code they can execute.
+Microsoft introduced Arbitrary Code Guard in Windows 10 RS2 (Creators Update, build 15063) as part of the Windows Defender Exploit Guard suite. ACG prevents a process from allocating memory that is simultaneously writable and executable, or from changing existing memory page permissions from writable to executable. ACG is primarily a user-mode mitigation, but it is relevant to kernel exploitation because many kernel exploit chains end by injecting code into a user-mode process (often a privileged or protected one) for post-exploitation. ACG is also part of the Protected Process Light (PPL) and Code Integrity Guard (CIG) security models, which restrict which processes can be injected into and what code they can execute.
 
 The mitigation is identified internally by the process mitigation policy `ProcessDynamicCodePolicy` and can be configured per-process through the `SetProcessMitigationPolicy` API, Image File Execution Options (IFEO) registry keys, or process creation attributes.
 
@@ -51,11 +51,11 @@ The mitigation is identified internally by the process mitigation policy `Proces
 
 ## Kernel Relevance
 
-ACG is significant for kernel exploitation in several ways:
+ACG affects kernel exploitation in several ways:
 
-- **PPL bypass motivation:** Protected Process Light processes use ACG (and CIG). Kernel exploits that aim to inject into PPL processes (e.g., `csrss.exe`, `services.exe`, antivirus engines) must contend with ACG restrictions.
-- **Post-exploitation limitations:** After achieving kernel code execution or ARW, injecting a user-mode payload into an ACG-protected process requires either using existing signed code paths or targeting a non-ACG process.
-- **Combined with HVCI:** When both HVCI (kernel W^X) and ACG (user W^X) are active, there is no memory anywhere on the system where an attacker can write and then execute custom code.
+- **PPL bypass motivation:** Protected Process Light processes use ACG (and CIG). Kernel exploits that inject into PPL processes (e.g., `csrss.exe`, `services.exe`, antivirus engines) must contend with ACG restrictions.
+- **Post-exploitation limitations:** After achieving kernel code execution or ARW, injecting a user-mode payload into an ACG-protected process requires using existing signed code paths or targeting a non-ACG process.
+- **Combined with HVCI:** When both HVCI (kernel W^X) and ACG (user W^X) are active, there is no memory on the system where custom code can be written and then executed.
 
 ## Windows Version Availability
 

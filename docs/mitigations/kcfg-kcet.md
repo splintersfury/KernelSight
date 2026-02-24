@@ -6,7 +6,7 @@ Kernel Control Flow Guard (kCFG) and kernel Control-flow Enforcement Technology 
 
 kCFG is a software-based forward-edge control flow integrity mechanism introduced in Windows 10 RS1 (Anniversary Update, build 14393). It validates that indirect call targets are legitimate function entry points by checking them against a compiler-generated bitmap. kCET is a hardware-based backward-edge protection that leverages Intel Control-flow Enforcement Technology (CET) or AMD Shadow Stack to protect return addresses. Microsoft enabled kCET enforcement in Windows 11 24H2, making it the first Windows release to ship with hardware shadow stacks active in the kernel.
 
-Together, kCFG and kCET provide comprehensive control flow integrity: kCFG protects forward edges (indirect calls and jumps) while kCET protects backward edges (return instructions). This combination makes traditional ROP and JOP chains significantly harder to construct and execute. The shift from code-reuse attacks to data-only attacks in modern Windows kernel exploitation is largely driven by these two mitigations.
+Together, kCFG and kCET cover both directions of control flow: kCFG protects forward edges (indirect calls and jumps) while kCET protects backward edges (return instructions). This makes traditional ROP and JOP chains much harder to execute. The shift from code-reuse attacks to data-only attacks in modern Windows kernel exploitation is largely driven by these two mitigations.
 
 ## Mechanism
 
@@ -30,9 +30,9 @@ Together, kCFG and kCET provide comprehensive control flow integrity: kCFG prote
 
 ## Primitives Blocked
 
-- **ROP chains (kCET):** Return-oriented programming relies on corrupting return addresses to chain gadgets. The shadow stack detects any return address tampering at the very first `RET` instruction, making ROP chains unviable on kCET-enabled systems regardless of chain length or complexity.
+- **ROP chains (kCET):** Return-oriented programming relies on corrupting return addresses to chain gadgets. The shadow stack detects return address tampering at the first `RET` instruction, making ROP chains unviable on kCET-enabled systems.
 - **Stack pivot attacks (kCET):** Pivoting the stack pointer to attacker-controlled memory causes shadow stack mismatch on the next `RET`, because the shadow stack pointer (SSP) is independent of RSP and cannot be redirected via normal memory writes.
-- **JOP / indirect call hijacking (kCFG):** Overwriting an indirect call target (e.g., a function pointer in a vtable or callback table) will fail validation unless the target is in the valid function bitmap. This blocks the majority of function pointer overwrites.
+- **JOP / indirect call hijacking (kCFG):** Overwriting an indirect call target (e.g., a function pointer in a vtable or callback table) fails validation unless the target is in the valid function bitmap.
 - **CR4 modification via ROP (kCET):** The classic SMEP bypass of ROP-chaining to `mov cr4, <reg>` is blocked because the ROP chain itself is detected by kCET at the first return.
 - **Callback overwrites to arbitrary addresses (kCFG):** Replacing a kernel callback pointer with an arbitrary address fails the bitmap check on dispatch.
 - **Interrupt handler replacement (kCFG/kCET):** Modifying IDT entries or ISR pointers is detected by kCFG validation, and any ROP-based setup is caught by kCET.
@@ -40,7 +40,7 @@ Together, kCFG and kCET provide comprehensive control flow integrity: kCFG prote
 
 ## Bypass History
 
-- **CFG-valid gadgets (ongoing):** kCFG only validates that a target is a legitimate function entry point. An attacker can redirect an indirect call to any valid function, even if it was not the intended target. Functions like `NtWriteVirtualMemory` or system call stubs are all valid targets. This is sometimes called "CFG-aware exploitation" and significantly narrows but does not eliminate the usable gadget set.
+- **CFG-valid gadgets (ongoing):** kCFG only validates that a target is a legitimate function entry point. An indirect call can be redirected to any valid function, even if it was not the intended target. Functions like `NtWriteVirtualMemory` or system call stubs are all valid targets. This is sometimes called "CFG-aware exploitation" -- it narrows the usable gadget set but does not eliminate it.
 - **Data-only attacks (always viable):** Attacks that modify data structures without hijacking control flow are completely unaffected by both kCFG and kCET. Token swapping, `PreviousMode` manipulation, and ACL/SD modification require no indirect call corruption. This is the primary reason modern kernel exploits have shifted to data-only techniques.
 - **Unprotected callbacks (ongoing, shrinking):** Some kernel callback mechanisms (e.g., certain exception dispatch paths, APC user-mode callbacks, I/O completion routines) may not be fully covered by kCFG validation. Microsoft has been progressively closing these gaps with each Windows release.
 - **Third-party driver gaps (ongoing):** Drivers not compiled with `/guard:cf` have unprotected indirect call sites. An attacker who can hijack control flow within such a driver is not subject to kCFG checks at those call sites.
@@ -61,9 +61,9 @@ kCFG requires drivers to be compiled with `/guard:cf`. Third-party drivers witho
 
 ## Impact on Exploit Development
 
-kCFG and kCET together have driven a fundamental shift in kernel exploitation strategy. Before kCFG, a single function pointer overwrite was often sufficient to hijack kernel execution and run arbitrary code. After kCFG, attackers must either find a useful CFG-valid target function or avoid control flow hijacking entirely. With kCET added in 24H2, even the ROP/JOP fallback is eliminated, leaving data-only attacks as the primary viable strategy on fully updated systems.
+kCFG and kCET together have shifted kernel exploitation strategy. Before kCFG, a single function pointer overwrite was often enough to hijack kernel execution. After kCFG, exploits must either find a useful CFG-valid target function or avoid control flow hijacking entirely. With kCET added in 24H2, the ROP/JOP fallback is also eliminated, leaving data-only attacks as the primary viable strategy on fully updated systems.
 
-This explains why recent high-profile kernel exploits (CVE-2024-21338, CVE-2024-30088, CVE-2024-38106) all use data-only post-exploitation rather than shellcode or ROP chains. The combination of kCFG, kCET, SMEP, SMAP, and HVCI has made code execution-based exploitation prohibitively difficult on modern Windows 11 24H2 systems with hardware support.
+Recent kernel exploits (CVE-2024-21338, CVE-2024-30088, CVE-2024-38106) all use data-only post-exploitation rather than shellcode or ROP chains. The combination of kCFG, kCET, SMEP, SMAP, and HVCI has made code execution-based exploitation prohibitively difficult on Windows 11 24H2 systems with hardware support.
 
 ## Cross-References
 

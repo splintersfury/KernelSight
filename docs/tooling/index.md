@@ -8,7 +8,7 @@ Tools and frameworks for Windows kernel driver vulnerability research. This sect
 
 ## Overview
 
-Tooling is essential across the entire research pipeline -- from static analysis of driver binaries to dynamic fuzzing, patch diffing, and kernel debugging. Choosing the right tool for each stage of research dramatically affects efficiency: static analysis narrows the attack surface, fuzzing discovers crashes at scale, debugging confirms exploitability, and patch diffing reveals what Microsoft considered worth fixing. This section covers the key categories and how they fit together in a typical workflow.
+Tooling spans the full research pipeline: static analysis of driver binaries, dynamic fuzzing, patch diffing, and kernel debugging. Static analysis narrows the attack surface, fuzzing discovers crashes at scale, debugging confirms exploitability, and patch diffing reveals what Microsoft fixed. This section covers each category and how they fit together.
 
 ## Tool Landscape
 
@@ -33,17 +33,7 @@ Tooling is essential across the entire research pipeline -- from static analysis
 
 ## Typical Research Flow
 
-A common research workflow touches multiple tool categories in sequence. For example, after Patch Tuesday a researcher might: (1) use `WinBIndex` to download the pre-patch and post-patch driver, (2) run `BinDiff` or `AutoPiff` to identify changed functions, (3) open the changed functions in `Ghidra` or `IDA Pro` for manual review, (4) write a `WTF` or `kAFL` harness targeting the patched code path, and (5) debug the triggered crash in `WinDbg` to confirm the root cause. Each tool category below supports one or more of these stages.
-
-## Cross-References
-
-Each sub-page dives into a specific category with tool comparisons, setup instructions, and practical workflows:
-
-- [Static Analysis](static-analysis.md) -- covers `IDA Pro`, `Ghidra`, `CodeQL`, `Joern`, and `IOCTLance` for analyzing driver binaries without execution.
-- [Fuzzing](fuzzing.md) -- covers `kAFL`, `WTF`, `Syzkaller`, and corpus strategies for automated crash discovery.
-- [Debugging](debugging.md) -- covers `WinDbg` setup, essential commands, extensions, and crash dump analysis.
-- [Patch Diffing](patch-diffing.md) -- covers `BinDiff`, `Diaphora`, `ghidriff`, and manual diff workflows.
-- [AutoPiff Integration](autopiff-integration.md) -- covers the automated pipeline that ties patch diffing, decompilation, and vulnerability classification together.
+A common workflow after Patch Tuesday: (1) download pre-patch and post-patch drivers from `WinBIndex`, (2) run `BinDiff` or `AutoPiff` to identify changed functions, (3) review changed functions in `Ghidra` or `IDA Pro`, (4) write a `WTF` or `kAFL` harness targeting the patched code path, (5) debug the triggered crash in `WinDbg` to confirm root cause.
 
 <div class="ks-next-pipeline">
   <a href="../index.md">&larr; Pipeline Overview</a>

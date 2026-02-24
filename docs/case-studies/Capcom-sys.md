@@ -27,27 +27,25 @@
 
 ## Root Cause
 
-`Capcom.sys` is arguably the most infamous BYOVD driver. It was shipped as an anti-cheat component with Capcom's Street Fighter V. The driver's IOCTL handler accepts a user-mode function pointer via `DeviceIoControl`, then:
+`Capcom.sys` is the most well-known BYOVD driver. It shipped as an anti-cheat component with Capcom's Street Fighter V. The driver's IOCTL handler accepts a user-mode function pointer via `DeviceIoControl`, then:
 
 1. Disables SMEP (Supervisor Mode Execution Prevention) by clearing the relevant bit in CR4
 2. Calls the user-supplied function pointer from ring 0
 3. Re-enables SMEP after the call returns
 
-This is not a bug — it is the driver's intended design. Capcom implemented it to execute anti-cheat verification code in kernel mode. The practical effect is that any process that can open the device (world-accessible ACLs) can execute arbitrary code in ring 0 by simply providing a function pointer. No memory corruption, no exploitation chain — just a direct call.
+This is not a bug but the driver's intended design. Capcom implemented it to run anti-cheat verification code in kernel mode. Any process that can open the device (world-accessible ACLs) can execute arbitrary code in ring 0 by providing a function pointer. No memory corruption, no exploitation chain, just a direct call.
 
 tandasat first documented the vulnerability. FuzzySecurity wrote the most widely-referenced exploitation guide. Rapid7 published additional analysis.
 
 ## Exploitation
 
-Exploitation is trivial:
-
 1. Load `Capcom.sys` and open `\\.\Htsysm72FB`
 2. Allocate a user-mode buffer containing shellcode
 3. Send IOCTL `0xAA013044` with the buffer address as the function pointer
-4. The driver disables SMEP and calls the pointer — shellcode executes in ring 0
-5. Shellcode performs token swap, installs rootkit, or executes any kernel operation
+4. The driver disables SMEP and calls the pointer, executing shellcode in ring 0
+5. Shellcode performs token swap, installs rootkit, or runs any kernel operation
 
-The entire exploit is approximately 50 lines of code. No heap spray, no race condition, no mitigation bypass needed (the driver disables SMEP itself). On systems without HVCI, this provides reliable ring-0 code execution.
+The exploit is about 50 lines of code. No heap spray, no race condition, no mitigation bypass needed (the driver disables SMEP itself). On systems without HVCI, this gives reliable ring-0 code execution.
 
 On HVCI-enabled systems, the driver cannot disable SMEP (the hypervisor prevents CR4 modification) and cannot execute user-mode code pages (W^X enforcement), so the attack fails.
 

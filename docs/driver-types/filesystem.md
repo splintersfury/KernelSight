@@ -45,4 +45,4 @@ File system drivers implement on-disk format parsing and file I/O for specific f
 
 ## Research Notes
 
-File system drivers are high-value targets because VHD mounting is available to standard users on Windows 10/11, providing a local attack vector without admin privileges. Both CVE-2025-24985 and CVE-2025-24993 were exploited in the wild.
+VHD mounting is available to standard users on Windows 10/11, so file system parsing bugs are reachable without admin privileges. Both CVE-2025-24985 and CVE-2025-24993 were exploited in the wild.

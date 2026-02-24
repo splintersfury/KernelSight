@@ -80,10 +80,4 @@ OEM hardware utility, diagnostic, and management drivers — the canonical BYOVD
 
 ## Research Notes
 
-Vendor utility drivers are the canonical BYOVD targets because:
-- They are **legitimately signed** by major OEMs with valid Authenticode signatures
-- They **intentionally expose** physical memory R/W, MSR access, and I/O port access — by design, not by bug
-- The "vulnerability" is the **design itself**: the driver was never intended to be loaded by unauthorized parties
-- Microsoft's Vulnerable Driver Blocklist covers many of these, but new variants are continually discovered
-- KDU (Kernel Driver Utility by hfiref0x) integrates many of these drivers as exploitation providers
-- LOLDrivers catalogs over 100 vendor utility drivers with known BYOVD potential
+Vendor utility drivers are the canonical BYOVD targets. They are legitimately signed by major OEMs and intentionally expose physical memory R/W, MSR access, and I/O port access — the "vulnerability" is the design itself, since the driver was never intended to be loaded by unauthorized parties. Microsoft's Vulnerable Driver Blocklist covers many of these, but new variants are continually discovered. KDU (Kernel Driver Utility by hfiref0x) integrates many as exploitation providers, and LOLDrivers catalogs over 100 vendor utility drivers with known BYOVD potential.

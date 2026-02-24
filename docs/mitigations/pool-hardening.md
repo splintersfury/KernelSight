@@ -1,12 +1,12 @@
 # Pool Hardening
 
-Incremental protections added to the Windows kernel pool allocator over multiple releases to prevent exploitation via heap corruption, pool overflow, and deterministic pool layout attacks.
+Incremental protections added to the Windows kernel pool allocator over multiple releases to raise the cost of heap corruption, pool overflow, and deterministic pool layout attacks.
 
 ## Overview
 
-Microsoft has progressively hardened the kernel pool (heap) allocator since Windows 10, with each release introducing additional protections that raise the difficulty of pool-based exploitation. The most significant architectural change came in Windows 10 19H1 (build 18362), which replaced the legacy NT pool allocator with the Segment Heap -- a modern allocator design with randomized metadata placement and improved isolation. Additional changes include NonPagedPoolNx enforcement, pool header cookie validation, safe unlinking, the new `ExAllocatePool2` API that zeros memory by default, and allocation size class bucketing that resists deterministic pool spray layouts.
+Microsoft has progressively hardened the kernel pool (heap) allocator since Windows 10, with each release adding protections against pool-based exploitation. The most significant architectural change came in Windows 10 19H1 (build 18362), which replaced the legacy NT pool allocator with the Segment Heap -- a modern allocator design with randomized metadata placement and improved isolation. Additional changes include NonPagedPoolNx enforcement, pool header cookie validation, safe unlinking, the `ExAllocatePool2` API that zeros memory by default, and allocation size class bucketing that resists deterministic pool spray layouts.
 
-These mitigations are particularly important because pool corruption (overflow, use-after-free, type confusion) remains the most common class of kernel vulnerability. Unlike mitigations such as SMEP/SMAP or HVCI that block specific exploitation primitives, pool hardening directly targets the initial corruption step.
+Pool corruption (overflow, use-after-free, type confusion) remains the most common class of kernel vulnerability. Unlike SMEP/SMAP or HVCI, which block specific exploitation primitives, pool hardening targets the initial corruption step directly.
 
 ## Mechanism
 
@@ -50,7 +50,7 @@ These mitigations are particularly important because pool corruption (overflow, 
 
 - **Pool header cookie leakage and forging (ongoing):** If an attacker has an information disclosure primitive to read the pool header cookie and global secret, they can forge valid headers. This downgrades the cookie protection to an information disclosure requirement.
 - **Probabilistic pool spray (ongoing):** While the Segment Heap randomizes allocation order, spraying a sufficient number of allocations (typically thousands) still achieves high probability of adjacent placement. The attack becomes probabilistic rather than deterministic but remains practical.
-- **Incomplete type isolation (ongoing):** Many different kernel object types share the same size class buckets. An attacker can spray one object type and overflow into a different type in the same bucket. Microsoft has been adding type-based isolation for specific high-value objects but coverage is incomplete.
+- **Incomplete type isolation (ongoing):** Many different kernel object types share the same size class buckets. One object type can be sprayed and overflowed into a different type in the same bucket. Microsoft has been adding type-based isolation for specific objects but coverage is incomplete.
 - **Large allocations bypass LFH (ongoing):** Allocations above the LFH threshold (approximately 16KB) go through the VS segment allocator, which has different randomization properties. Very large allocations (above 1 page) use page-aligned allocations that can be more predictable.
 - **Cross-page overflow into adjacent allocation (ongoing):** Pool overflow attacks that cross page boundaries can still reach adjacent objects, especially in VS segments where subsegment layout is less randomized than LFH.
 

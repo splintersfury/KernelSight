@@ -1,10 +1,10 @@
 # Debugging
 
-Kernel debugging setup and techniques for Windows driver vulnerability research.
+Kernel debugging setup and techniques for Windows driver research.
 
 ## Overview
 
-Kernel debugging is essential for exploit development, crash analysis, and understanding driver internals at runtime. `WinDbg` is the primary tool, with several extensions and workflows optimized for security research. A working kernel debugging setup is a prerequisite for many other activities -- snapshot-based fuzzing, exploit proof-of-concept development, and verifying that a static analysis finding is actually reachable at runtime.
+Kernel debugging is used for exploit development, crash analysis, and understanding driver internals at runtime. `WinDbg` is the primary tool. A working kernel debugging setup is a prerequisite for snapshot-based fuzzing, PoC development, and verifying that a static analysis finding is reachable at runtime.
 
 ## WinDbg Setup
 
@@ -22,14 +22,14 @@ Kernel debugging is essential for exploit development, crash analysis, and under
 - **Hyper-V**: use `bcdedit /hypervisorsettings` for hypervisor-level debugging configuration
 - **QEMU/KVM**: launch with `-serial tcp::1234,server` and connect `WinDbg` via serial over TCP
 - VM debugging is recommended for safety: kernel crashes simply require a VM reset rather than a physical reboot
-- `VirtualKD-Redux` accelerates VM kernel debugging significantly by replacing the slow serial protocol with a fast host-guest channel
+- `VirtualKD-Redux` accelerates VM kernel debugging by replacing the slow serial protocol with a fast host-guest channel
 
 ### WinDbg Preview
 
 - Modern UI with JavaScript scripting engine and Time Travel Debugging (TTD) support
 - TTD records a full execution trace that can be replayed forward and backward
 - TTD limitations: kernel-mode TTD support is limited and primarily works for user-mode scenarios
-- JavaScript scripting (`dx` command and `.scriptload`) enables powerful automation of analysis tasks
+- JavaScript scripting (`dx` command and `.scriptload`) enables automation of analysis tasks
 
 ## Essential Commands
 
@@ -60,7 +60,7 @@ Kernel debugging is essential for exploit development, crash analysis, and under
 
 ## Kernel Debugging Workflow
 
-A typical kernel debugging session for driver vulnerability research:
+Typical session for driver vulnerability research:
 
 1. Set up two-machine or VM debugging environment with KDNET or serial connection
 2. Load target driver symbols: `.sympath+ <path_to_symbols>` followed by `.reload`
@@ -78,7 +78,7 @@ A typical kernel debugging session for driver vulnerability research:
 - **Pool tracking**: monitors all allocations and frees for leak detection and double-free identification
 - **IRQL checking**: detects incorrect IRQL usage, a common class of driver bug that causes subtle corruption
 - **Deadlock detection**: monitors lock acquisition ordering to find potential deadlocks before they occur in production
-- Reboot is required after enabling Driver Verifier -- it adds runtime overhead but catches many subtle bugs that would otherwise go unnoticed
+- Reboot is required after enabling Driver Verifier; it adds runtime overhead but catches bugs that would otherwise go unnoticed
 - Query current settings: `verifier /query` to see which drivers are being verified and which checks are active
 
 ## Crash Dump Analysis

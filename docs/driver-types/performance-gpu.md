@@ -59,9 +59,4 @@ CPU tuning, GPU, and chipset drivers — expose MSR writes, GPU memory mapping, 
 
 ## Research Notes
 
-Performance and GPU drivers are valuable BYOVD targets because:
-- They **require MSR access** by design — CPU tuning requires writing to performance-related MSRs
-- GPU drivers **map large physical memory regions** for framebuffer and MMIO access
-- MSR writes can be weaponized to **disable security features** (e.g., writing to IA32_LSTAR to redirect syscalls)
-- GPU memory mapping can provide a **covert channel** for kernel memory access
-- These drivers are **widely deployed** on gaming and workstation systems
+Performance and GPU drivers are common BYOVD targets. CPU tuning drivers require MSR access by design, and GPU drivers map large physical memory regions for framebuffer and MMIO access. MSR writes can disable security features (e.g., writing to IA32_LSTAR to redirect syscalls), and GPU memory mapping can provide kernel memory access through DMA regions. These drivers are widely deployed on gaming and workstation systems.

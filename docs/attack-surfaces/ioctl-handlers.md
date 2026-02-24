@@ -17,7 +17,7 @@ When a user-mode process calls `DeviceIoControl`, the I/O Manager constructs an 
 
 For `METHOD_BUFFERED` transfers, the I/O Manager allocates a kernel buffer large enough for the larger of the input and output buffers, copies the user input into it, and after the driver completes the IRP, copies the result back to user space. This provides inherent isolation but the driver must still validate that the buffer sizes are sufficient for the expected structure. For `METHOD_IN_DIRECT` and `METHOD_OUT_DIRECT`, the output buffer is described by an MDL that the I/O Manager probes and locks, giving the driver direct access to the user pages. `METHOD_NEITHER` provides no buffering at all -- the driver receives raw user-mode pointers and is entirely responsible for probing and capturing the data safely.
 
-The severity of IOCTL vulnerabilities stems from the combination of direct user reachability and the sheer variety of IOCTL codes a single driver may handle. A driver like `ks.sys` handles dozens of distinct control codes across multiple device types, and each code path must independently validate buffer sizes, pointer alignment, and access permissions. A single missing check on one code path is sufficient for a local privilege escalation. The `DeviceIoControl` API is callable from sandboxed processes and low-privilege contexts, making IOCTL vulnerabilities especially valuable for sandbox escapes and local privilege escalation chains.
+IOCTL vulnerabilities combine direct user reachability with a wide variety of control codes per driver. A driver like `ks.sys` handles dozens of distinct control codes across multiple device types, and each code path must independently validate buffer sizes, pointer alignment, and access permissions. A single missing check on one code path is sufficient for local privilege escalation. The `DeviceIoControl` API is callable from sandboxed processes and low-privilege contexts, so IOCTL bugs are often used for sandbox escapes and local privilege escalation chains.
 
 The access control model for device objects adds another dimension. When a driver calls `IoCreateDevice` or `IoCreateDeviceSecure`, it may specify a security descriptor limiting which users can open handles. However, if the driver does not set `FILE_DEVICE_SECURE_OPEN`, the I/O Manager only checks the security descriptor on the device namespace root, not on individual opens to named paths under the device. This means a driver that exposes a device at `\\Device\\MyDriver` without `FILE_DEVICE_SECURE_OPEN` may allow unprivileged processes to open `\\Device\\MyDriver\AnySubPath` and reach the IOCTL handler.
 
@@ -35,7 +35,7 @@ The access control model for device objects adds another dimension. When a drive
 
 ## Driver Examples
 
-Nearly every WDM and KMDF driver exposes IOCTL handlers. Historically high-value targets include `ks.sys` and `ksthunk.sys` (kernel streaming), `afd.sys` (ancillary function driver for Winsock), `csc.sys` (client-side caching), `appid.sys` (AppLocker), `win32kbase.sys` (GDI system calls), and virtually all third-party antivirus, EDR, and GPU drivers. Kernel streaming drivers are particularly rich attack surfaces because they handle complex media pipeline structures with deeply nested variable-length fields. Third-party drivers from antivirus vendors (Avast, ESET, Kaspersky), virtualization products (VMware, VirtualBox), and hardware peripheral companies frequently contain IOCTL vulnerabilities due to less rigorous code review compared to Microsoft inbox drivers.
+Nearly every WDM and KMDF driver exposes IOCTL handlers. Frequently targeted drivers include `ks.sys` and `ksthunk.sys` (kernel streaming), `afd.sys` (ancillary function driver for Winsock), `csc.sys` (client-side caching), `appid.sys` (AppLocker), `win32kbase.sys` (GDI system calls), and virtually all third-party antivirus, EDR, and GPU drivers. Kernel streaming drivers handle complex media pipeline structures with deeply nested variable-length fields. Third-party drivers from antivirus vendors (Avast, ESET, Kaspersky), virtualization products (VMware, VirtualBox), and hardware peripheral companies frequently contain IOCTL vulnerabilities, as they typically receive less code review than Microsoft inbox drivers.
 
 ## Detection Approach
 
@@ -69,7 +69,7 @@ AutoPiff detects IOCTL hardening patches with these rules:
 
 ### Third-Party IOCTL Examples
 
-Third-party vendor utility drivers are among the most exploited IOCTL-based attack surfaces. Unlike Microsoft inbox drivers where the vulnerability is a missing check, these drivers intentionally expose powerful IOCTLs:
+Third-party vendor utility drivers are among the most exploited IOCTL-based attack surfaces. Unlike Microsoft inbox drivers where the vulnerability is a missing check, these drivers intentionally expose privileged IOCTLs:
 
 | Driver | Vendor | IOCTLs Exposed | Case Study |
 |--------|--------|---------------|------------|
