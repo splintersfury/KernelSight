@@ -34,10 +34,18 @@ Event Tracing for Windows (ETW) kernel logger sessions can inadvertently expose 
 
 Hardware-level side channels provide KASLR bypass capabilities independent of software restrictions.
 
-- **Prefetch/TSC timing** -- Measuring access latency to distinguish mapped kernel pages from unmapped ones reveals which of the 256 possible base addresses is correct
+- **Prefetch instruction timing (EntryBleed for Windows)** -- The CPU `prefetch` instruction executes faster when the target virtual address is present in the current page tables versus unmapped. On modern Windows 11 (24H2) where KVA shadowing is disabled, the entire kernel address space remains in user-mode page tables, making kernel pages distinguishable by timing. An attacker probes the 256 possible kernel base addresses by measuring `prefetch` + `rdtsc` latency for each candidate, identifying the correct base within milliseconds. Demonstrated to work reliably on modern Intel CPUs; AMD results are less consistent. See [24H2 NT Exploit](https://exploits.forsale/24h2-nt-exploit/) for a working implementation. This technique requires no software vulnerability — only user-mode code execution.
 - **KASLR entropy bruteforce** -- With only 256 possible base addresses, an attacker with a partial info leak can enumerate all possibilities
 - **Interrupt timing variations** -- Kernel interrupt handling time varies based on cache state, which correlates with address layout
 - Status: These attacks are hardware-dependent and have not been fully mitigated. Windows 11 24H2 increased kernel entropy but did not eliminate timing channels.
+
+## Security Descriptor Corruption
+
+With an arbitrary write or [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md), an attacker can bypass KASLR restrictions by corrupting the kernel structures that enforce them, rather than exploiting an information disclosure vulnerability.
+
+- **SepMediumDaclSd DACL zeroing** -- The global `SepMediumDaclSd` security descriptor gates `NtQuerySystemInformation` access for sensitive info classes. Zeroing the DACL (e.g., via `RtlClearAllBits`) removes the integrity level check, allowing Low-IL processes to query kernel module addresses. See [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md).
+- **SepMediumDaclSd Control field bit-flip** -- A more surgical variant targets the `SE_SACL_PRESENT` (0x10) bit in the security descriptor's `Control` field. Clearing this bit tricks `SeAccessCheck` into skipping Mandatory Integrity Control validation entirely, bypassing both DACL and integrity label checks with a single bit write. Demonstrated in the [StarLabs Chrome sandbox escape](https://starlabs.sg/blog/2025/07-fooling-the-sandbox-a-chrome-atic-escape/) using CVE-2024-30088's partial write primitive.
+- **WIL feature flag bypass** -- Even after bypassing the DACL check, a secondary gate exists: the WIL runtime flag `Feature_RestrictKernelAddressLeaks__private_featureState` controls whether kernel addresses are scrubbed from API output. Flipping this flag's state bits (via `RtlSetBit`) disables address scrubbing. Combined with DACL corruption, this fully defeats `NtQuerySystemInformation` restrictions on modern Windows. Demonstrated in [CVE-2026-21241](../case-studies/CVE-2026-21241.md).
 
 ## Driver Info Disclosure CVEs
 
@@ -67,7 +75,15 @@ On Windows 11 24H2, the primary KASLR bypass mechanisms are:
 
 - **Driver-specific information disclosure vulnerabilities** remain the most practical KASLR defeat method. Each Patch Tuesday potentially introduces new info leak CVEs in kernel components.
 - **Medium-IL NtQuerySystemInformation** still returns some kernel information, though the most sensitive classes are restricted.
-- **Timing side-channels** work but are noisy, slow, and hardware-dependent.
+- **Security descriptor corruption** (SepMediumDaclSd + WIL feature flag) allows converting any write primitive into a KASLR bypass without a dedicated info leak vulnerability.
+- **Prefetch side-channel** works on Intel CPUs without any software vulnerability, though it is hardware-dependent.
 - **ETW and API-based leaks** are largely closed for low-IL and partially restricted for medium-IL.
 
-For exploit chains targeting 24H2, researchers typically combine a driver info disclosure vulnerability with a separate corruption vulnerability, treating KASLR bypass as its own stage in the exploit chain.
+For exploit chains targeting 24H2, researchers increasingly use security descriptor corruption (when they already have a write primitive) or prefetch timing (when they need a standalone leak), treating KASLR bypass as its own stage in the exploit chain.
+
+## See Also
+
+- [KASLR](kaslr.md) -- overview of the mitigation mechanism
+- [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md) -- SepMediumDaclSd corruption technique
+- [Bit-Manipulation Primitives](../primitives/exploitation/bit-manipulation.md) -- RtlSetBit/RtlClearAllBits used for SD and feature flag corruption
+- [CVE-2026-21241](../case-studies/CVE-2026-21241.md) -- full exploit chain using SD corruption + WIL bypass for KASLR defeat
