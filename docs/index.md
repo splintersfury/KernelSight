@@ -13,6 +13,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 
 | Date | What's New |
 |------|------------|
+| **2026-03-01** | New guide: [Why Kernel Drivers?](guides/why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, the security cost, and Microsoft's trajectory toward constraining kernel code. |
 | **2026-02-28** | New guides: [Corpus Analytics](guides/corpus-analytics.md), [Exploit Chain Patterns](guides/exploit-chain-patterns.md), [Patch Patterns](guides/patch-patterns.md), [Mitigation Timeline](guides/mitigation-timeline.md). New deep dives: [afd.sys](case-studies/afd-deep-dive.md) (13 CVEs), [win32k](case-studies/win32k-deep-dive.md) (12 CVEs), [ntfs.sys](case-studies/ntfs-deep-dive.md) (7 CVEs). |
 | **2026-02-28** | New guide: [Anatomy of a Secure Driver](guides/secure-driver-anatomy.md) -- the 6 anti-patterns behind most kernel driver CVEs, with root cause distribution chart, pseudocode fixes, and a 14-point secure driver checklist. |
 | **2026-02-28** | Comprehensive expansion: 58 more case studies added — filling gaps across every 2025-2026 Patch Tuesday. Coverage now spans afd.sys (13 CVEs), clfs.sys (12 CVEs), win32k (10 CVEs), dwmcore.dll (8 CVEs), ntfs.sys (8 CVEs), ntoskrnl (7 CVEs), plus new drivers: rasman.sys, storvsp.sys, dxgkrnl.sys, msfs.sys. BYOVD additions include Paragon BioNTdrv siblings, TfSysMon.sys, STProcessMonitor.sys. Corpus now at 131 CVEs, 52 exploited ITW. |
