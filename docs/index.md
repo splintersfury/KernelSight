@@ -13,6 +13,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 
 | Date | What's New |
 |------|------------|
+| **2026-02-28** | New guide: [Anatomy of a Secure Driver](guides/secure-driver-anatomy.md) -- the 6 anti-patterns behind most kernel driver CVEs, with root cause distribution chart, pseudocode fixes, and a 14-point secure driver checklist. |
 | **2026-02-28** | Comprehensive expansion: 58 more case studies added — filling gaps across every 2025-2026 Patch Tuesday. Coverage now spans afd.sys (13 CVEs), clfs.sys (12 CVEs), win32k (10 CVEs), dwmcore.dll (8 CVEs), ntfs.sys (8 CVEs), ntoskrnl (7 CVEs), plus new drivers: rasman.sys, storvsp.sys, dxgkrnl.sys, msfs.sys. BYOVD additions include Paragon BioNTdrv siblings, TfSysMon.sys, STProcessMonitor.sys. Corpus now at 131 CVEs, 52 exploited ITW. |
 | **2026-02-28** | Bulk addition: 25 new case studies covering 2025-2026 kernel CVEs — ITW zero-days in [afd.sys](case-studies/CVE-2025-21418.md), [clfs.sys](case-studies/CVE-2025-32701.md), [DWM](case-studies/CVE-2025-30400.md), [ntoskrnl](case-studies/CVE-2025-62215.md), [win32k](case-studies/CVE-2025-24983.md), [Hyper-V](case-studies/CVE-2025-21334.md); BYOVD campaigns via [Paragon](case-studies/CVE-2025-0289.md), [NSecKrnl](case-studies/CVE-2025-68947.md), [EnPortv](case-studies/EnPortv-sys.md). Corpus now at 82 CVEs, 47 exploited ITW. |
 | **2026-02-28** | [CVE-2025-3464](case-studies/CVE-2025-3464.md) / [CVE-2025-1533](case-studies/CVE-2025-1533.md) — AsIO3.sys auth bypass + stack overflow. Full exploit chain from Cisco Talos: hardlink auth bypass, `ObfDereferenceObject` [decrement-by-one](primitives/arw/arb-increment-decrement.md), [PreviousMode flip](primitives/exploitation/previous-mode-manipulation.md), [token theft](primitives/exploitation/token-swapping.md). |
@@ -113,6 +114,10 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <strong><a href="tooling/">Tooling</a></strong>
 <p>Static analysis, fuzzing, kernel debugging, and AutoPiff integration for automated vulnerability detection across driver patches.</p>
 </li>
+<li markdown>
+<strong><a href="guides/">Guides</a></strong>
+<p>Cross-cutting analysis that synthesizes patterns from the corpus -- what makes a driver secure, what the common mistakes look like, and how to avoid them.</p>
+</li>
 </ol>
 
 <hr class="ks-divider--dots">
@@ -146,6 +151,11 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <a class="ks-path-card" href="tooling/autopiff-integration/">
   <strong>Building detection automation</strong>
   <span>See how AutoPiff integrates with this knowledge base to detect vulnerability patterns at scale.</span>
+</a>
+
+<a class="ks-path-card" href="guides/secure-driver-anatomy/">
+  <strong>Writing or auditing a driver</strong>
+  <span>The 6 anti-patterns behind most kernel driver CVEs, with fixes, a checklist, and real CVE citations.</span>
 </a>
 
 </div>
