@@ -1,6 +1,6 @@
 # AsIO3.sys
 
-> ASRock/ASUS hardware access driver — physical memory R/W, MSR access, and ObfDereferenceObject decrement primitive
+> ASRock/ASUS hardware access driver that exposes physical memory reads/writes, MSR access, and an `ObfDereferenceObject` decrement primitive
 
 ## Summary
 
@@ -37,7 +37,7 @@
 
 The driver's authorization relies solely on SHA256 hash verification of the calling process's executable path ([CVE-2025-3464](CVE-2025-3464.md)), which can be bypassed via a hardlink attack. The `IRP_MJ_CREATE` handler also contains a stack buffer overflow in its `Win32PathToNtPath` function ([CVE-2025-1533](CVE-2025-1533.md)) due to a `MAX_PATH` length assumption.
 
-The driver was first documented by swapcontext in the KDU v1.1 release and later received full exploitation analysis from Cisco Talos (Marcin Noga), who demonstrated a complete SYSTEM escalation chain using the decrement-by-one primitive.
+Swapcontext first documented the driver in the KDU v1.1 release. Cisco Talos researcher Marcin Noga later published a full exploitation analysis, demonstrating a complete SYSTEM escalation chain using the decrement-by-one primitive.
 
 ## Exploitation
 
