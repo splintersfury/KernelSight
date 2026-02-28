@@ -262,6 +262,9 @@ nav:
     - ACG: mitigations/acg.md
     - KASLR: mitigations/kaslr.md
     - KASLR Bypasses: mitigations/kaslr-bypasses.md
+  - Guides:
+    - guides/index.md
+    - Anatomy of a Secure Driver: guides/secure-driver-anatomy.md
   - Tools:
     - tooling/index.md
     - Static Analysis: tooling/static-analysis.md
