@@ -53,66 +53,94 @@ The top 10 driver families account for roughly 75% of the corpus. Four families 
   <p class="ks-figure-caption">"win32k family" combines win32k.sys, win32kbase.sys, and win32kfull.sys. "KS stack" combines ks.sys, ksthunk.sys, and mskssrv.sys. Remaining 44 CVEs span 52 additional drivers.</p>
 </div>
 
-## CVEs by Year
+## Kernel CVE Volume by Year
 
-Most CVEs land in 2025, partly because Patch Tuesday coverage expanded and more researchers started poking at kernel attack surface. The year reflects disclosure, not discovery.
+Windows kernel-mode components average 90--140 CVEs per year. The chart below counts every CVE in the NVD whose description mentions a kernel-mode component -- ntoskrnl, win32k, CLFS, AFD, NTFS, TCP/IP, DWM, cloud files mini-filter, or kernel-mode driver.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG — CVEs by Disclosure Year</span>
-  <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked bar chart showing CVE counts by year, split between ITW and non-ITW">
-    <!-- Y-axis labels -->
-    <text class="ks-annotation" x="40" y="210" text-anchor="end">0</text>
-    <line class="ks-line" x1="45" y1="207" x2="670" y2="207" opacity="0.15"/>
-    <text class="ks-annotation" x="40" y="170" text-anchor="end">20</text>
-    <line class="ks-line" x1="45" y1="167" x2="670" y2="167" opacity="0.15"/>
-    <text class="ks-annotation" x="40" y="130" text-anchor="end">40</text>
-    <line class="ks-line" x1="45" y1="127" x2="670" y2="127" opacity="0.15"/>
-    <text class="ks-annotation" x="40" y="90" text-anchor="end">60</text>
-    <line class="ks-line" x1="45" y1="87" x2="670" y2="87" opacity="0.15"/>
-    <text class="ks-annotation" x="40" y="50" text-anchor="end">80</text>
-    <line class="ks-line" x1="45" y1="47" x2="670" y2="47" opacity="0.15"/>
-    <!-- 2015-2021 (12 total, 5 ITW) -->
-    <rect class="ks-box" x="65" y="183" width="40" height="24" rx="0"/>
-    <rect class="ks-box" x="65" y="173" width="40" height="10" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="85" y="170">12</text>
-    <text class="ks-annotation" x="85" y="225" text-anchor="middle">&#x2264;21</text>
-    <!-- 2022 (4 total, 3 ITW) -->
-    <rect class="ks-box" x="130" y="205" width="40" height="2" rx="0"/>
-    <rect class="ks-box" x="130" y="199" width="40" height="6" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="150" y="196">4</text>
-    <text class="ks-annotation" x="150" y="225" text-anchor="middle">2022</text>
-    <!-- 2023 (14 total, 5 ITW) -->
-    <rect class="ks-box" x="195" y="189" width="40" height="18" rx="0"/>
-    <rect class="ks-box" x="195" y="179" width="40" height="10" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="215" y="176">14</text>
-    <text class="ks-annotation" x="215" y="225" text-anchor="middle">2023</text>
-    <!-- 2024 (18 total, 7 ITW) -->
-    <rect class="ks-box" x="260" y="185" width="40" height="22" rx="0"/>
-    <rect class="ks-box" x="260" y="171" width="40" height="14" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="280" y="168">18</text>
-    <text class="ks-annotation" x="280" y="225" text-anchor="middle">2024</text>
-    <!-- 2025 (72 total, 27 ITW) -->
-    <rect class="ks-box" x="325" y="117" width="40" height="90" rx="0"/>
-    <rect class="ks-box" x="325" y="63" width="40" height="54" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="345" y="60">72</text>
-    <text class="ks-annotation" x="345" y="225" text-anchor="middle">2025</text>
-    <!-- 2026 (14 total, 5 ITW) -->
-    <rect class="ks-box" x="390" y="189" width="40" height="18" rx="0"/>
-    <rect class="ks-box" x="390" y="179" width="40" height="10" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="410" y="176">14</text>
-    <text class="ks-annotation" x="410" y="225" text-anchor="middle">2026</text>
-    <!-- Legend -->
-    <rect class="ks-box" x="490" y="60" width="12" height="12" rx="0"/>
-    <text class="ks-annotation" x="508" y="70">Non-ITW</text>
-    <rect class="ks-box" x="490" y="80" width="12" height="12" rx="0" opacity="0.5"/>
-    <text class="ks-annotation" x="508" y="90">Exploited ITW</text>
+  <span class="ks-figure-label">FIG — Windows Kernel-Mode CVEs by Year (NVD)</span>
+  <svg viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart showing Windows kernel-mode CVE counts from NVD by year, 2015 to 2026">
+    <!-- Y-axis -->
+    <text class="ks-annotation" x="55" y="213" text-anchor="end">0</text>
+    <line class="ks-line" x1="60" y1="210" x2="660" y2="210" opacity="0.15"/>
+    <text class="ks-annotation" x="55" y="163" text-anchor="end">50</text>
+    <line class="ks-line" x1="60" y1="160" x2="660" y2="160" opacity="0.15"/>
+    <text class="ks-annotation" x="55" y="113" text-anchor="end">100</text>
+    <line class="ks-line" x1="60" y1="110" x2="660" y2="110" opacity="0.15"/>
+    <text class="ks-annotation" x="55" y="63" text-anchor="end">150</text>
+    <line class="ks-line" x1="60" y1="60" x2="660" y2="60" opacity="0.15"/>
+    <!-- 2015 -->
+    <rect class="ks-box" x="65" y="144" width="35" height="66" rx="0"/>
+    <text class="ks-annotation" x="82" y="140">66</text>
+    <text class="ks-annotation" x="82" y="228" text-anchor="middle">2015</text>
+    <!-- 2016 -->
+    <rect class="ks-box" x="115" y="112" width="35" height="98" rx="0"/>
+    <text class="ks-annotation" x="132" y="108">98</text>
+    <text class="ks-annotation" x="132" y="228" text-anchor="middle">2016</text>
+    <!-- 2017 -->
+    <rect class="ks-box" x="165" y="71" width="35" height="139" rx="0"/>
+    <text class="ks-annotation" x="182" y="67">139</text>
+    <text class="ks-annotation" x="182" y="228" text-anchor="middle">2017</text>
+    <!-- 2018 -->
+    <rect class="ks-box" x="215" y="87" width="35" height="123" rx="0"/>
+    <text class="ks-annotation" x="232" y="83">123</text>
+    <text class="ks-annotation" x="232" y="228" text-anchor="middle">2018</text>
+    <!-- 2019 -->
+    <rect class="ks-box" x="265" y="119" width="35" height="91" rx="0"/>
+    <text class="ks-annotation" x="282" y="115">91</text>
+    <text class="ks-annotation" x="282" y="228" text-anchor="middle">2019</text>
+    <!-- 2020 -->
+    <rect class="ks-box" x="315" y="89" width="35" height="121" rx="0"/>
+    <text class="ks-annotation" x="332" y="85">121</text>
+    <text class="ks-annotation" x="332" y="228" text-anchor="middle">2020</text>
+    <!-- 2021 -->
+    <rect class="ks-box" x="365" y="119" width="35" height="91" rx="0"/>
+    <text class="ks-annotation" x="382" y="115">91</text>
+    <text class="ks-annotation" x="382" y="228" text-anchor="middle">2021</text>
+    <!-- 2022 -->
+    <rect class="ks-box" x="415" y="118" width="35" height="92" rx="0"/>
+    <text class="ks-annotation" x="432" y="114">92</text>
+    <text class="ks-annotation" x="432" y="228" text-anchor="middle">2022</text>
+    <!-- 2023 -->
+    <rect class="ks-box" x="465" y="105" width="35" height="105" rx="0"/>
+    <text class="ks-annotation" x="482" y="101">105</text>
+    <text class="ks-annotation" x="482" y="228" text-anchor="middle">2023</text>
+    <!-- 2024 -->
+    <rect class="ks-box" x="515" y="100" width="35" height="110" rx="0"/>
+    <text class="ks-annotation" x="532" y="96">110</text>
+    <text class="ks-annotation" x="532" y="228" text-anchor="middle">2024</text>
+    <!-- 2025 -->
+    <rect class="ks-box" x="565" y="81" width="35" height="129" rx="0"/>
+    <text class="ks-annotation" x="582" y="77">129</text>
+    <text class="ks-annotation" x="582" y="228" text-anchor="middle">2025</text>
+    <!-- 2026 (partial) -->
+    <rect class="ks-box" x="615" y="183" width="35" height="27" rx="0" opacity="0.5"/>
+    <text class="ks-annotation" x="632" y="179">27</text>
+    <text class="ks-annotation" x="632" y="228" text-anchor="middle">2026*</text>
   </svg>
-  <p class="ks-figure-caption">"&#x2264;21" combines 2015--2021 (mostly BYOVD drivers). Darker bars = not exploited in the wild; lighter bars = exploited ITW. 9 undated BYOVD entries excluded.</p>
+  <p class="ks-figure-caption">Counts from NVD keyword search across kernel-mode component descriptions. 2017's spike coincides with Microsoft's switch from security bulletins to per-CVE advisories. 2026* is partial (Jan--Feb only).</p>
 </div>
+
+Annual volume stays between 90 and 140 with no clear upward trend since 2017. The swings mostly track advisory timing rather than actual changes in the kernel's attack surface. Microsoft's 2017 shift from monthly bulletins to individual CVE IDs pushed that year's count up artificially. The 2019 and 2021 dips coincide with lighter Patch Tuesday months, not fewer vulnerabilities.
+
+### Corpus Coverage
+
+The KernelSight corpus samples 134 of roughly 1,200 kernel-mode CVEs disclosed since 2015 -- about 11%. The sampling is deliberate: the corpus tracks CVEs that have published exploit research, not a random cross-section of Patch Tuesday fixes.
+
+| Period | NVD Total | Corpus | Coverage |
+|--------|-----------|--------|----------|
+| 2015--2021 | 689 | 12 | 1.7% |
+| 2022 | 92 | 4 | 4.3% |
+| 2023 | 105 | 14 | 13.3% |
+| 2024 | 110 | 18 | 16.4% |
+| 2025 | 129 | 72 | 55.8% |
+| 2026 (partial) | 27 | 14 | 51.9% |
+
+Coverage concentrates on 2025--2026 because those years have the most public exploit writeups. Most pre-2022 entries are BYOVD drivers where the vulnerability existed years before formal CVE assignment.
 
 ## Vulnerability Class Breakdown
 
-Buffer overflows lead, but use-after-free is close behind and accounts for most of the exploited-in-the-wild entries. BYOVD drivers make up most of the "Arbitrary R/W" column -- bugs by design, not accident.
+Buffer overflows are most common, followed closely by use-after-free, which dominates the exploited-in-the-wild cases. BYOVD drivers account for most "Arbitrary R/W" entries -- intentional design choices rather than bugs.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG — Vulnerability Class Distribution</span>
