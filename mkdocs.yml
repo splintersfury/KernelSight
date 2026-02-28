@@ -165,6 +165,31 @@ nav:
     - amsdk.sys: case-studies/amsdk-sys.md
     - CVE-2023-1048: case-studies/CVE-2023-1048.md
     - CVE-2023-1676: case-studies/CVE-2023-1676.md
+    - CVE-2025-21334: case-studies/CVE-2025-21334.md
+    - CVE-2025-21335: case-studies/CVE-2025-21335.md
+    - CVE-2025-21418: case-studies/CVE-2025-21418.md
+    - CVE-2025-24983: case-studies/CVE-2025-24983.md
+    - CVE-2025-24990: case-studies/CVE-2025-24990.md
+    - CVE-2025-30400: case-studies/CVE-2025-30400.md
+    - CVE-2025-32701: case-studies/CVE-2025-32701.md
+    - CVE-2025-32706: case-studies/CVE-2025-32706.md
+    - CVE-2025-32709: case-studies/CVE-2025-32709.md
+    - CVE-2025-24066: case-studies/CVE-2025-24066.md
+    - CVE-2025-24067: case-studies/CVE-2025-24067.md
+    - CVE-2025-53149: case-studies/CVE-2025-53149.md
+    - CVE-2025-24046: case-studies/CVE-2025-24046.md
+    - CVE-2025-49667: case-studies/CVE-2025-49667.md
+    - CVE-2025-60719: case-studies/CVE-2025-60719.md
+    - CVE-2025-62215: case-studies/CVE-2025-62215.md
+    - CVE-2025-62221: case-studies/CVE-2025-62221.md
+    - CVE-2026-21231: case-studies/CVE-2026-21231.md
+    - CVE-2026-21519: case-studies/CVE-2026-21519.md
+    - CVE-2025-0289: case-studies/CVE-2025-0289.md
+    - CVE-2025-68947: case-studies/CVE-2025-68947.md
+    - CVE-2025-8061: case-studies/CVE-2025-8061.md
+    - CVE-2025-52915: case-studies/CVE-2025-52915.md
+    - CVE-2024-51324: case-studies/CVE-2024-51324.md
+    - EnPortv.sys: case-studies/EnPortv-sys.md
   - Defenses:
     - mitigations/index.md
     - SMEP / SMAP: mitigations/smep-smap.md

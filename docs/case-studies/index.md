@@ -4,15 +4,34 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 57 CVEs across 41 unique drivers, with 30 exploited in the wild — including 25 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 82 CVEs across 52 unique drivers, with 47 exploited in the wild — including 31 third-party BYOVD driver case studies.
 
 ## CVE Index
 
 | CVE | Driver | Class | ITW | Build (Vuln → Fix) |
 |-----|--------|-------|-----|---------------------|
+| [CVE-2026-21519](CVE-2026-21519.md) | `dwmcore.dll` | Type Confusion | Yes | |
+| [CVE-2026-21231](CVE-2026-21231.md) | `ntoskrnl.exe` | Race Condition | Yes | |
+| [CVE-2025-62221](CVE-2025-62221.md) | `cldflt.sys` | Use-After-Free | Yes | |
+| [CVE-2025-62215](CVE-2025-62215.md) | `ntoskrnl.exe` | Race Condition / Double-Free | Yes | |
+| [CVE-2025-60719](CVE-2025-60719.md) | `afd.sys` | Use-After-Free / Race Condition | No | |
+| [CVE-2025-53149](CVE-2025-53149.md) | `ksthunk.sys` | Buffer Overflow (Heap) | No | |
+| [CVE-2025-49667](CVE-2025-49667.md) | `win32k.sys` | Double Free | No | |
+| [CVE-2025-32709](CVE-2025-32709.md) | `afd.sys` | Use-After-Free | Yes | |
+| [CVE-2025-32706](CVE-2025-32706.md) | `clfs.sys` | Buffer Overflow (Heap) | Yes | |
+| [CVE-2025-32701](CVE-2025-32701.md) | `clfs.sys` | Use-After-Free | Yes | |
+| [CVE-2025-30400](CVE-2025-30400.md) | `dwmcore.dll` | Use-After-Free | Yes | |
 | [CVE-2025-29824](CVE-2025-29824.md) | `clfs.sys` | Use-After-Free / Logic Bug | Yes | `10.0.26100.3476` → `10.0.26100.3775` |
 | [CVE-2025-24993](CVE-2025-24993.md) | `ntfs.sys` | Buffer Overflow / Bounds Check | Yes | `10.0.22621.4830` → `10.0.22621.4890` |
 | [CVE-2025-24985](CVE-2025-24985.md) | `fastfat.sys` | Integer Overflow | Yes | `10.0.22621.4830` → `10.0.22621.5037` |
+| [CVE-2025-24983](CVE-2025-24983.md) | `win32k.sys` | Use-After-Free / Race Condition | Yes | |
+| [CVE-2025-24990](CVE-2025-24990.md) | `ltmdm64.sys` | Untrusted Pointer Dereference | Yes | |
+| [CVE-2025-24066](CVE-2025-24066.md) | `ks.sys` | Buffer Overflow (Heap) | No | |
+| [CVE-2025-24067](CVE-2025-24067.md) | `mskssrv.sys` | Buffer Overflow (Heap) | No | |
+| [CVE-2025-24046](CVE-2025-24046.md) | `ks.sys` | Double Free | No | |
+| [CVE-2025-21418](CVE-2025-21418.md) | `afd.sys` | Buffer Overflow (Heap) | Yes | |
+| [CVE-2025-21334](CVE-2025-21334.md) | `vkrnlintvsp.sys` | Use-After-Free | Yes | |
+| [CVE-2025-21335](CVE-2025-21335.md) | `vkrnlintvsp.sys` | Use-After-Free | Yes | |
 | [CVE-2025-21333](CVE-2025-21333.md) | `vsp.sys` | Buffer Overflow | Yes | `10.0.26100.2605` → `10.0.26100.2894` |
 | [CVE-2024-49138](CVE-2024-49138.md) | `clfs.sys` | Buffer Overflow / Bounds Check | Yes | `10.0.22621.4541` → `10.0.22621.4601` |
 | [CVE-2024-49114](CVE-2024-49114.md) | `cldflt.sys` | Buffer Overflow | No | `10.0.22621.4460` → `10.0.22621.4602` |
@@ -65,6 +84,8 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [AsIO3.sys](AsIO3-sys.md) | `AsIO3.sys` | ASRock/ASUS | Arbitrary R/W | Yes | Blocklisted |
 | [CVE-2023-1048](CVE-2023-1048.md) | `WinRing0x64.sys` | OpenLibSys / TechPowerUp / Razer / many | MSR Write / Phys Mem R/W | Yes | Blocklisted |
 | [CVE-2023-1676](CVE-2023-1676.md) | `mydrivers64.sys` | DriverGenius | MSR Write / Phys Mem R/W | No | Still loadable |
+| [CVE-2025-0289](CVE-2025-0289.md) | `BioNTdrv.sys` | Paragon | Arb Kernel Write | Yes | Blocklisted |
+| [CVE-2025-8061](CVE-2025-8061.md) | `LnvMSRIO.sys` | Lenovo | MSR R/W / Phys Mem R/W | No | Patched |
 
 ### Performance & GPU Drivers
 
@@ -84,6 +105,10 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [viragt64.sys](viragt64-sys.md) | `viragt64.sys` | TG Soft | Process Termination | Yes | Blocklisted |
 | [Truesight.sys](Truesight-sys.md) | `Truesight.sys` | Adlice | EDR Bypass | Yes | Blocklisted |
 | [amsdk.sys](amsdk-sys.md) | `amsdk.sys` | WatchDog | Process Termination | Yes | Blocklisted |
+| [CVE-2025-68947](CVE-2025-68947.md) | `NSecKrnl.sys` | NsecSoft | Process Termination | Yes | Under active abuse |
+| [CVE-2025-52915](CVE-2025-52915.md) | `K7RKScan.sys` | K7 Computing | Process Termination | No | Still loadable |
+| [CVE-2024-51324](CVE-2024-51324.md) | `BdApiUtil.sys` | Baidu | Process Termination | Yes | Still loadable |
+| [EnPortv.sys](EnPortv-sys.md) | `EnPortv.sys` | Guidance/OpenText | Process Termination | Yes | Revoked cert, still loads |
 
 ## By Driver
 
@@ -92,6 +117,9 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2023-21768](CVE-2023-21768.md) — AFD WinSock — missing ProbeForWrite allows kernel write-what-where via IO ring
 - [CVE-2023-28218](CVE-2023-28218.md) — AFD WinSock — integer overflow in AfdCopyCMSGBuffer allows EoP
 - [CVE-2024-38193](CVE-2024-38193.md) — AFD — use-after-free race on Registered I/O buffers allows EoP
+- [CVE-2025-21418](CVE-2025-21418.md) — AFD — heap-based buffer overflow allows SYSTEM escalation
+- [CVE-2025-32709](CVE-2025-32709.md) — AFD — use-after-free after socket closure allows SYSTEM escalation
+- [CVE-2025-60719](CVE-2025-60719.md) — AFD — use-after-free from race between socket unbind and concurrent operations
 - [CVE-2026-21241](CVE-2026-21241.md) — AFD — race condition in AfdNotifyPostEvents spinlock release causes use-after-free EoP
 
 ### `appid.sys`
@@ -103,6 +131,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2023-36036](CVE-2023-36036.md) — Cloud Files Mini Filter — heap overflow via crafted reparse data
 - [CVE-2024-30085](CVE-2024-30085.md) — Cloud Files Mini Filter — missing size check before memcpy leads to heap overflow
 - [CVE-2024-49114](CVE-2024-49114.md) — Cloud Files Mini-Filter — elevation of privilege via buffer overflow
+- [CVE-2025-62221](CVE-2025-62221.md) — Cloud Files Mini Filter — use-after-free allows SYSTEM escalation
 
 ### `clfs.sys`
 
@@ -111,10 +140,17 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2023-36424](CVE-2023-36424.md) — Common Log File System — pool overflow from unvalidated reparse data
 - [CVE-2024-49138](CVE-2024-49138.md) — Common Log File System — heap overflow in LoadContainerQ allows EoP
 - [CVE-2025-29824](CVE-2025-29824.md) — Common Log File System — elevation of privilege via log file metadata corruption
+- [CVE-2025-32701](CVE-2025-32701.md) — Common Log File System — use-after-free in log stream object allows SYSTEM escalation
+- [CVE-2025-32706](CVE-2025-32706.md) — Common Log File System — heap buffer overflow from missing input validation
 
 ### `csc.sys`
 
 - [CVE-2024-26229](CVE-2024-26229.md) — Client-Side Caching — missing access check allows EoP
+
+### `dwmcore.dll`
+
+- [CVE-2025-30400](CVE-2025-30400.md) — Desktop Window Manager — use-after-free in composition surface handling allows SYSTEM escalation
+- [CVE-2026-21519](CVE-2026-21519.md) — Desktop Window Manager — type confusion allows SYSTEM escalation
 
 ### `fastfat.sys`
 
@@ -127,17 +163,21 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 ### `ks.sys`
 
 - [CVE-2024-35250](CVE-2024-35250.md) — Kernel Streaming — untrusted pointer dereference in IOCTL dispatch allows EoP
+- [CVE-2025-24046](CVE-2025-24046.md) — Kernel Streaming — double free in filter object handling
+- [CVE-2025-24066](CVE-2025-24066.md) — Kernel Streaming — heap-based buffer overflow allows EoP
 
 ### `ksthunk.sys`
 
 - [CVE-2024-38054](CVE-2024-38054.md) — Kernel Streaming WOW64 Thunk — integer overflow in KSSTREAM_HEADER thunking allows EoP
 - [CVE-2024-38238](CVE-2024-38238.md) — Kernel Streaming WOW64 Thunk — MmMapLockedPages without MmProbeAndLockPages in frame handling
+- [CVE-2025-53149](CVE-2025-53149.md) — Kernel Streaming WOW64 Thunk — heap-based buffer overflow
 
 ### `mskssrv.sys`
 
 - [CVE-2023-29360](CVE-2023-29360.md) — Kernel Streaming Server — MmProbeAndLockPages called with KernelMode on user MDL
 - [CVE-2023-36802](CVE-2023-36802.md) — Kernel Streaming Server — FsContextReg/FsStreamReg object type confusion leads to EoP
 - [CVE-2024-30089](CVE-2024-30089.md) — Kernel Streaming Server — ref-count logic error causes use-after-free EoP
+- [CVE-2025-24067](CVE-2025-24067.md) — Kernel Streaming Server — heap-based buffer overflow allows EoP
 
 ### `ntfs.sys`
 
@@ -149,10 +189,17 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [CVE-2024-21302](CVE-2024-21302.md) — NT Kernel — secure kernel version downgrade bypass via unvalidated version state
 - [CVE-2024-30088](CVE-2024-30088.md) — NT Kernel — TOCTOU race in AuthzBasepCopyoutInternalSecurityAttributes
 - [CVE-2024-38106](CVE-2024-38106.md) — NT Kernel — missing lock around VslpEnterIumSecureMode causes race condition EoP
+- [CVE-2025-62215](CVE-2025-62215.md) — NT Kernel — race condition / double-free allows SYSTEM escalation
+- [CVE-2026-21231](CVE-2026-21231.md) — NT Kernel — race condition allows SYSTEM escalation
 
 ### `vsp.sys`
 
 - [CVE-2025-21333](CVE-2025-21333.md) — Hyper-V Virtual Service Provider — heap-based buffer overflow
+
+### `vkrnlintvsp.sys`
+
+- [CVE-2025-21334](CVE-2025-21334.md) — Hyper-V VSP Integration — use-after-free allows SYSTEM escalation
+- [CVE-2025-21335](CVE-2025-21335.md) — Hyper-V VSP Integration — use-after-free allows SYSTEM escalation
 
 ### `tcpip.sys`
 
@@ -161,6 +208,8 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 ### `win32k.sys`
 
 - [CVE-2024-38256](CVE-2024-38256.md) — Win32k — uninitialized resource usage leaks kernel memory to user mode
+- [CVE-2025-24983](CVE-2025-24983.md) — Win32k — use-after-free / race condition allows SYSTEM escalation
+- [CVE-2025-49667](CVE-2025-49667.md) — Win32k — double free allows SYSTEM escalation
 
 ### `win32kbase.sys`
 
@@ -264,6 +313,34 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 
 - [CVE-2023-1676](CVE-2023-1676.md) — DriverGenius — MSR write (0x9C402088), physical memory R/W (0x9C406104/0x9C40A108)
 
+### `BioNTdrv.sys`
+
+- [CVE-2025-0289](CVE-2025-0289.md) — Paragon — arbitrary kernel write via IOCTL
+
+### `LnvMSRIO.sys`
+
+- [CVE-2025-8061](CVE-2025-8061.md) — Lenovo — MSR R/W and physical memory R/W via IOCTL
+
+### `NSecKrnl.sys`
+
+- [CVE-2025-68947](CVE-2025-68947.md) — NsecSoft — process termination abused for EDR bypass
+
+### `K7RKScan.sys`
+
+- [CVE-2025-52915](CVE-2025-52915.md) — K7 Computing — process termination primitive
+
+### `BdApiUtil.sys`
+
+- [CVE-2024-51324](CVE-2024-51324.md) — Baidu — process termination abused for AV/EDR bypass
+
+### `EnPortv.sys`
+
+- [EnPortv.sys](EnPortv-sys.md) — Guidance/OpenText — process termination primitive
+
+### `ltmdm64.sys`
+
+- [CVE-2025-24990](CVE-2025-24990.md) — LiteManager — untrusted pointer dereference allows SYSTEM escalation
+
 ## By Exploitation Status
 
 ### Exploited in the Wild
@@ -298,3 +375,20 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 - [Truesight.sys](Truesight-sys.md) — `Truesight.sys` — Adlice — EDR bypass
 - [amsdk.sys](amsdk-sys.md) — `amsdk.sys` — WatchDog — process termination (Silver Fox APT)
 - [CVE-2023-1048](CVE-2023-1048.md) — `WinRing0x64.sys` — OpenLibSys — MSR write and physical memory R/W
+- [CVE-2025-21334](CVE-2025-21334.md) — `vkrnlintvsp.sys` — Hyper-V VSP Integration — use-after-free allows SYSTEM
+- [CVE-2025-21335](CVE-2025-21335.md) — `vkrnlintvsp.sys` — Hyper-V VSP Integration — use-after-free allows SYSTEM
+- [CVE-2025-21418](CVE-2025-21418.md) — `afd.sys` — AFD — heap-based buffer overflow allows SYSTEM escalation
+- [CVE-2025-24983](CVE-2025-24983.md) — `win32k.sys` — Win32k — use-after-free / race condition allows SYSTEM
+- [CVE-2025-24990](CVE-2025-24990.md) — `ltmdm64.sys` — LiteManager — untrusted pointer dereference allows SYSTEM
+- [CVE-2025-30400](CVE-2025-30400.md) — `dwmcore.dll` — DWM — use-after-free in composition surface allows SYSTEM
+- [CVE-2025-32701](CVE-2025-32701.md) — `clfs.sys` — CLFS — use-after-free in log stream object allows SYSTEM
+- [CVE-2025-32706](CVE-2025-32706.md) — `clfs.sys` — CLFS — heap buffer overflow allows SYSTEM
+- [CVE-2025-32709](CVE-2025-32709.md) — `afd.sys` — AFD — use-after-free after socket closure allows SYSTEM
+- [CVE-2025-62215](CVE-2025-62215.md) — `ntoskrnl.exe` — NT Kernel — race condition / double-free allows SYSTEM
+- [CVE-2025-62221](CVE-2025-62221.md) — `cldflt.sys` — Cloud Files Mini Filter — use-after-free allows SYSTEM
+- [CVE-2026-21231](CVE-2026-21231.md) — `ntoskrnl.exe` — NT Kernel — race condition allows SYSTEM
+- [CVE-2026-21519](CVE-2026-21519.md) — `dwmcore.dll` — DWM — type confusion allows SYSTEM
+- [CVE-2025-0289](CVE-2025-0289.md) — `BioNTdrv.sys` — Paragon — arbitrary kernel write
+- [CVE-2025-68947](CVE-2025-68947.md) — `NSecKrnl.sys` — NsecSoft — process termination / EDR bypass
+- [CVE-2024-51324](CVE-2024-51324.md) — `BdApiUtil.sys` — Baidu — process termination / AV bypass
+- [EnPortv.sys](EnPortv-sys.md) — `EnPortv.sys` — Guidance/OpenText — process termination

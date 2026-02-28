@@ -985,3 +985,256 @@ cves:
       poc: "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1676"
     case_study: "docs/case-studies/CVE-2023-1676.md"
 
+  # 2025-2026 Microsoft Kernel CVEs — ITW Zero-Days
+  - cve_id: "CVE-2025-21334"
+    driver: "vkrnlintvsp.sys"
+    description: "Hyper-V VSP Integration — use-after-free allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21334"
+    case_study: "docs/case-studies/CVE-2025-21334.md"
+
+  - cve_id: "CVE-2025-21335"
+    driver: "vkrnlintvsp.sys"
+    description: "Hyper-V VSP Integration — use-after-free allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21335"
+    case_study: "docs/case-studies/CVE-2025-21335.md"
+
+  - cve_id: "CVE-2025-21418"
+    driver: "afd.sys"
+    description: "AFD — heap-based buffer overflow allows SYSTEM escalation"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21418"
+    case_study: "docs/case-studies/CVE-2025-21418.md"
+
+  - cve_id: "CVE-2025-24983"
+    driver: "win32k.sys"
+    description: "Win32k — use-after-free / race condition allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24983"
+    case_study: "docs/case-studies/CVE-2025-24983.md"
+
+  - cve_id: "CVE-2025-24990"
+    driver: "ltmdm64.sys"
+    description: "LiteManager — untrusted pointer dereference allows SYSTEM escalation"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24990"
+    case_study: "docs/case-studies/CVE-2025-24990.md"
+
+  - cve_id: "CVE-2025-30400"
+    driver: "dwmcore.dll"
+    description: "Desktop Window Manager — use-after-free in composition surface handling allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-30400"
+    case_study: "docs/case-studies/CVE-2025-30400.md"
+
+  - cve_id: "CVE-2025-32701"
+    driver: "clfs.sys"
+    description: "Common Log File System — use-after-free in log stream object allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32701"
+    case_study: "docs/case-studies/CVE-2025-32701.md"
+
+  - cve_id: "CVE-2025-32706"
+    driver: "clfs.sys"
+    description: "Common Log File System — heap buffer overflow from missing input validation"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32706"
+    case_study: "docs/case-studies/CVE-2025-32706.md"
+
+  - cve_id: "CVE-2025-32709"
+    driver: "afd.sys"
+    description: "AFD — use-after-free after socket closure allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32709"
+    case_study: "docs/case-studies/CVE-2025-32709.md"
+
+  - cve_id: "CVE-2025-62215"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — race condition / double-free allows SYSTEM escalation"
+    vuln_class: "race-conditions"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62215"
+    case_study: "docs/case-studies/CVE-2025-62215.md"
+
+  - cve_id: "CVE-2025-62221"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — use-after-free allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62221"
+    case_study: "docs/case-studies/CVE-2025-62221.md"
+
+  - cve_id: "CVE-2026-21231"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — race condition allows SYSTEM escalation"
+    vuln_class: "race-conditions"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21231"
+    case_study: "docs/case-studies/CVE-2026-21231.md"
+
+  - cve_id: "CVE-2026-21519"
+    driver: "dwmcore.dll"
+    description: "Desktop Window Manager — type confusion allows SYSTEM escalation"
+    vuln_class: "type-confusion"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21519"
+    case_study: "docs/case-studies/CVE-2026-21519.md"
+
+  # 2025-2026 Microsoft Kernel CVEs — Detailed Writeups
+  - cve_id: "CVE-2025-24066"
+    driver: "ks.sys"
+    description: "Kernel Streaming — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24066"
+    case_study: "docs/case-studies/CVE-2025-24066.md"
+
+  - cve_id: "CVE-2025-24067"
+    driver: "mskssrv.sys"
+    description: "Kernel Streaming Server — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24067"
+    case_study: "docs/case-studies/CVE-2025-24067.md"
+
+  - cve_id: "CVE-2025-53149"
+    driver: "ksthunk.sys"
+    description: "Kernel Streaming WOW64 Thunk — heap-based buffer overflow"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53149"
+    case_study: "docs/case-studies/CVE-2025-53149.md"
+
+  - cve_id: "CVE-2025-24046"
+    driver: "ks.sys"
+    description: "Kernel Streaming — double free in filter object handling"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24046"
+    case_study: "docs/case-studies/CVE-2025-24046.md"
+
+  - cve_id: "CVE-2025-49667"
+    driver: "win32k.sys"
+    description: "Win32k — double free allows SYSTEM escalation"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49667"
+    case_study: "docs/case-studies/CVE-2025-49667.md"
+
+  - cve_id: "CVE-2025-60719"
+    driver: "afd.sys"
+    description: "AFD — use-after-free from race between socket unbind and concurrent operations"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-60719"
+    case_study: "docs/case-studies/CVE-2025-60719.md"
+
+  # 2025-2026 Third-Party BYOVD Drivers
+  - cve_id: "CVE-2025-0289"
+    driver: "BioNTdrv.sys"
+    vendor: "Paragon"
+    description: "Paragon Partition Manager — arbitrary kernel write via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: true
+    status: "blocklisted"
+    references:
+      msrc: ""
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-0289.md"
+
+  - cve_id: "CVE-2025-68947"
+    driver: "NSecKrnl.sys"
+    vendor: "NsecSoft"
+    description: "NsecSoft — process termination abused for EDR bypass"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    status: "under_active_abuse"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-68947.md"
+
+  - cve_id: "CVE-2025-8061"
+    driver: "LnvMSRIO.sys"
+    vendor: "Lenovo"
+    description: "Lenovo — MSR R/W and physical memory R/W via IOCTL"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "patched"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-8061.md"
+
+  - cve_id: "CVE-2025-52915"
+    driver: "K7RKScan.sys"
+    vendor: "K7 Computing"
+    description: "K7 Computing — process termination primitive"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "still_loadable"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-52915.md"
+
+  - cve_id: "CVE-2024-51324"
+    driver: "BdApiUtil.sys"
+    vendor: "Baidu"
+    description: "Baidu — process termination abused for AV/EDR bypass"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    status: "still_loadable"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2024-51324.md"
+
+  - cve_id: "EnPortv-sys"
+    driver: "EnPortv.sys"
+    vendor: "Guidance/OpenText"
+    description: "Guidance/OpenText — process termination primitive"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    status: "revoked_cert"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/EnPortv-sys.md"
+

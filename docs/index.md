@@ -6,13 +6,14 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 57 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 82 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates
 
 | Date | What's New |
 |------|------------|
+| **2026-02-28** | Bulk addition: 25 new case studies covering 2025-2026 kernel CVEs — ITW zero-days in [afd.sys](case-studies/CVE-2025-21418.md), [clfs.sys](case-studies/CVE-2025-32701.md), [DWM](case-studies/CVE-2025-30400.md), [ntoskrnl](case-studies/CVE-2025-62215.md), [win32k](case-studies/CVE-2025-24983.md), [Hyper-V](case-studies/CVE-2025-21334.md); BYOVD campaigns via [Paragon](case-studies/CVE-2025-0289.md), [NSecKrnl](case-studies/CVE-2025-68947.md), [EnPortv](case-studies/EnPortv-sys.md). Corpus now at 82 CVEs, 47 exploited ITW. |
 | **2026-02-28** | [CVE-2025-3464](case-studies/CVE-2025-3464.md) / [CVE-2025-1533](case-studies/CVE-2025-1533.md) — AsIO3.sys auth bypass + stack overflow. Full exploit chain from Cisco Talos: hardlink auth bypass, `ObfDereferenceObject` [decrement-by-one](primitives/arw/arb-increment-decrement.md), [PreviousMode flip](primitives/exploitation/previous-mode-manipulation.md), [token theft](primitives/exploitation/token-swapping.md). |
 | **2026-02-25** | [CVE-2026-21241](case-studies/CVE-2026-21241.md) — afd.sys notification UAF. Full 7-stage exploit chain: NPNX pool spray, `_IO_MINI_COMPLETION_PACKET_USER` callback abuse, RtlSetBit/RtlClearAllBits [bit-manipulation primitive](primitives/exploitation/bit-manipulation.md), SepMediumDaclSd DACL corruption, WIL feature flag bypass, token privilege escalation. |
 | **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md) — using `RtlSetBit`/`RtlClearAllBits` as kCFG-compliant kernel exploitation primitives. |
@@ -85,7 +86,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <ol class="ks-pipeline-list" markdown>
 <li markdown>
 <strong><a href="driver-types/">Driver Types</a></strong>
-<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 41 unique drivers.</p>
+<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 52 unique drivers.</p>
 </li>
 <li markdown>
 <strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
@@ -101,7 +102,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 57 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 30 exploited in the wild, including 23 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 82 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 47 exploited in the wild, including 31 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -118,9 +119,9 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">57</span> CVE case studies &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">41</span> unique drivers &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">30</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">82</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">52</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">47</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">57</span> technique pages &nbsp;&middot;&nbsp;
