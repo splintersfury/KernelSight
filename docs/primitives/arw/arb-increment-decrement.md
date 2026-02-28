@@ -11,6 +11,13 @@ An arbitrary increment/decrement primitive allows modifying a value at a control
 - Increment token privilege bits to enable `SeDebugPrivilege`
 - Decrement reference count to trigger premature free (UAF)
 - Modify single bytes in security descriptors
+- Decrement `KTHREAD.PreviousMode` from 1 (UserMode) to 0 (KernelMode) — see [PreviousMode Manipulation](../exploitation/previous-mode-manipulation.md)
+
+## Related CVEs
+
+| CVE | Driver | Description |
+|-----|--------|-------------|
+| [CVE-2025-3464](../../case-studies/CVE-2025-3464.md) | `AsIO3.sys` | `ObfDereferenceObject` IOCTL provides decrement at `(addr - 0x30)`; used to flip PreviousMode for full kernel R/W |
 
 ## AutoPiff Detection
 

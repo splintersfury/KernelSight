@@ -151,6 +151,8 @@ nav:
     - CVE-2023-41444: case-studies/CVE-2023-41444.md
     - CVE-2025-45737: case-studies/CVE-2025-45737.md
     - ATSZIO64.sys: case-studies/ATSZIO64-sys.md
+    - CVE-2025-1533: case-studies/CVE-2025-1533.md
+    - CVE-2025-3464: case-studies/CVE-2025-3464.md
     - AsIO3.sys: case-studies/AsIO3-sys.md
     - CVE-2020-12928: case-studies/CVE-2020-12928.md
     - CVE-2023-20598: case-studies/CVE-2023-20598.md

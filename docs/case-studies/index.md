@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 55 CVEs across 41 unique drivers, with 30 exploited in the wild — including 23 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 57 CVEs across 41 unique drivers, with 30 exploited in the wild — including 25 third-party BYOVD driver case studies.
 
 ## CVE Index
 
@@ -60,6 +60,8 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [CVE-2023-41444](CVE-2023-41444.md) | `iREC.sys` | iREC | Arbitrary R/W | No | Still loadable |
 | [CVE-2025-45737](CVE-2025-45737.md) | `NeacController.sys` | NEAC | Arbitrary R/W | No | Still loadable |
 | [ATSZIO64.sys](ATSZIO64-sys.md) | `ATSZIO64.sys` | ASUS | Arbitrary R/W | Yes | Blocklisted |
+| [CVE-2025-1533](CVE-2025-1533.md) | `AsIO3.sys` | ASUS | Stack Overflow | No | Blocklisted |
+| [CVE-2025-3464](CVE-2025-3464.md) | `AsIO3.sys` | ASUS | Auth Bypass / Arb Decrement | No | Blocklisted |
 | [AsIO3.sys](AsIO3-sys.md) | `AsIO3.sys` | ASRock/ASUS | Arbitrary R/W | Yes | Blocklisted |
 | [CVE-2023-1048](CVE-2023-1048.md) | `WinRing0x64.sys` | OpenLibSys / TechPowerUp / Razer / many | MSR Write / Phys Mem R/W | Yes | Blocklisted |
 | [CVE-2023-1676](CVE-2023-1676.md) | `mydrivers64.sys` | DriverGenius | MSR Write / Phys Mem R/W | No | Still loadable |
@@ -214,6 +216,8 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 
 ### `AsIO3.sys`
 
+- [CVE-2025-1533](CVE-2025-1533.md) — ASUS — stack overflow in Win32PathToNtPath (MAX_PATH assumption)
+- [CVE-2025-3464](CVE-2025-3464.md) — ASUS — auth bypass via hardlink, ObfDereferenceObject decrement-by-one, PreviousMode flip, token theft
 - [AsIO3.sys](AsIO3-sys.md) — ASRock/ASUS — physical mem R/W, SMM
 
 ### `AMDRyzenMasterDriver.sys`

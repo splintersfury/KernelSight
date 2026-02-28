@@ -771,6 +771,38 @@ cves:
       poc: "https://github.com/DOGSHITD/SciDetectorApp"
     case_study: "docs/case-studies/ATSZIO64-sys.md"
 
+  - cve_id: "CVE-2025-1533"
+    driver: "AsIO3.sys"
+    vendor: "ASUS"
+    description: "ASUS AsIO3 — stack-based buffer overflow in Win32PathToNtPath (MAX_PATH assumption)"
+    vuln_class: "buffer-overflow"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "multiple"
+    status: "blocklisted"
+    talos_id: "TALOS-2025-2144"
+    references:
+      writeup: "https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2025-1533.md"
+
+  - cve_id: "CVE-2025-3464"
+    driver: "AsIO3.sys"
+    vendor: "ASUS"
+    description: "ASUS AsIO3 — authorization bypass via hardlink enables ObfDereferenceObject decrement-by-one, PreviousMode flip, token theft"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: false
+    abused_version: "multiple"
+    status: "blocklisted"
+    talos_id: "TALOS-2025-2150"
+    references:
+      writeup: "https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/"
+      poc: ""
+    case_study: "docs/case-studies/CVE-2025-3464.md"
+
   - cve_id: "AsIO3-sys"
     driver: "AsIO3.sys"
     vendor: "ASRock/ASUS"
