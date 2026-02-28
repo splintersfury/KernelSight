@@ -4,7 +4,7 @@
 
 ## Root Cause Distribution
 
-Across 134 CVEs in the KernelSight corpus, the vast majority trace to a small set of root causes. Unvalidated input dominates -- missing length checks, unchecked file offsets, unbounded copies. The remaining categories surface less often individually but share a common theme: the driver trusts something it shouldn't.
+Across 134 CVEs in the KernelSight corpus, the majority stem from a small set of root causes. Unvalidated input dominates -- missing length checks, unchecked file offsets, unbounded copies. The remaining categories occur less frequently but share a common theme: the driver trusts something it shouldn't.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG — Root Cause Distribution (134 CVEs)</span>
@@ -74,7 +74,7 @@ if (InterlockedDecrement(&Object->RefCount) == 0) {
 
 ### 3. Trusting On-Disk / File-Embedded Offsets
 
-**What goes wrong** -- File system and log drivers read offset/index fields from on-disk structures and use them as memory indices without bounds checking. A crafted image triggers out-of-bounds access. CLFS alone accounts for three CVEs here: [CVE-2025-29824](../case-studies/CVE-2025-29824.md), [CVE-2022-37969](../case-studies/CVE-2022-37969.md), and [CVE-2023-28252](../case-studies/CVE-2023-28252.md) -- all exploited in the wild. [CVE-2025-24992](../case-studies/CVE-2025-24992.md) (ntfs.sys) rounds out the set.
+**What goes wrong** -- File system and log drivers read offset/index fields from on-disk structures and use them as memory indices without bounds checking. A crafted image triggers out-of-bounds access. CLFS contains three such CVEs: [CVE-2025-29824](../case-studies/CVE-2025-29824.md), [CVE-2022-37969](../case-studies/CVE-2022-37969.md), and [CVE-2023-28252](../case-studies/CVE-2023-28252.md) -- all exploited in the wild. [CVE-2025-24992](../case-studies/CVE-2025-24992.md) (ntfs.sys) is another example.
 
 **The fix** -- Treat on-disk data with the same suspicion as user input. Bounds-check every offset and index against the container or record size before use.
 
@@ -85,13 +85,13 @@ if (record->FieldOffset + record->FieldLength > ContainerSize)
 
 ### 4. Exposing Physical Memory or Arbitrary MSR Access
 
-**What goes wrong** -- The driver maps physical memory to userland or exposes model-specific register (MSR) read/write via IOCTLs. This gives any caller full kernel read/write by design. [CVE-2021-21551](../case-studies/CVE-2021-21551.md) (Dell DBUtil), [CVE-2019-16098](../case-studies/CVE-2019-16098.md) (MSI RTCore64), [CVE-2020-12928](../case-studies/CVE-2020-12928.md) (AMD Ryzen Master), and [Capcom.sys](../case-studies/Capcom-sys.md) are textbook examples. All are used in BYOVD campaigns.
+**What goes wrong** -- The driver maps physical memory to userland or exposes model-specific register (MSR) read/write via IOCTLs. This gives any caller full kernel read/write by design. [CVE-2021-21551](../case-studies/CVE-2021-21551.md) (Dell DBUtil), [CVE-2019-16098](../case-studies/CVE-2019-16098.md) (MSI RTCore64), [CVE-2020-12928](../case-studies/CVE-2020-12928.md) (AMD Ryzen Master), and [Capcom.sys](../case-studies/Capcom-sys.md) are well-known examples. All are used in BYOVD campaigns.
 
 **The fix** -- Don't ship physical memory mapping or MSR access in production drivers. If hardware diagnostics require it, gate behind a restrictive DACL, limit to specific physical ranges, and never expose it in a signed driver intended for end-user systems.
 
 ### 5. No IOCTL Authentication / Open Device ACLs
 
-**What goes wrong** -- The driver creates its device object with a permissive ACL, allowing any user to open the device and send IOCTLs. Some drivers don't check caller identity at all. [CVE-2025-3464](../case-studies/CVE-2025-3464.md) (AsIO3.sys auth bypass), [CVE-2023-1048](../case-studies/CVE-2023-1048.md) (KProcessHacker unrestricted IOCTLs), [CVE-2025-0289](../case-studies/CVE-2025-0289.md) (Paragon BioNTdrv.sys), and [CVE-2025-68947](../case-studies/CVE-2025-68947.md) (NSecKrnl) all let unprivileged callers reach dangerous code paths.
+**What goes wrong** -- The driver creates its device object with a permissive ACL, allowing any user to open the device and send IOCTLs. Some drivers don't check caller identity at all. [CVE-2025-3464](../case-studies/CVE-2025-3464.md) (AsIO3.sys auth bypass), [CVE-2023-1048](../case-studies/CVE-2023-1048.md) (KProcessHacker unrestricted IOCTLs), [CVE-2025-0289](../case-studies/CVE-2025-0289.md) (Paragon BioNTdrv.sys), and [CVE-2025-68947](../case-studies/CVE-2025-68947.md) (NSecKrnl) all allow unprivileged callers to reach dangerous code paths.
 
 **The fix** -- Set a restrictive DACL at `IoCreateDeviceSecure` or via an INF security descriptor. Enforce per-IOCTL access checks for sensitive operations.
 
@@ -145,7 +145,7 @@ Even a vulnerability-free driver becomes a weapon if it exposes raw kernel read/
 
 ## Detection & Audit Pointers
 
-Static analysis catches most input validation and double-fetch bugs at scale -- see [Static Analysis](../tooling/static-analysis.md). [Fuzzing](../tooling/fuzzing.md) covers the synchronization and error-path categories where static tools struggle. [AutoPiff](../tooling/autopiff-integration.md) automates diff-based detection across Patch Tuesday drops.
+Static analysis catches most input validation and double-fetch bugs at scale -- see [Static Analysis](../tooling/static-analysis.md). [Fuzzing](../tooling/fuzzing.md) covers synchronization and error-path categories where static tools struggle. [AutoPiff](../tooling/autopiff-integration.md) automates diff-based detection across Patch Tuesday drops.
 
 ## Cross-References
 
