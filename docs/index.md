@@ -6,7 +6,7 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 132 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 134 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates
@@ -103,7 +103,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 132 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 52 exploited in the wild, including 38 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 134 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 52 exploited in the wild, including 38 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -120,7 +120,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">132</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">134</span> CVE case studies &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">62</span> unique drivers &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">52</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>

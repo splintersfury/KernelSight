@@ -1832,3 +1832,32 @@ cves:
       advisory: "https://www.netskope.com/company/security-compliance-and-assurance/security-advisories-and-disclosures/netskope-security-advisory-nskpsa-2025-005"
     case_study: "docs/case-studies/CVE-2025-11156.md"
 
+  - cve_id: "CVE-2025-5942"
+    driver: "epdlpdrv.sys"
+    vendor: "Netskope"
+    description: "Netskope Endpoint DLP — heap overflow causes BSOD from unprivileged user"
+    vuln_class: "buffer-overflow"
+    third_party: true
+    byovd: false
+    itw: false
+    status: "patched"
+    references:
+      nvd: "https://nvd.nist.gov/vuln/detail/CVE-2025-5942"
+      advisory: "https://www.netskope.com/company/security-compliance-and-assurance/security-advisories-and-disclosures/netskope-security-advisory-nskpsa-2025-003"
+    case_study: "docs/case-studies/CVE-2025-5942.md"
+
+  - cve_id: "CVE-2024-11616"
+    driver: "epdlpdrv.sys"
+    vendor: "Netskope"
+    description: "Netskope Endpoint DLP — double-fetch TOCTOU heap overflow via communication port"
+    vuln_class: "toctou"
+    third_party: true
+    byovd: false
+    itw: false
+    status: "patched"
+    references:
+      writeup: "https://inbits-sec.com/posts/cve-2024-11616-netskope/"
+      poc: "https://github.com/inb1ts/CVE-2024-11616"
+      advisory: "https://www.netskope.com/company/security-compliance-and-assurance/security-advisories-and-disclosures/netskope-security-advisory-nskpsa-2024-003"
+    case_study: "docs/case-studies/CVE-2024-11616.md"
+

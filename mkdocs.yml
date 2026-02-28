@@ -247,6 +247,8 @@ nav:
     - CVE-2025-0287: case-studies/CVE-2025-0287.md
     - CVE-2025-0288: case-studies/CVE-2025-0288.md
     - CVE-2025-1055: case-studies/CVE-2025-1055.md
+    - CVE-2024-11616: case-studies/CVE-2024-11616.md
+    - CVE-2025-5942: case-studies/CVE-2025-5942.md
     - CVE-2025-11156: case-studies/CVE-2025-11156.md
     - CVE-2025-70795: case-studies/CVE-2025-70795.md
   - Defenses:
