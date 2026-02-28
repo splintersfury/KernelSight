@@ -2,6 +2,7 @@
 
 Cross-cutting analysis that synthesizes patterns from the KernelSight corpus.
 
+- [Why Kernel Drivers?](why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, and Microsoft's trajectory.
 - [Anatomy of a Secure Driver](secure-driver-anatomy.md) -- the 6 anti-patterns behind most Windows kernel driver vulnerabilities, with fixes and real CVE citations.
 - [Corpus Analytics](corpus-analytics.md) -- visual breakdown of 134 CVEs by driver, year, vulnerability class, and exploitation status.
 - [Exploit Chain Patterns](exploit-chain-patterns.md) -- the 5 recurring exploit chain shapes, from initial corruption through SYSTEM.

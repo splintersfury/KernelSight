@@ -267,6 +267,7 @@ nav:
     - KASLR Bypasses: mitigations/kaslr-bypasses.md
   - Guides:
     - guides/index.md
+    - Why Kernel Drivers?: guides/why-kernel-drivers.md
     - Anatomy of a Secure Driver: guides/secure-driver-anatomy.md
     - Corpus Analytics: guides/corpus-analytics.md
     - Exploit Chain Patterns: guides/exploit-chain-patterns.md
