@@ -108,6 +108,9 @@ nav:
   - CVEs:
     - case-studies/index.md
     - CLFS Deep-Dive: case-studies/clfs-deep-dive.md
+    - AFD Deep-Dive: case-studies/afd-deep-dive.md
+    - Win32k Deep-Dive: case-studies/win32k-deep-dive.md
+    - NTFS Deep-Dive: case-studies/ntfs-deep-dive.md
     - CVE-2026-21241: case-studies/CVE-2026-21241.md
     - CVE-2025-29824: case-studies/CVE-2025-29824.md
     - CVE-2025-24993: case-studies/CVE-2025-24993.md
@@ -265,6 +268,10 @@ nav:
   - Guides:
     - guides/index.md
     - Anatomy of a Secure Driver: guides/secure-driver-anatomy.md
+    - Corpus Analytics: guides/corpus-analytics.md
+    - Exploit Chain Patterns: guides/exploit-chain-patterns.md
+    - Patch Patterns: guides/patch-patterns.md
+    - Mitigation Timeline: guides/mitigation-timeline.md
   - Tools:
     - tooling/index.md
     - Static Analysis: tooling/static-analysis.md
