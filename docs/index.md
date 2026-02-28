@@ -1,6 +1,7 @@
 ---
 hide:
   - toc
+description: "Windows kernel driver exploitation knowledge base — 134 CVEs across 62 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
 ---
 
 <div class="ks-hero-title" markdown>KernelSight</div>

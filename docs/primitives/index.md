@@ -1,3 +1,7 @@
+---
+description: "19 Windows kernel exploitation primitives — arbitrary read/write via IOCTL, pool overflow, MDL mapping, PTE manipulation, token swapping, PreviousMode, I/O Ring, WNF, and pool spray techniques."
+---
+
 # Primitives
 
 <div class="ks-pipeline-pos">

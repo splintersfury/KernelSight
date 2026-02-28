@@ -1,3 +1,7 @@
+---
+description: "9 Windows kernel attack surfaces — IOCTL handlers, filesystem IRPs, NDIS/network, PnP/Power, WDF/KMDF, registry callbacks, ALPC, shared memory, and WMI/ETW entry points."
+---
+
 # Attack Surfaces
 
 <div class="ks-pipeline-pos">

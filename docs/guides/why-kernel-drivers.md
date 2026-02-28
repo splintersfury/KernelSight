@@ -1,3 +1,7 @@
+---
+description: "Why Windows kernel drivers exist — x86-64 privilege rings, Ring 0-only capabilities, user-mode alternatives (UMDF, WFP, ETW), the security cost of kernel code, and Microsoft's trajectory toward constraining drivers."
+---
+
 # Why Kernel Drivers?
 
 > Why the attack surface exists -- what hardware enforces, what only Ring 0 can do, and where Microsoft is trying to draw the line.

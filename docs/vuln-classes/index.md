@@ -1,3 +1,7 @@
+---
+description: "10 Windows kernel vulnerability classes — buffer overflow, use-after-free, type confusion, TOCTOU, race conditions, integer overflow, arbitrary R/W, and logic bugs with real CVE examples."
+---
+
 # Vulnerability Classes
 
 <div class="ks-pipeline-pos">

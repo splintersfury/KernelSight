@@ -1,3 +1,7 @@
+---
+description: "12 categories of Windows kernel drivers — file system, network stack, Win32k, CLFS, kernel streaming, vendor utility, and more. Each with vulnerability patterns and CVE cross-references."
+---
+
 # Driver Types
 
 <div class="ks-pipeline-pos">

@@ -1,3 +1,7 @@
+---
+description: "Guides for Windows kernel driver security — secure driver anatomy, corpus analytics, exploit chain patterns, patch patterns, and mitigation timelines."
+---
+
 # Guides
 
 Cross-cutting analysis that synthesizes patterns from the KernelSight corpus.

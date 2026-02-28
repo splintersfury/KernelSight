@@ -1,3 +1,7 @@
+---
+description: "134 Windows kernel CVE case studies with root cause analysis, exploit chains, patch diffs, and detection rules. Covers ntoskrnl, CLFS, afd.sys, win32k, NTFS, and 41 BYOVD drivers."
+---
+
 # Case Studies
 
 <div class="ks-pipeline-pos">

@@ -1,3 +1,7 @@
+---
+description: "Windows kernel exploit mitigations — SMEP, SMAP, kCFG, kCET, VBS, HVCI, KDP, pool hardening, Secure Pool, ACG, and KASLR. How each defence works and what bypasses exist."
+---
+
 # Mitigations
 
 <div class="ks-pipeline-pos">

@@ -21,6 +21,25 @@
   <meta name="twitter:title" content="KernelSight">
   <meta name="twitter:description" content="{{ config.site_description }}">
   {% endif %}
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "KernelSight",
+    "url": "https://splintersfury.github.io/KernelSight/",
+    "description": "{{ config.site_description }}",
+    "author": {
+      "@type": "Person",
+      "name": "Ahmad Abdillah Bin Zaini"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://splintersfury.github.io/KernelSight/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <script>
     (function() {
       var m = location.pathname.match(
