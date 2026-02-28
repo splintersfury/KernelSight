@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 140 CVEs across 63 unique drivers, with 52 exploited in the wild — including 38 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 131 CVEs across 61 unique drivers, with 52 exploited in the wild — including 38 third-party BYOVD driver case studies.
 
 ## CVE Index
 

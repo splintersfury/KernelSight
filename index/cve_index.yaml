@@ -1791,3 +1791,30 @@ cves:
       writeup: ""
     case_study: "docs/case-studies/CVE-2025-70795.md"
 
+  - cve_id: "CVE-2024-49114"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini-Filter — buffer overflow EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-49114"
+    case_study: "docs/case-studies/CVE-2024-49114.md"
+
+  - cve_id: "CVE-2025-21333"
+    driver: "vsp.sys"
+    description: "Hyper-V Virtual Service Provider — heap-based buffer overflow EoP"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21333"
+    case_study: "docs/case-studies/CVE-2025-21333.md"
+
+  - cve_id: "CVE-2025-29824"
+    driver: "clfs.sys"
+    description: "CLFS — use-after-free / logic bug EoP, exploited by Storm-2460 for RansomEXX"
+    vuln_class: "use-after-free"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-29824"
+    case_study: "docs/case-studies/CVE-2025-29824.md"
+
