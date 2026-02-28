@@ -52,33 +52,25 @@ Windows kernel mitigations have accumulated over a decade. Each new defense rais
     <text class="ks-annotation" x="580" y="98" text-anchor="middle">2023</text>
     <line class="ks-line" x1="640" y1="76" x2="640" y2="84"/>
     <text class="ks-annotation" x="640" y="98" text-anchor="middle">2024</text>
-
     <!-- Milestone markers (above line) -->
     <line class="ks-line" x1="40" y1="80" x2="40" y2="55" stroke-dasharray="3,3"/>
     <text class="ks-label" x="40" y="50" text-anchor="middle" font-size="7">SMEP</text>
-
     <line class="ks-line" x1="100" y1="80" x2="100" y2="35" stroke-dasharray="3,3"/>
     <text class="ks-label" x="100" y="30" text-anchor="middle" font-size="7">KASLR</text>
-
     <line class="ks-line" x1="160" y1="80" x2="160" y2="55" stroke-dasharray="3,3"/>
     <text class="ks-label" x="160" y="50" text-anchor="middle" font-size="7">kCFG</text>
-
     <line class="ks-line" x1="220" y1="80" x2="220" y2="35" stroke-dasharray="3,3"/>
     <text class="ks-label" x="220" y="30" text-anchor="middle" font-size="7">HVCI</text>
     <line class="ks-line" x1="250" y1="80" x2="250" y2="55" stroke-dasharray="3,3"/>
     <text class="ks-label" x="250" y="50" text-anchor="middle" font-size="7">SMAP</text>
-
     <line class="ks-line" x1="400" y1="80" x2="400" y2="35" stroke-dasharray="3,3"/>
     <text class="ks-label" x="400" y="22" text-anchor="middle" font-size="7">Segment</text>
     <text class="ks-label" x="400" y="32" text-anchor="middle" font-size="7">Heap</text>
-
     <line class="ks-line" x1="520" y1="80" x2="520" y2="55" stroke-dasharray="3,3"/>
     <text class="ks-label" x="520" y="50" text-anchor="middle" font-size="7">kCET</text>
-
     <line class="ks-line" x1="640" y1="80" x2="640" y2="35" stroke-dasharray="3,3"/>
     <text class="ks-label" x="640" y="22" text-anchor="middle" font-size="7">CLFS</text>
     <text class="ks-label" x="640" y="32" text-anchor="middle" font-size="7">Isolation</text>
-
     <!-- CVE density bands (below line) -->
     <text class="ks-annotation" x="390" y="120" text-anchor="middle">CVE density</text>
     <rect class="ks-box" x="40" y="125" width="60" height="6" rx="0" opacity="0.15"/>
@@ -89,7 +81,6 @@ Windows kernel mitigations have accumulated over a decade. Each new defense rais
     <rect class="ks-box" x="520" y="125" width="60" height="6" rx="0" opacity="0.7"/>
     <rect class="ks-box" x="580" y="125" width="60" height="6" rx="0" opacity="0.9"/>
     <rect class="ks-box" x="640" y="125" width="60" height="6" rx="0" opacity="0.6"/>
-
     <text class="ks-annotation" x="390" y="155" text-anchor="middle">Darker = more CVEs disclosed in that period</text>
   </svg>
   <p class="ks-figure-caption">Each milestone marks when a major mitigation first shipped. CVE density bands approximate disclosure volume -- 2025 dominates the corpus due to expanded Patch Tuesday coverage.</p>

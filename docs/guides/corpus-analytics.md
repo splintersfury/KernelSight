@@ -71,43 +71,36 @@ Most CVEs land in 2025, partly because Patch Tuesday coverage expanded and more 
     <line class="ks-line" x1="45" y1="87" x2="670" y2="87" opacity="0.15"/>
     <text class="ks-annotation" x="40" y="50" text-anchor="end">80</text>
     <line class="ks-line" x1="45" y1="47" x2="670" y2="47" opacity="0.15"/>
-
     <!-- 2015-2021 (12 total, 5 ITW) -->
     <rect class="ks-box" x="65" y="183" width="40" height="24" rx="0"/>
     <rect class="ks-box" x="65" y="173" width="40" height="10" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="85" y="170">12</text>
     <text class="ks-annotation" x="85" y="225" text-anchor="middle">&#x2264;21</text>
-
     <!-- 2022 (4 total, 3 ITW) -->
     <rect class="ks-box" x="130" y="205" width="40" height="2" rx="0"/>
     <rect class="ks-box" x="130" y="199" width="40" height="6" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="150" y="196">4</text>
     <text class="ks-annotation" x="150" y="225" text-anchor="middle">2022</text>
-
     <!-- 2023 (14 total, 5 ITW) -->
     <rect class="ks-box" x="195" y="189" width="40" height="18" rx="0"/>
     <rect class="ks-box" x="195" y="179" width="40" height="10" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="215" y="176">14</text>
     <text class="ks-annotation" x="215" y="225" text-anchor="middle">2023</text>
-
     <!-- 2024 (18 total, 7 ITW) -->
     <rect class="ks-box" x="260" y="185" width="40" height="22" rx="0"/>
     <rect class="ks-box" x="260" y="171" width="40" height="14" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="280" y="168">18</text>
     <text class="ks-annotation" x="280" y="225" text-anchor="middle">2024</text>
-
     <!-- 2025 (72 total, 27 ITW) -->
     <rect class="ks-box" x="325" y="117" width="40" height="90" rx="0"/>
     <rect class="ks-box" x="325" y="63" width="40" height="54" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="345" y="60">72</text>
     <text class="ks-annotation" x="345" y="225" text-anchor="middle">2025</text>
-
     <!-- 2026 (14 total, 5 ITW) -->
     <rect class="ks-box" x="390" y="189" width="40" height="18" rx="0"/>
     <rect class="ks-box" x="390" y="179" width="40" height="10" rx="0" opacity="0.5"/>
     <text class="ks-annotation" x="410" y="176">14</text>
     <text class="ks-annotation" x="410" y="225" text-anchor="middle">2026</text>
-
     <!-- Legend -->
     <rect class="ks-box" x="490" y="60" width="12" height="12" rx="0"/>
     <text class="ks-annotation" x="508" y="70">Non-ITW</text>
