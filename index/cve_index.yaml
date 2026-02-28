@@ -1238,3 +1238,556 @@ cves:
       writeup: ""
     case_study: "docs/case-studies/EnPortv-sys.md"
 
+  # Additional 2025-2026 Microsoft Kernel CVEs
+  - cve_id: "CVE-2025-24984"
+    driver: "ntfs.sys"
+    description: "NTFS — information disclosure via sensitive data in log files"
+    vuln_class: "uninitialized-memory"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24984"
+    case_study: "docs/case-studies/CVE-2025-24984.md"
+
+  - cve_id: "CVE-2025-24991"
+    driver: "ntfs.sys"
+    description: "NTFS — out-of-bounds read leaks kernel memory via crafted volume"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24991"
+    case_study: "docs/case-studies/CVE-2025-24991.md"
+
+  - cve_id: "CVE-2025-24992"
+    driver: "ntfs.sys"
+    description: "NTFS — buffer over-read leaks kernel memory"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24992"
+    case_study: "docs/case-studies/CVE-2025-24992.md"
+
+  - cve_id: "CVE-2025-21367"
+    driver: "win32k.sys"
+    description: "Win32k — race condition allows EoP"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21367"
+    case_study: "docs/case-studies/CVE-2025-21367.md"
+
+  - cve_id: "CVE-2025-24044"
+    driver: "win32k.sys"
+    description: "Win32k — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24044"
+    case_study: "docs/case-studies/CVE-2025-24044.md"
+
+  - cve_id: "CVE-2025-27732"
+    driver: "win32k.sys"
+    description: "Win32k GRFX — improper memory locking allows EoP"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-27732"
+    case_study: "docs/case-studies/CVE-2025-27732.md"
+
+  - cve_id: "CVE-2025-24058"
+    driver: "dwmcore.dll"
+    description: "DWM — improper input validation allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24058"
+    case_study: "docs/case-studies/CVE-2025-24058.md"
+
+  - cve_id: "CVE-2025-24063"
+    driver: "ks.sys"
+    description: "Kernel Streaming — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24063"
+    case_study: "docs/case-studies/CVE-2025-24063.md"
+
+  - cve_id: "CVE-2025-29829"
+    driver: "Trusted Runtime Interface"
+    description: "Trusted Runtime Interface — info disclosure via uninitialized memory"
+    vuln_class: "uninitialized-memory"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-29829"
+    case_study: "docs/case-studies/CVE-2025-29829.md"
+
+  - cve_id: "CVE-2025-32713"
+    driver: "clfs.sys"
+    description: "CLFS — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32713"
+    case_study: "docs/case-studies/CVE-2025-32713.md"
+
+  - cve_id: "CVE-2025-32722"
+    driver: "storport.sys"
+    description: "Storage Port — buffer over-read leaks kernel memory"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32722"
+    case_study: "docs/case-studies/CVE-2025-32722.md"
+
+  - cve_id: "CVE-2025-47982"
+    driver: "storvsp.sys"
+    description: "Storage VSP — improper input validation allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-47982"
+    case_study: "docs/case-studies/CVE-2025-47982.md"
+
+  - cve_id: "CVE-2025-49661"
+    driver: "afd.sys"
+    description: "AFD — untrusted pointer dereference allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49661"
+    case_study: "docs/case-studies/CVE-2025-49661.md"
+
+  - cve_id: "CVE-2025-49675"
+    driver: "ksthunk.sys"
+    description: "KS WOW Thunk — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49675"
+    case_study: "docs/case-studies/CVE-2025-49675.md"
+
+  - cve_id: "CVE-2025-49733"
+    driver: "win32k.sys"
+    description: "Win32k ICOMP — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49733"
+    case_study: "docs/case-studies/CVE-2025-49733.md"
+
+  - cve_id: "CVE-2025-49762"
+    driver: "afd.sys"
+    description: "AFD — race condition allows EoP"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49762"
+    case_study: "docs/case-studies/CVE-2025-49762.md"
+
+  - cve_id: "CVE-2025-53147"
+    driver: "afd.sys"
+    description: "AFD — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53147"
+    case_study: "docs/case-studies/CVE-2025-53147.md"
+
+  - cve_id: "CVE-2025-53718"
+    driver: "afd.sys"
+    description: "AFD — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53718"
+    case_study: "docs/case-studies/CVE-2025-53718.md"
+
+  - cve_id: "CVE-2025-53803"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — information disclosure via kernel memory leak"
+    vuln_class: "uninitialized-memory"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53803"
+    case_study: "docs/case-studies/CVE-2025-53803.md"
+
+  - cve_id: "CVE-2025-53804"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — information disclosure via kernel-mode driver"
+    vuln_class: "uninitialized-memory"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53804"
+    case_study: "docs/case-studies/CVE-2025-53804.md"
+
+  - cve_id: "CVE-2025-54110"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — integer overflow allows EoP"
+    vuln_class: "integer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-54110"
+    case_study: "docs/case-studies/CVE-2025-54110.md"
+
+  - cve_id: "CVE-2025-54916"
+    driver: "ntfs.sys"
+    description: "NTFS — stack-based buffer overflow allows RCE"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-54916"
+    case_study: "docs/case-studies/CVE-2025-54916.md"
+
+  - cve_id: "CVE-2025-55228"
+    driver: "win32k.sys"
+    description: "Win32k GRFX — race condition allows RCE"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55228"
+    case_study: "docs/case-studies/CVE-2025-55228.md"
+
+  - cve_id: "CVE-2025-55680"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — race condition / TOCTOU allows EoP"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55680"
+    case_study: "docs/case-studies/CVE-2025-55680.md"
+
+  - cve_id: "CVE-2025-55681"
+    driver: "dwmcore.dll"
+    description: "DWM — out-of-bounds access allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55681"
+    case_study: "docs/case-studies/CVE-2025-55681.md"
+
+  - cve_id: "CVE-2025-58722"
+    driver: "dwmcore.dll"
+    description: "DWM — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-58722"
+    case_study: "docs/case-studies/CVE-2025-58722.md"
+
+  - cve_id: "CVE-2025-59230"
+    driver: "rasman.sys"
+    description: "Remote Access Connection Manager — EoP zero-day"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59230"
+    case_study: "docs/case-studies/CVE-2025-59230.md"
+
+  - cve_id: "CVE-2025-59254"
+    driver: "dwmcore.dll"
+    description: "DWM — memory handling flaw allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59254"
+    case_study: "docs/case-studies/CVE-2025-59254.md"
+
+  - cve_id: "CVE-2025-60709"
+    driver: "clfs.sys"
+    description: "CLFS — out-of-bounds read allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-60709"
+    case_study: "docs/case-studies/CVE-2025-60709.md"
+
+  - cve_id: "CVE-2025-62213"
+    driver: "afd.sys"
+    description: "AFD — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62213"
+    case_study: "docs/case-studies/CVE-2025-62213.md"
+
+  - cve_id: "CVE-2025-62217"
+    driver: "afd.sys"
+    description: "AFD — elevation of privilege"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62217"
+    case_study: "docs/case-studies/CVE-2025-62217.md"
+
+  - cve_id: "CVE-2025-62454"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62454"
+    case_study: "docs/case-studies/CVE-2025-62454.md"
+
+  - cve_id: "CVE-2025-62457"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — out-of-bounds read allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62457"
+    case_study: "docs/case-studies/CVE-2025-62457.md"
+
+  - cve_id: "CVE-2025-62458"
+    driver: "win32k.sys"
+    description: "Win32k — elevation of privilege"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62458"
+    case_study: "docs/case-studies/CVE-2025-62458.md"
+
+  - cve_id: "CVE-2025-62470"
+    driver: "clfs.sys"
+    description: "CLFS — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62470"
+    case_study: "docs/case-studies/CVE-2025-62470.md"
+
+  - cve_id: "CVE-2025-64673"
+    driver: "storvsp.sys"
+    description: "Storage VSP — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-64673"
+    case_study: "docs/case-studies/CVE-2025-64673.md"
+
+  - cve_id: "CVE-2025-64680"
+    driver: "dwmcore.dll"
+    description: "DWM — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-64680"
+    case_study: "docs/case-studies/CVE-2025-64680.md"
+
+  - cve_id: "CVE-2025-24052"
+    driver: "ltmdm64.sys"
+    description: "Agere Modem — stack buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24052"
+    case_study: "docs/case-studies/CVE-2025-24052.md"
+
+  - cve_id: "CVE-2026-20814"
+    driver: "dxgkrnl.sys"
+    description: "DirectX Graphics Kernel — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20814"
+    case_study: "docs/case-studies/CVE-2026-20814.md"
+
+  - cve_id: "CVE-2026-20820"
+    driver: "clfs.sys"
+    description: "CLFS — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20820"
+    case_study: "docs/case-studies/CVE-2026-20820.md"
+
+  - cve_id: "CVE-2026-20822"
+    driver: "win32kfull.sys"
+    description: "Win32k — use-after-free in graphics component allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20822"
+    case_study: "docs/case-studies/CVE-2026-20822.md"
+
+  - cve_id: "CVE-2026-20840"
+    driver: "ntfs.sys"
+    description: "NTFS — heap-based buffer overflow allows RCE"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20840"
+    case_study: "docs/case-studies/CVE-2026-20840.md"
+
+  - cve_id: "CVE-2026-20842"
+    driver: "dwmcore.dll"
+    description: "DWM — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20842"
+    case_study: "docs/case-studies/CVE-2026-20842.md"
+
+  - cve_id: "CVE-2026-20857"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — elevation of privilege"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20857"
+    case_study: "docs/case-studies/CVE-2026-20857.md"
+
+  - cve_id: "CVE-2026-20876"
+    driver: "VBS Enclave"
+    description: "VBS Enclave — heap-based buffer overflow allows EoP"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20876"
+    case_study: "docs/case-studies/CVE-2026-20876.md"
+
+  - cve_id: "CVE-2026-20922"
+    driver: "ntfs.sys"
+    description: "NTFS — heap-based buffer overflow allows RCE"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20922"
+    case_study: "docs/case-studies/CVE-2026-20922.md"
+
+  - cve_id: "CVE-2026-21253"
+    driver: "msfs.sys"
+    description: "Mailslot File System — use-after-free allows EoP"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21253"
+    case_study: "docs/case-studies/CVE-2026-21253.md"
+
+  - cve_id: "CVE-2026-21533"
+    driver: "Remote Desktop Services"
+    description: "Remote Desktop Services — EoP zero-day"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21533"
+    case_study: "docs/case-studies/CVE-2026-21533.md"
+
+  - cve_id: "CVE-2026-2636"
+    driver: "clfs.sys"
+    description: "CLFS — improper flag validation causes DoS"
+    vuln_class: "logic-bugs"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-2636"
+    case_study: "docs/case-studies/CVE-2026-2636.md"
+
+  # Legacy inbox drivers (removed by Microsoft)
+  - cve_id: "CVE-2023-31096"
+    driver: "agrsm64.sys"
+    description: "Agere Soft Modem — stack overflow (driver removed Jan 2026)"
+    vuln_class: "buffer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-31096"
+    case_study: "docs/case-studies/CVE-2023-31096.md"
+
+  - cve_id: "CVE-2024-55414"
+    driver: "smserl64.sys"
+    description: "Motorola Soft Modem — physical memory mapping (driver removed Jan 2026)"
+    vuln_class: "arbitrary-rw-primitives"
+    itw: false
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2024-55414.md"
+
+  # Additional BYOVD drivers
+  - cve_id: "CVE-2025-0285"
+    driver: "BioNTdrv.sys"
+    vendor: "Paragon"
+    description: "Paragon — arbitrary kernel memory mapping"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "blocklisted"
+    references:
+      writeup: "https://www.kb.cert.org/vuls/id/726882"
+    case_study: "docs/case-studies/CVE-2025-0285.md"
+
+  - cve_id: "CVE-2025-0286"
+    driver: "BioNTdrv.sys"
+    vendor: "Paragon"
+    description: "Paragon — arbitrary kernel memory write"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "blocklisted"
+    references:
+      writeup: "https://www.kb.cert.org/vuls/id/726882"
+    case_study: "docs/case-studies/CVE-2025-0286.md"
+
+  - cve_id: "CVE-2025-0287"
+    driver: "BioNTdrv.sys"
+    vendor: "Paragon"
+    description: "Paragon — null pointer dereference (DoS)"
+    vuln_class: "null-deref"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "blocklisted"
+    references:
+      writeup: "https://www.kb.cert.org/vuls/id/726882"
+    case_study: "docs/case-studies/CVE-2025-0287.md"
+
+  - cve_id: "CVE-2025-0288"
+    driver: "BioNTdrv.sys"
+    vendor: "Paragon"
+    description: "Paragon — arbitrary kernel write via memmove"
+    vuln_class: "arbitrary-rw-primitives"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "blocklisted"
+    references:
+      writeup: "https://www.kb.cert.org/vuls/id/726882"
+    case_study: "docs/case-studies/CVE-2025-0288.md"
+
+  - cve_id: "CVE-2025-61156"
+    driver: "TfSysMon.sys"
+    vendor: "ThreatFire"
+    description: "ThreatFire — process termination via insecure IOCTL"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: true
+    status: "under_active_abuse"
+    references:
+      poc: "https://github.com/D7EAD/CVE-2025-61156"
+    case_study: "docs/case-studies/CVE-2025-61156.md"
+
+  - cve_id: "CVE-2025-1055"
+    driver: "K7RKScan.sys"
+    vendor: "K7 Computing"
+    description: "K7 Computing — elevation of privilege"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "still_loadable"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-1055.md"
+
+  - cve_id: "CVE-2025-70795"
+    driver: "STProcessMonitor.sys"
+    vendor: "Safetica"
+    description: "Safetica — process termination primitive"
+    vuln_class: "logic-bugs"
+    third_party: true
+    byovd: true
+    itw: false
+    status: "still_loadable"
+    references:
+      writeup: ""
+    case_study: "docs/case-studies/CVE-2025-70795.md"
+
