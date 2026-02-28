@@ -1818,3 +1818,17 @@ cves:
       msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-29824"
     case_study: "docs/case-studies/CVE-2025-29824.md"
 
+  - cve_id: "CVE-2025-11156"
+    driver: "epdlpdrv.sys"
+    vendor: "Netskope"
+    description: "Netskope Endpoint DLP — null pointer dereference when driver loaded as generic kernel service"
+    vuln_class: "null-pointer-deref"
+    third_party: true
+    byovd: false
+    itw: false
+    status: "patched"
+    references:
+      nvd: "https://nvd.nist.gov/vuln/detail/CVE-2025-11156"
+      advisory: "https://www.netskope.com/company/security-compliance-and-assurance/security-advisories-and-disclosures/netskope-security-advisory-nskpsa-2025-005"
+    case_study: "docs/case-studies/CVE-2025-11156.md"
+

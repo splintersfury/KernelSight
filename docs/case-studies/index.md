@@ -4,7 +4,7 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span>
 </div>
 
-Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 131 CVEs across 61 unique drivers, with 52 exploited in the wild — including 38 third-party BYOVD driver case studies.
+Case studies are where the pipeline comes together. Each entry walks through a real CVE from root cause through exploitation to patch — connecting the driver type, attack surface, vulnerability class, and primitives used into a complete chain. The corpus covers 132 CVEs across 62 unique drivers, with 52 exploited in the wild — including 39 third-party BYOVD driver case studies.
 
 ## CVE Index
 
@@ -165,6 +165,7 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 | [CVE-2025-52915](CVE-2025-52915.md) | `K7RKScan.sys` | K7 Computing | Process Termination | No | Still loadable |
 | [CVE-2025-1055](CVE-2025-1055.md) | `K7RKScan.sys` | K7 Computing | Elevation of Privilege | No | Still loadable |
 | [CVE-2025-70795](CVE-2025-70795.md) | `STProcessMonitor.sys` | Safetica | Process Termination | No | Still loadable |
+| [CVE-2025-11156](CVE-2025-11156.md) | `epdlpdrv.sys` | Netskope | Null Pointer Deref / DoS | No | Patched |
 | [CVE-2024-51324](CVE-2024-51324.md) | `BdApiUtil.sys` | Baidu | Process Termination | Yes | Still loadable |
 | [EnPortv.sys](EnPortv-sys.md) | `EnPortv.sys` | Guidance/OpenText | Process Termination | Yes | Revoked cert, still loads |
 
@@ -492,6 +493,10 @@ Case studies are where the pipeline comes together. Each entry walks through a r
 ### `STProcessMonitor.sys`
 
 - [CVE-2025-70795](CVE-2025-70795.md) — Safetica — process termination
+
+### `epdlpdrv.sys`
+
+- [CVE-2025-11156](CVE-2025-11156.md) — Netskope Endpoint DLP — null pointer dereference / DoS
 
 ## By Exploitation Status
 

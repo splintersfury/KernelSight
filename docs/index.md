@@ -6,7 +6,7 @@ hide:
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 131 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 132 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates
@@ -87,7 +87,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <ol class="ks-pipeline-list" markdown>
 <li markdown>
 <strong><a href="driver-types/">Driver Types</a></strong>
-<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 61 unique drivers.</p>
+<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 62 unique drivers.</p>
 </li>
 <li markdown>
 <strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
@@ -103,7 +103,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 131 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 52 exploited in the wild, including 38 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 132 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 52 exploited in the wild, including 38 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -120,8 +120,8 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">131</span> CVE case studies &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">61</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">132</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">62</span> unique drivers &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">52</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
