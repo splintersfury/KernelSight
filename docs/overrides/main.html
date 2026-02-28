@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="KernelSight">
+  {% if page %}
+  <meta property="og:title" content="{{ page.title }} — KernelSight">
+  <meta property="og:description" content="{{ page.meta.description | default(config.site_description, true) }}">
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  {% else %}
+  <meta property="og:title" content="KernelSight">
+  <meta property="og:description" content="{{ config.site_description }}">
+  {% endif %}
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  {% if page %}
+  <meta name="twitter:title" content="{{ page.title }} — KernelSight">
+  <meta name="twitter:description" content="{{ page.meta.description | default(config.site_description, true) }}">
+  {% else %}
+  <meta name="twitter:title" content="KernelSight">
+  <meta name="twitter:description" content="{{ config.site_description }}">
+  {% endif %}
   <script>
     (function() {
       var m = location.pathname.match(
