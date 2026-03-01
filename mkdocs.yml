@@ -133,17 +133,23 @@ nav:
     - CVE-2024-38256: case-studies/CVE-2024-38256.md
     - CVE-2024-38238: case-studies/CVE-2024-38238.md
     - CVE-2024-38193: case-studies/CVE-2024-38193.md
+    - CVE-2024-38144: case-studies/CVE-2024-38144.md
     - CVE-2024-38106: case-studies/CVE-2024-38106.md
     - CVE-2024-38063: case-studies/CVE-2024-38063.md
     - CVE-2024-38054: case-studies/CVE-2024-38054.md
     - CVE-2024-35250: case-studies/CVE-2024-35250.md
+    - CVE-2024-30090: case-studies/CVE-2024-30090.md
     - CVE-2024-30089: case-studies/CVE-2024-30089.md
     - CVE-2024-30088: case-studies/CVE-2024-30088.md
     - CVE-2024-30085: case-studies/CVE-2024-30085.md
+    - CVE-2024-30084: case-studies/CVE-2024-30084.md
     - CVE-2024-26229: case-studies/CVE-2024-26229.md
+    - CVE-2024-26218: case-studies/CVE-2024-26218.md
+    - CVE-2024-21345: case-studies/CVE-2024-21345.md
     - CVE-2024-21338: case-studies/CVE-2024-21338.md
     - CVE-2024-21302: case-studies/CVE-2024-21302.md
     - CVE-2023-36802: case-studies/CVE-2023-36802.md
+    - CVE-2023-36427: case-studies/CVE-2023-36427.md
     - CVE-2023-36424: case-studies/CVE-2023-36424.md
     - CVE-2023-36036: case-studies/CVE-2023-36036.md
     - CVE-2023-32019: case-studies/CVE-2023-32019.md
@@ -151,10 +157,17 @@ nav:
     - CVE-2023-29336: case-studies/CVE-2023-29336.md
     - CVE-2023-28252: case-studies/CVE-2023-28252.md
     - CVE-2023-28218: case-studies/CVE-2023-28218.md
+    - CVE-2023-23420: case-studies/CVE-2023-23420.md
+    - CVE-2023-23376: case-studies/CVE-2023-23376.md
     - CVE-2023-21768: case-studies/CVE-2023-21768.md
+    - CVE-2022-41073: case-studies/CVE-2022-41073.md
     - CVE-2022-37969: case-studies/CVE-2022-37969.md
+    - CVE-2022-35803: case-studies/CVE-2022-35803.md
+    - CVE-2022-24521: case-studies/CVE-2022-24521.md
+    - CVE-2022-22047: case-studies/CVE-2022-22047.md
     - CVE-2022-21907: case-studies/CVE-2022-21907.md
     - CVE-2022-21882: case-studies/CVE-2022-21882.md
+    - CVE-2022-34707: case-studies/CVE-2022-34707.md
     - CVE-2021-21551: case-studies/CVE-2021-21551.md
     - CVE-2019-16098: case-studies/CVE-2019-16098.md
     - CVE-2018-19320: case-studies/CVE-2018-19320.md

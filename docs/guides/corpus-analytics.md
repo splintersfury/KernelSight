@@ -125,18 +125,18 @@ Annual volume stays between 90 and 140 with no clear upward trend since 2017. Th
 
 ### Corpus Coverage
 
-The KernelSight corpus samples 134 of roughly 1,200 kernel-mode CVEs disclosed since 2015 -- about 11%. The sampling is deliberate: the corpus tracks CVEs that have published exploit research, not a random cross-section of Patch Tuesday fixes.
+The KernelSight corpus samples 147 of roughly 1,200 kernel-mode CVEs disclosed since 2015 -- about 12%. The sampling is deliberate: the corpus tracks CVEs that have published exploit research, not a random cross-section of Patch Tuesday fixes.
 
 | Period | NVD Total | Corpus | Coverage |
 |--------|-----------|--------|----------|
 | 2015--2021 | 689 | 12 | 1.7% |
-| 2022 | 92 | 4 | 4.3% |
-| 2023 | 105 | 14 | 13.3% |
-| 2024 | 110 | 18 | 16.4% |
+| 2022 | 92 | 9 | 9.8% |
+| 2023 | 105 | 17 | 16.2% |
+| 2024 | 110 | 23 | 20.9% |
 | 2025 | 129 | 72 | 55.8% |
 | 2026 (partial) | 27 | 14 | 51.9% |
 
-Coverage concentrates on 2025--2026 because those years have the most public exploit writeups. Most pre-2022 entries are BYOVD drivers where the vulnerability existed years before formal CVE assignment.
+Coverage concentrates on 2025--2026 because those years have the most public exploit writeups. The 2022--2024 jump reflects backfilling CVEs with published exploit research (CLFS ransomware chain, Project Zero registry audit, DEVCORE kernel streaming work). Most pre-2022 entries are BYOVD drivers where the vulnerability existed years before formal CVE assignment.
 
 ## Vulnerability Class Breakdown
 

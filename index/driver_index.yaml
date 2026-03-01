@@ -17,11 +17,15 @@ drivers:
   - name: "cldflt.sys"
     cves:
       - "CVE-2023-36036"
+      - "CVE-2024-30084"
       - "CVE-2024-30085"
 
   - name: "clfs.sys"
     cves:
+      - "CVE-2022-24521"
+      - "CVE-2022-35803"
       - "CVE-2022-37969"
+      - "CVE-2023-23376"
       - "CVE-2023-28252"
       - "CVE-2023-36424"
       - "CVE-2024-49138"
@@ -44,7 +48,9 @@ drivers:
 
   - name: "ksthunk.sys"
     cves:
+      - "CVE-2024-30090"
       - "CVE-2024-38054"
+      - "CVE-2024-38144"
       - "CVE-2024-38238"
 
   - name: "mskssrv.sys"
@@ -59,8 +65,13 @@ drivers:
 
   - name: "ntoskrnl.exe"
     cves:
+      - "CVE-2022-34707"
+      - "CVE-2023-23420"
       - "CVE-2023-32019"
+      - "CVE-2023-36427"
       - "CVE-2024-21302"
+      - "CVE-2024-21345"
+      - "CVE-2024-26218"
       - "CVE-2024-30088"
       - "CVE-2024-38106"
 
@@ -80,3 +91,10 @@ drivers:
     cves:
       - "CVE-2023-29336"
 
+  - name: "csrss.exe"
+    cves:
+      - "CVE-2022-22047"
+
+  - name: "spoolsv.exe"
+    cves:
+      - "CVE-2022-41073"

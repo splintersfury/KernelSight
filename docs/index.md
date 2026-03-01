@@ -1,7 +1,7 @@
 ---
 hide:
   - toc
-description: "Windows kernel driver exploitation knowledge base — 134 CVEs across 62 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
+description: "Windows kernel driver exploitation knowledge base — 147 CVEs across 64 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
 ---
 
 <div class="ks-hero-title" markdown>KernelSight</div>
@@ -14,6 +14,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 
 | Date | What's New |
 |------|------------|
+| **2026-03-01** | Backfill: 13 case studies added for 2022--2024 CVEs with published exploit research. CLFS ransomware chain (CVE-2022-24521, CVE-2022-35803, CVE-2023-23376), Project Zero registry audit (CVE-2022-34707, CVE-2023-23420), DEVCORE kernel streaming (CVE-2024-30090, CVE-2024-30084, CVE-2024-38144), activation context bugs (CVE-2022-22047, CVE-2022-41073). Corpus now at 147 CVEs, 57 exploited ITW. |
 | **2026-03-01** | New guide: [Why Kernel Drivers?](guides/why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, the security cost, and Microsoft's trajectory toward constraining kernel code. |
 | **2026-02-28** | New guides: [Corpus Analytics](guides/corpus-analytics.md), [Exploit Chain Patterns](guides/exploit-chain-patterns.md), [Patch Patterns](guides/patch-patterns.md), [Mitigation Timeline](guides/mitigation-timeline.md). New deep dives: [afd.sys](case-studies/afd-deep-dive.md) (13 CVEs), [win32k](case-studies/win32k-deep-dive.md) (12 CVEs), [ntfs.sys](case-studies/ntfs-deep-dive.md) (7 CVEs). |
 | **2026-02-28** | New guide: [Anatomy of a Secure Driver](guides/secure-driver-anatomy.md) -- the 6 anti-patterns behind most kernel driver CVEs, with root cause distribution chart, pseudocode fixes, and a 14-point secure driver checklist. |
@@ -128,9 +129,9 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">134</span> CVE case studies &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">62</span> unique drivers &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">52</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">147</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">64</span> unique drivers &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">57</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">57</span> technique pages &nbsp;&middot;&nbsp;

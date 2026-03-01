@@ -1861,3 +1861,133 @@ cves:
       advisory: "https://www.netskope.com/company/security-compliance-and-assurance/security-advisories-and-disclosures/netskope-security-advisory-nskpsa-2024-003"
     case_study: "docs/case-studies/CVE-2024-11616.md"
 
+  - cve_id: "CVE-2022-24521"
+    driver: "clfs.sys"
+    description: "CLFS — rgClients PreviousMode decrement via crafted BLF metadata"
+    vuln_class: "logic-bugs"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-24521"
+      writeup: "https://securelist.com/windows-clfs-exploits-ransomware-cve-2022-24521/111580/"
+    case_study: "docs/case-studies/CVE-2022-24521.md"
+
+  - cve_id: "CVE-2022-35803"
+    driver: "clfs.sys"
+    description: "CLFS — type confusion via incomplete CVE-2022-24481 patch bypass"
+    vuln_class: "type-confusion"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-35803"
+      writeup: "https://blog.northseapwn.top/2022/11/11/Windows-Kernel-Exploit-CVE-2022-35803-in-Common-Log-File-System/index.html"
+    case_study: "docs/case-studies/CVE-2022-35803.md"
+
+  - cve_id: "CVE-2022-34707"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel (Registry) — reference count overflow in CM_KEY_SECURITY"
+    vuln_class: "integer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-34707"
+      writeup: "https://googleprojectzero.blogspot.com/2024/04/the-windows-registry-adventure-1.html"
+    case_study: "docs/case-studies/CVE-2022-34707.md"
+
+  - cve_id: "CVE-2022-22047"
+    driver: "csrss.exe"
+    description: "CSRSS — activation context cache poisoning via impersonated device map"
+    vuln_class: "logic-bugs"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-22047"
+      writeup: "https://www.thezdi.com/blog/2023/1/23/activation-context-cache-poisoning-exploiting-csrss-for-privilege-escalation"
+    case_study: "docs/case-studies/CVE-2022-22047.md"
+
+  - cve_id: "CVE-2022-41073"
+    driver: "spoolsv.exe"
+    description: "Print Spooler — drive root remapping during impersonation"
+    vuln_class: "logic-bugs"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-41073"
+      writeup: "https://googleprojectzero.github.io/0days-in-the-wild/0day-RCAs/2022/CVE-2022-41073.html"
+    case_study: "docs/case-studies/CVE-2022-41073.md"
+
+  - cve_id: "CVE-2023-23376"
+    driver: "clfs.sys"
+    description: "CLFS — out-of-bounds write via CLFS_CONTROL_RECORD manipulation"
+    vuln_class: "buffer-overflow"
+    itw: true
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-23376"
+      writeup: "https://securelist.com/windows-clfs-exploits-ransomware-cve-2023-23376/111593/"
+    case_study: "docs/case-studies/CVE-2023-23376.md"
+
+  - cve_id: "CVE-2023-23420"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel (Registry) — use-after-free in transacted key rename"
+    vuln_class: "use-after-free"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-23420"
+      writeup: "https://googleprojectzero.blogspot.com/2024/04/the-windows-registry-adventure-1.html"
+    case_study: "docs/case-studies/CVE-2023-23420.md"
+
+  - cve_id: "CVE-2023-36427"
+    driver: "ntoskrnl.exe"
+    description: "Hyper-V / NT Kernel — arbitrary physical memory corruption via Intel HFI MSR abuse"
+    vuln_class: "arbitrary-rw-primitives"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-36427"
+      writeup: "https://github.com/tandasat/CVE-2023-36427"
+    case_study: "docs/case-studies/CVE-2023-36427.md"
+
+  - cve_id: "CVE-2024-30090"
+    driver: "ksthunk.sys"
+    description: "Kernel Streaming WOW Thunk — RequestorMode confusion via 32-to-64-bit IRP conversion"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30090"
+      writeup: "https://devco.re/blog/2024/10/05/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part2-en/"
+      poc: "https://github.com/Dor00tkit/CVE-2024-30090"
+    case_study: "docs/case-studies/CVE-2024-30090.md"
+
+  - cve_id: "CVE-2024-30084"
+    driver: "cldflt.sys"
+    description: "Cloud Files Mini Filter — TOCTOU race condition"
+    vuln_class: "race-conditions"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30084"
+      writeup: "https://devco.re/blog/2024/08/23/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part1-en/"
+    case_study: "docs/case-studies/CVE-2024-30084.md"
+
+  - cve_id: "CVE-2024-38144"
+    driver: "ksthunk.sys"
+    description: "Kernel Streaming WOW Thunk — integer overflow in buffer size calculation"
+    vuln_class: "integer-overflow"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38144"
+      writeup: "https://devco.re/blog/2024/08/23/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part1-en/"
+    case_study: "docs/case-studies/CVE-2024-38144.md"
+
+  - cve_id: "CVE-2024-21345"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — elevation of privilege via improper kernel object handling"
+    vuln_class: "logic-bugs"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21345"
+      poc: "https://github.com/exploits-forsale/CVE-2024-21345"
+    case_study: "docs/case-studies/CVE-2024-21345.md"
+
+  - cve_id: "CVE-2024-26218"
+    driver: "ntoskrnl.exe"
+    description: "NT Kernel — elevation of privilege via improper kernel call handling"
+    vuln_class: "logic-bugs"
+    itw: false
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-26218"
+      poc: "https://github.com/exploits-forsale/CVE-2024-26218"
+    case_study: "docs/case-studies/CVE-2024-26218.md"
