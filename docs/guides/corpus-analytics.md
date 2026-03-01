@@ -1,40 +1,40 @@
 # Corpus Analytics
 
-> Visual breakdown of 134 CVEs across 62 drivers -- what gets exploited, how often, and where the patterns cluster.
+> Visual breakdown of 147 CVEs across 64 drivers -- what gets exploited, how often, and where the patterns cluster.
 
 ## CVEs by Driver Family
 
-The top 10 driver families account for roughly 75% of the corpus. Four families -- afd.sys, clfs.sys, win32k, and the Kernel Streaming stack -- share the lead at 12--13 CVEs each.
+The top 10 driver families account for roughly 68% of the corpus. clfs.sys leads at 15, followed by ntoskrnl.exe and the Kernel Streaming stack at 14 each, then afd.sys at 13.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG — CVEs by Driver Family (Top 10)</span>
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing CVE counts by driver family">
-    <!-- afd.sys -->
-    <text class="ks-label" x="175" y="35" text-anchor="end">afd.sys</text>
-    <rect class="ks-box" x="180" y="22" width="338" height="20" rx="0"/>
-    <text class="ks-annotation" x="526" y="36">13</text>
     <!-- clfs.sys -->
-    <text class="ks-label" x="175" y="65" text-anchor="end">clfs.sys</text>
-    <rect class="ks-box" x="180" y="52" width="312" height="20" rx="0"/>
-    <text class="ks-annotation" x="500" y="66">12</text>
-    <!-- win32k family -->
-    <text class="ks-label" x="175" y="95" text-anchor="end">win32k family</text>
-    <rect class="ks-box" x="180" y="82" width="312" height="20" rx="0"/>
-    <text class="ks-annotation" x="500" y="96">12</text>
-    <!-- Kernel Streaming -->
-    <text class="ks-label" x="175" y="125" text-anchor="end">KS stack</text>
-    <rect class="ks-box" x="180" y="112" width="312" height="20" rx="0"/>
-    <text class="ks-annotation" x="500" y="126">12</text>
+    <text class="ks-label" x="175" y="35" text-anchor="end">clfs.sys</text>
+    <rect class="ks-box" x="180" y="22" width="390" height="20" rx="0"/>
+    <text class="ks-annotation" x="578" y="36">15</text>
     <!-- ntoskrnl -->
-    <text class="ks-label" x="175" y="155" text-anchor="end">ntoskrnl.exe</text>
-    <rect class="ks-box" x="180" y="142" width="234" height="20" rx="0"/>
-    <text class="ks-annotation" x="422" y="156">9</text>
-    <!-- dwmcore.dll -->
-    <text class="ks-label" x="175" y="185" text-anchor="end">dwmcore.dll</text>
-    <rect class="ks-box" x="180" y="172" width="208" height="20" rx="0"/>
-    <text class="ks-annotation" x="396" y="186">8</text>
+    <text class="ks-label" x="175" y="65" text-anchor="end">ntoskrnl.exe</text>
+    <rect class="ks-box" x="180" y="52" width="364" height="20" rx="0"/>
+    <text class="ks-annotation" x="552" y="66">14</text>
+    <!-- Kernel Streaming -->
+    <text class="ks-label" x="175" y="95" text-anchor="end">KS stack</text>
+    <rect class="ks-box" x="180" y="82" width="364" height="20" rx="0"/>
+    <text class="ks-annotation" x="552" y="96">14</text>
+    <!-- afd.sys -->
+    <text class="ks-label" x="175" y="125" text-anchor="end">afd.sys</text>
+    <rect class="ks-box" x="180" y="112" width="338" height="20" rx="0"/>
+    <text class="ks-annotation" x="526" y="126">13</text>
+    <!-- win32k family -->
+    <text class="ks-label" x="175" y="155" text-anchor="end">win32k family</text>
+    <rect class="ks-box" x="180" y="142" width="312" height="20" rx="0"/>
+    <text class="ks-annotation" x="500" y="156">12</text>
     <!-- cldflt.sys -->
-    <text class="ks-label" x="175" y="215" text-anchor="end">cldflt.sys</text>
+    <text class="ks-label" x="175" y="185" text-anchor="end">cldflt.sys</text>
+    <rect class="ks-box" x="180" y="172" width="234" height="20" rx="0"/>
+    <text class="ks-annotation" x="422" y="186">9</text>
+    <!-- dwmcore.dll -->
+    <text class="ks-label" x="175" y="215" text-anchor="end">dwmcore.dll</text>
     <rect class="ks-box" x="180" y="202" width="208" height="20" rx="0"/>
     <text class="ks-annotation" x="396" y="216">8</text>
     <!-- ntfs.sys -->
@@ -50,7 +50,7 @@ The top 10 driver families account for roughly 75% of the corpus. Four families 
     <rect class="ks-box" x="180" y="292" width="78" height="20" rx="0"/>
     <text class="ks-annotation" x="266" y="306">3</text>
   </svg>
-  <p class="ks-figure-caption">"win32k family" combines win32k.sys, win32kbase.sys, and win32kfull.sys. "KS stack" combines ks.sys, ksthunk.sys, and mskssrv.sys. Remaining 44 CVEs span 52 additional drivers.</p>
+  <p class="ks-figure-caption">"win32k family" combines win32k.sys, win32kbase.sys, and win32kfull.sys. "KS stack" combines ks.sys, ksthunk.sys, and mskssrv.sys. Remaining 47 CVEs span 54 additional drivers.</p>
 </div>
 
 ## Kernel CVE Volume by Year
@@ -147,40 +147,40 @@ Buffer overflows are most common, followed closely by use-after-free, which domi
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing vulnerability class distribution">
     <!-- Buffer Overflow -->
     <text class="ks-label" x="175" y="35" text-anchor="end">Buffer Overflow</text>
-    <rect class="ks-box" x="180" y="22" width="240" height="20" rx="0"/>
-    <text class="ks-annotation" x="428" y="36">30</text>
+    <rect class="ks-box" x="180" y="22" width="248" height="20" rx="0"/>
+    <text class="ks-annotation" x="436" y="36">31</text>
     <!-- Use-After-Free -->
     <text class="ks-label" x="175" y="65" text-anchor="end">Use-After-Free</text>
-    <rect class="ks-box" x="180" y="52" width="200" height="20" rx="0"/>
-    <text class="ks-annotation" x="388" y="66">25</text>
+    <rect class="ks-box" x="180" y="52" width="208" height="20" rx="0"/>
+    <text class="ks-annotation" x="396" y="66">26</text>
     <!-- Arbitrary R/W -->
     <text class="ks-label" x="175" y="95" text-anchor="end">Arbitrary R/W</text>
-    <rect class="ks-box" x="180" y="82" width="168" height="20" rx="0"/>
-    <text class="ks-annotation" x="356" y="96">21</text>
+    <rect class="ks-box" x="180" y="82" width="176" height="20" rx="0"/>
+    <text class="ks-annotation" x="364" y="96">22</text>
     <!-- EoP (generic) -->
     <text class="ks-label" x="175" y="125" text-anchor="end">EoP (generic)</text>
-    <rect class="ks-box" x="180" y="112" width="144" height="20" rx="0"/>
-    <text class="ks-annotation" x="332" y="126">18</text>
+    <rect class="ks-box" x="180" y="112" width="160" height="20" rx="0"/>
+    <text class="ks-annotation" x="348" y="126">20</text>
     <!-- Race Condition -->
     <text class="ks-label" x="175" y="155" text-anchor="end">Race Condition</text>
-    <rect class="ks-box" x="180" y="142" width="96" height="20" rx="0"/>
-    <text class="ks-annotation" x="284" y="156">12</text>
-    <!-- Info Disclosure -->
-    <text class="ks-label" x="175" y="185" text-anchor="end">Info Disclosure</text>
-    <rect class="ks-box" x="180" y="172" width="64" height="20" rx="0"/>
-    <text class="ks-annotation" x="252" y="186">8</text>
-    <!-- Type Confusion -->
-    <text class="ks-label" x="175" y="215" text-anchor="end">Type Confusion</text>
-    <rect class="ks-box" x="180" y="202" width="40" height="20" rx="0"/>
-    <text class="ks-annotation" x="228" y="216">5</text>
-    <!-- Integer Overflow -->
-    <text class="ks-label" x="175" y="245" text-anchor="end">Integer Overflow</text>
-    <rect class="ks-box" x="180" y="232" width="32" height="20" rx="0"/>
-    <text class="ks-annotation" x="220" y="246">4</text>
+    <rect class="ks-box" x="180" y="142" width="112" height="20" rx="0"/>
+    <text class="ks-annotation" x="300" y="156">14</text>
     <!-- Logic Bug -->
-    <text class="ks-label" x="175" y="275" text-anchor="end">Logic / Other</text>
-    <rect class="ks-box" x="180" y="262" width="56" height="20" rx="0"/>
-    <text class="ks-annotation" x="244" y="276">7</text>
+    <text class="ks-label" x="175" y="185" text-anchor="end">Logic / Other</text>
+    <rect class="ks-box" x="180" y="172" width="80" height="20" rx="0"/>
+    <text class="ks-annotation" x="268" y="186">10</text>
+    <!-- Info Disclosure -->
+    <text class="ks-label" x="175" y="215" text-anchor="end">Info Disclosure</text>
+    <rect class="ks-box" x="180" y="202" width="64" height="20" rx="0"/>
+    <text class="ks-annotation" x="252" y="216">8</text>
+    <!-- Type Confusion -->
+    <text class="ks-label" x="175" y="245" text-anchor="end">Type Confusion</text>
+    <rect class="ks-box" x="180" y="232" width="48" height="20" rx="0"/>
+    <text class="ks-annotation" x="236" y="246">6</text>
+    <!-- Integer Overflow -->
+    <text class="ks-label" x="175" y="275" text-anchor="end">Integer Overflow</text>
+    <rect class="ks-box" x="180" y="262" width="48" height="20" rx="0"/>
+    <text class="ks-annotation" x="236" y="276">6</text>
     <!-- Process Termination -->
     <text class="ks-label" x="175" y="305" text-anchor="end">Process Kill</text>
     <rect class="ks-box" x="180" y="292" width="32" height="20" rx="0"/>
@@ -192,12 +192,12 @@ Buffer overflows are most common, followed closely by use-after-free, which domi
 ## Exploitation Status
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">52</span> exploited in the wild &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">82</span> not exploited ITW<br>
+<span class="ks-stat-num">57</span> exploited in the wild &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">90</span> not exploited ITW<br>
 <span class="ks-stat-num">2</span> remotely exploitable &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">132</span> local only<br>
+<span class="ks-stat-num">145</span> local only<br>
 <span class="ks-stat-num">41</span> third-party BYOVD drivers &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">93</span> Microsoft inbox drivers
+<span class="ks-stat-num">106</span> Microsoft inbox drivers
 </div>
 
 Nearly 39% of the corpus has been exploited in the wild. The two remote CVEs are [CVE-2022-21907](../case-studies/CVE-2022-21907.md) (http.sys) and [CVE-2024-38063](../case-studies/CVE-2024-38063.md) (tcpip.sys). Everything else requires local access or a BYOVD drop.
@@ -210,22 +210,22 @@ Where do specific bug types concentrate? This table crosses the top 8 driver fam
 
 | Driver | Buf Ovf | UAF | Race | Type Conf | Info Disc | Arb R/W | Int Ovf | Other |
 |--------|---------|-----|------|-----------|-----------|---------|---------|-------|
+| **clfs.sys** | 8 | 2 | | 1 | | | | 4 |
+| **ntoskrnl** | | 2 | 3 | | 2 | 1 | 2 | 4 |
 | **afd.sys** | 1 | 7 | 3 | | | | 1 | 1 |
-| **clfs.sys** | 7 | 2 | | | | | | 3 |
 | **win32k** | | 5 | 3 | 2 | 1 | | | 1 |
-| **KS stack** | 4 | 2 | | 1 | | | 1 | 4 |
-| **ntoskrnl** | | 1 | 3 | | 2 | | 1 | 2 |
+| **KS stack** | 4 | 2 | 1 | 1 | | | 2 | 4 |
+| **cldflt** | 3 | 2 | 2 | | | | | 2 |
 | **dwmcore** | 2 | 1 | | 1 | | | | 4 |
-| **cldflt** | 3 | 2 | 1 | | | | | 2 |
 | **ntfs** | 3 | | | | 3 | | | 1 |
 
 Notable clusters:
 
+- **clfs.sys skews buffer overflow.** Corrupt on-disk offsets cause OOB writes in the BLF parser, accounting for 8 of 15 CVEs.
 - **afd.sys skews UAF.** Socket teardown races account for 7 of 13 CVEs.
-- **clfs.sys skews buffer overflow.** Corrupt on-disk offsets cause OOB writes in the BLF parser.
+- **ntoskrnl.exe spreads across classes.** Registry races, UAF, integer overflow, arb R/W, and logic bugs -- no single dominant class across 14 CVEs.
 - **win32k splits between UAF and races.** Callback reentrancy and concurrent window ops feed both.
 - **ntfs.sys splits between buffer overflow and info disclosure.** Crafted VHD images hit both through MFT parsing.
-- **ntoskrnl.exe leans toward races.** Token and secure-mode operations lack proper locking.
 
 ## Cross-References
 
