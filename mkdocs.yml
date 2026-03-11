@@ -305,8 +305,8 @@ nav:
     - Debugging: tooling/debugging.md
     - Patch Diffing: tooling/patch-diffing.md
     - AutoPiff Integration: tooling/autopiff-integration.md
-    - Reference:
-      - BYOVD: reference/byovd.md
-      - LOLDrivers Deep Analysis: reference/loldrivers-analysis.md
-      - KDU Provider Compatibility: reference/kdu-compatibility.md
-      - Resources: reference/resources.md
+  - Reference:
+    - BYOVD: reference/byovd.md
+    - LOLDrivers Deep Analysis: reference/loldrivers-analysis.md
+    - KDU Provider Compatibility: reference/kdu-compatibility.md
+    - Resources: reference/resources.md
