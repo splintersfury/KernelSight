@@ -14,6 +14,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 
 | Date | What's New |
 |------|------------|
+| **2026-03-12** | [KDU Provider Compatibility](reference/kdu-compatibility.md) and [LOLDrivers Deep Analysis](reference/loldrivers-analysis.md) updated with full 1,775-driver Tier 2 Ghidra results. 1,404 KDU-compatible (79%), 354 Tier 2 confirmed, 122 confirmed MapDriver candidates with physical + virtual memory primitives reachable from IOCTL handlers. All mitigations, ROP gadgets, and I/O methods scored. |
 | **2026-03-01** | Backfill: 13 case studies added for 2022--2024 CVEs with published exploit research. CLFS ransomware chain (CVE-2022-24521, CVE-2022-35803, CVE-2023-23376), Project Zero registry audit (CVE-2022-34707, CVE-2023-23420), DEVCORE kernel streaming (CVE-2024-30090, CVE-2024-30084, CVE-2024-38144), activation context bugs (CVE-2022-22047, CVE-2022-41073). Corpus now at 147 CVEs, 57 exploited ITW. |
 | **2026-03-01** | New guide: [Why Kernel Drivers?](guides/why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, the security cost, and Microsoft's trajectory toward constraining kernel code. |
 | **2026-02-28** | New guides: [Corpus Analytics](guides/corpus-analytics.md), [Exploit Chain Patterns](guides/exploit-chain-patterns.md), [Patch Patterns](guides/patch-patterns.md), [Mitigation Timeline](guides/mitigation-timeline.md). New deep dives: [afd.sys](case-studies/afd-deep-dive.md) (13 CVEs), [win32k](case-studies/win32k-deep-dive.md) (12 CVEs), [ntfs.sys](case-studies/ntfs-deep-dive.md) (7 CVEs). |
@@ -135,7 +136,10 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <span class="ks-stat-num">2</span> remotely exploitable<br>
 <span class="ks-stat-num">12</span> driver type categories &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">57</span> technique pages &nbsp;&middot;&nbsp;
-<span class="ks-stat-num">80+</span> AutoPiff detection rules
+<span class="ks-stat-num">80+</span> AutoPiff detection rules<br>
+<span class="ks-stat-num">1,775</span> LOLDrivers analyzed &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">354</span> Tier 2 Ghidra confirmed &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">122</span> confirmed MapDriver candidates
 </div>
 
 ## Recommended Paths
