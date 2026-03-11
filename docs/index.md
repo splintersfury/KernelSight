@@ -7,7 +7,7 @@ description: "Windows kernel driver exploitation knowledge base — 147 CVEs acr
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 134 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 147 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates
@@ -17,15 +17,12 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 | **2026-03-12** | [KDU Provider Compatibility](reference/kdu-compatibility.md) and [LOLDrivers Deep Analysis](reference/loldrivers-analysis.md) updated with full 1,775-driver Tier 2 Ghidra results. 1,404 KDU-compatible (79%), 354 Tier 2 confirmed, 122 confirmed MapDriver candidates with physical + virtual memory primitives reachable from IOCTL handlers. All mitigations, ROP gadgets, and I/O methods scored. |
 | **2026-03-01** | Backfill: 13 case studies added for 2022--2024 CVEs with published exploit research. CLFS ransomware chain (CVE-2022-24521, CVE-2022-35803, CVE-2023-23376), Project Zero registry audit (CVE-2022-34707, CVE-2023-23420), DEVCORE kernel streaming (CVE-2024-30090, CVE-2024-30084, CVE-2024-38144), activation context bugs (CVE-2022-22047, CVE-2022-41073). Corpus now at 147 CVEs, 57 exploited ITW. |
 | **2026-03-01** | New guide: [Why Kernel Drivers?](guides/why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, the security cost, and Microsoft's trajectory toward constraining kernel code. |
-| **2026-02-28** | New guides: [Corpus Analytics](guides/corpus-analytics.md), [Exploit Chain Patterns](guides/exploit-chain-patterns.md), [Patch Patterns](guides/patch-patterns.md), [Mitigation Timeline](guides/mitigation-timeline.md). New deep dives: [afd.sys](case-studies/afd-deep-dive.md) (13 CVEs), [win32k](case-studies/win32k-deep-dive.md) (12 CVEs), [ntfs.sys](case-studies/ntfs-deep-dive.md) (7 CVEs). |
-| **2026-02-28** | New guide: [Anatomy of a Secure Driver](guides/secure-driver-anatomy.md) -- the 6 anti-patterns behind most kernel driver CVEs, with root cause distribution chart, pseudocode fixes, and a 14-point secure driver checklist. |
-| **2026-02-28** | Comprehensive expansion: 58 more case studies added — filling gaps across every 2025-2026 Patch Tuesday. Coverage now spans afd.sys (13 CVEs), clfs.sys (12 CVEs), win32k (10 CVEs), dwmcore.dll (8 CVEs), ntfs.sys (8 CVEs), ntoskrnl (7 CVEs), plus new drivers: rasman.sys, storvsp.sys, dxgkrnl.sys, msfs.sys. BYOVD additions include Paragon BioNTdrv siblings, TfSysMon.sys, STProcessMonitor.sys. Corpus now at 131 CVEs, 52 exploited ITW. |
-| **2026-02-28** | Bulk addition: 25 new case studies covering 2025-2026 kernel CVEs — ITW zero-days in [afd.sys](case-studies/CVE-2025-21418.md), [clfs.sys](case-studies/CVE-2025-32701.md), [DWM](case-studies/CVE-2025-30400.md), [ntoskrnl](case-studies/CVE-2025-62215.md), [win32k](case-studies/CVE-2025-24983.md), [Hyper-V](case-studies/CVE-2025-21334.md); BYOVD campaigns via [Paragon](case-studies/CVE-2025-0289.md), [NSecKrnl](case-studies/CVE-2025-68947.md), [EnPortv](case-studies/EnPortv-sys.md). Corpus now at 82 CVEs, 47 exploited ITW. |
-| **2026-02-28** | [CVE-2025-3464](case-studies/CVE-2025-3464.md) / [CVE-2025-1533](case-studies/CVE-2025-1533.md) — AsIO3.sys auth bypass + stack overflow. Full exploit chain from Cisco Talos: hardlink auth bypass, `ObfDereferenceObject` [decrement-by-one](primitives/arw/arb-increment-decrement.md), [PreviousMode flip](primitives/exploitation/previous-mode-manipulation.md), [token theft](primitives/exploitation/token-swapping.md). |
-| **2026-02-25** | [CVE-2026-21241](case-studies/CVE-2026-21241.md) — afd.sys notification UAF. Full 7-stage exploit chain: NPNX pool spray, `_IO_MINI_COMPLETION_PACKET_USER` callback abuse, RtlSetBit/RtlClearAllBits [bit-manipulation primitive](primitives/exploitation/bit-manipulation.md), SepMediumDaclSd DACL corruption, WIL feature flag bypass, token privilege escalation. |
-| **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md) — using `RtlSetBit`/`RtlClearAllBits` as kCFG-compliant kernel exploitation primitives. |
-| **2026-02-25** | Expanded: [ACL / SD Manipulation](primitives/exploitation/acl-sd-manipulation.md) — SepMediumDaclSd corruption and SE_SACL_PRESENT bit-flip techniques for KASLR bypass. |
-| **2026-02-25** | Expanded: [KASLR Bypasses](mitigations/kaslr-bypasses.md) — prefetch side-channel (EntryBleed for Windows), security descriptor corruption section, WIL feature flag bypass. |
+| **2026-02-28** | New guides: [Corpus Analytics](guides/corpus-analytics.md), [Exploit Chain Patterns](guides/exploit-chain-patterns.md), [Patch Patterns](guides/patch-patterns.md), [Mitigation Timeline](guides/mitigation-timeline.md), [Anatomy of a Secure Driver](guides/secure-driver-anatomy.md). New deep dives: [afd.sys](case-studies/afd-deep-dive.md), [win32k](case-studies/win32k-deep-dive.md), [ntfs.sys](case-studies/ntfs-deep-dive.md). |
+| **2026-02-28** | 58 new case studies added across afd.sys, clfs.sys, win32k, dwmcore.dll, ntfs.sys, ntoskrnl, plus new drivers: rasman.sys, storvsp.sys, dxgkrnl.sys, msfs.sys. BYOVD additions include Paragon BioNTdrv siblings, TfSysMon.sys, STProcessMonitor.sys. |
+| **2026-02-28** | 25 new case studies for 2025-2026 kernel CVEs -- ITW zero-days in [afd.sys](case-studies/CVE-2025-21418.md), [clfs.sys](case-studies/CVE-2025-32701.md), [DWM](case-studies/CVE-2025-30400.md), [ntoskrnl](case-studies/CVE-2025-62215.md), [win32k](case-studies/CVE-2025-24983.md), [Hyper-V](case-studies/CVE-2025-21334.md); BYOVD via [Paragon](case-studies/CVE-2025-0289.md), [NSecKrnl](case-studies/CVE-2025-68947.md), [EnPortv](case-studies/EnPortv-sys.md). |
+| **2026-02-28** | [CVE-2025-3464](case-studies/CVE-2025-3464.md) / [CVE-2025-1533](case-studies/CVE-2025-1533.md) -- AsIO3.sys auth bypass + stack overflow via [decrement-by-one](primitives/arw/arb-increment-decrement.md), [PreviousMode flip](primitives/exploitation/previous-mode-manipulation.md), [token theft](primitives/exploitation/token-swapping.md). |
+| **2026-02-25** | [CVE-2026-21241](case-studies/CVE-2026-21241.md) -- afd.sys notification UAF with [bit-manipulation primitive](primitives/exploitation/bit-manipulation.md), DACL corruption, token privilege escalation. |
+| **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md). Expanded: [ACL / SD Manipulation](primitives/exploitation/acl-sd-manipulation.md), [KASLR Bypasses](mitigations/kaslr-bypasses.md). |
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_001 — The Exploitation Pipeline</span>
@@ -93,7 +90,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <ol class="ks-pipeline-list" markdown>
 <li markdown>
 <strong><a href="driver-types/">Driver Types</a></strong>
-<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 62 unique drivers.</p>
+<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 64 unique drivers.</p>
 </li>
 <li markdown>
 <strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
@@ -109,7 +106,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 134 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 52 exploited in the wild, including 38 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 147 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 57 exploited in the wild, including 38 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
@@ -167,3 +164,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 </a>
 
 </div>
+
+## Data & Analysis
+
+The pipeline above covers *how* kernel drivers get exploited. For a data-driven view of *which* drivers are most dangerous, see the [Reference](reference/) section — 1,775 LOLDrivers analyzed with automated Ghidra decompilation, scored for weaponisability, and mapped to KDU provider compatibility.
