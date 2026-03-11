@@ -307,4 +307,5 @@ nav:
     - AutoPiff Integration: tooling/autopiff-integration.md
     - Reference:
       - BYOVD: reference/byovd.md
+      - LOLDrivers Deep Analysis: reference/loldrivers-analysis.md
       - Resources: reference/resources.md
