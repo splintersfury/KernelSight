@@ -308,4 +308,5 @@ nav:
     - Reference:
       - BYOVD: reference/byovd.md
       - LOLDrivers Deep Analysis: reference/loldrivers-analysis.md
+      - KDU Provider Compatibility: reference/kdu-compatibility.md
       - Resources: reference/resources.md
