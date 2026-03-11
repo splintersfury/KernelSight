@@ -1,224 +1,251 @@
 ---
 title: KDU Provider Compatibility Analysis
-description: Cross-referencing LOLDrivers with Kernel Driver Utility (KDU) provider requirements
+description: Which LOLDrivers could be weaponized as KDU providers? Automated analysis of 1,775 drivers.
 ---
 
 # KDU Provider Compatibility Analysis
 
-Automated analysis cross-referencing **1,775 LOLDrivers** against [hfiref0x/KDU](https://github.com/hfiref0x/KDU) (Kernel Driver Utility) provider requirements.
+Which [LOLDrivers](https://loldrivers.io) could be weaponized as [KDU](https://github.com/hfiref0x/KDU) providers? This page answers that question by mapping each driver's confirmed IOCTL-reachable primitives to KDU's provider requirements.
 
-KDU uses vulnerable signed drivers to load unsigned kernel code. Each provider driver exposes specific primitives (physical memory mapping, virtual memory read/write, MSR access, or port I/O) that KDU chains to achieve kernel code execution.
+**Last updated:** 2026-03-11  
+**Drivers analyzed:** 1045 (Tier 1) / 1045 (Tier 2 Ghidra)  
 
 ## Key Findings
 
 | Metric | Count |
 |--------|-------|
-| Total LOLDrivers analyzed | 1,775 |
-| Known KDU providers found | 34/57 |
-| **Potential new KDU providers** | **238** |
-| Physical memory primitives | 784 drivers |
-| Virtual memory primitives | 1,110 drivers |
-| Process manipulation | 923 drivers |
-| Port I/O access | 423 drivers |
+| Total drivers analyzed | 1,045 |
+| **KDU-compatible** | **897** (86%) |
+| Tier 2 confirmed | 245 |
+| Tier 1 likely | 652 |
+| MapDriver capable | 192 |
+| MapDriver (physical brute-force) | 315 |
+| DKOM / DSECorruption | 390 |
+| DumpProcess | 0 |
 
-## KDU Provider Primitives
+## What This Means
 
-KDU requires drivers to expose one or more of these callback primitives:
+KDU uses vulnerable signed drivers to load unsigned kernel code. A driver is "KDU-compatible" if it exposes memory primitives through its IOCTL handlers that an attacker can chain into kernel code execution.
 
-| Primitive | Purpose | Key Imports |
-|-----------|---------|-------------|
-| `ReadPhysicalMemory` / `WritePhysicalMemory` | Direct physical address R/W | `MmMapIoSpace`, `MmGetPhysicalAddress` |
-| `ReadKernelVM` / `WriteKernelVM` | Kernel virtual memory R/W | `MmCopyVirtualMemory`, `ZwMapViewOfSection` |
-| `VirtualToPhysical` | VA→PA translation for page table walks | `MmGetPhysicalAddress`, `MmGetVirtualForPhysical` |
-| `QueryPML4Value` | Page Map Level 4 base for CR3 | Physical memory scan of low stub |
-| `MapDriver` | Full kernel code loading chain | Physical + Virtual + PML4 |
-| `ControlDSE` | Disable Driver Signature Enforcement | Virtual memory write to `ci.dll!g_CiOptions` |
-| `OpenProcess` | Arbitrary process handle acquisition | `PsLookupProcessByProcessId`, `ObOpenObjectByPointer` |
+- **Confirmed**: Ghidra analysis verified the dangerous API is reachable from an IOCTL handler
+- **Likely**: The driver imports the API, but we haven't confirmed IOCTL reachability yet
 
-KDU supports these actions:
+KDU supports these actions, from most to least powerful:
 
-- **MapDriver** — Load unsigned code into kernel (requires physical + virtual memory)
-- **DKOM** — Direct Kernel Object Manipulation (requires virtual memory write)
-- **DSECorruption** — Patch `ci.dll` to disable signature checks (requires virtual memory write)
-- **DumpProcess** — Read arbitrary process memory (requires process + virtual memory)
+1. **MapDriver** - Load arbitrary unsigned code into the kernel (needs physical + virtual memory R/W)
+2. **MapDriver (physical brute-force)** - Same, but uses only physical memory with PML4 brute-forcing
+3. **DKOM** - Direct Kernel Object Manipulation, e.g. hiding processes (needs virtual memory write)
+4. **DSECorruption** - Patch `ci.dll!g_CiOptions` to disable driver signature enforcement
+5. **DumpProcess** - Read arbitrary process memory (needs process handle + virtual memory read)
 
-## Existing KDU Providers in LOLDrivers
+## Confirmed MapDriver Candidates
 
-**34** of KDU's 57 known providers appear in the LOLDrivers catalog:
+These 78 drivers have Ghidra-confirmed physical + virtual memory primitives reachable from IOCTL handlers. They could load unsigned kernel code.
 
-| KDU # | Driver | Vendor | CVE | Action | Score | IOCTLs |
-|-------|--------|--------|-----|--------|-------|--------|
-| 0 | `iqvw64e.sys, iQVW64.SYS, IQVW32.sys, NalDrv.sys` | Intel NAL | CVE-2015-2291 | MapDriver | 15 | 4 |
-| 1 | `RTCore64.sys` | MSI RTCore | CVE-2019-16098 | MapDriver | 14 | 0 |
-| 2 | `gdrv.sys` | Gigabyte GDRV | CVE-2018-19320 | MapDriver | 15 | 0 |
-| 3 | `ATSZIO.sys, ATSZIO64.sys` | ASUSTeK WinFlash | — | MapDriver | 13 | 0 |
-| 4 | `MsIo64.sys` | Patriot Viper RGB | — | MapDriver | 15 | 0 |
-| 5 | `GLCKIO2.sys` | ASRock Polychrome | — | MapDriver | 14 | 0 |
-| 6 | `EneIo64.sys` | G.SKILL Trident Z | — | MapDriver | 15 | 4 |
-| 8 | `EneTechIo64.sys` | Thermaltake RAM | — | MapDriver | 13 | 0 |
-| 9 | `Phymemx64.sys` | Huawei MateBook | — | MapDriver | 12 | 0 |
-| 10 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | Realtek Dash | — | MapDriver | 15 | 19 |
-| 12 | `LHA.sys` | LG Device Mgr | — | MapDriver | 10 | 0 |
-| 14 | `directio64.sys` | PassMark | — | MapDriver | 15 | 0 |
-| 16 | `dbutil_2_3.sys` | Dell BIOS | CVE-2021-21551 | MapDriver | 15 | 0 |
-| 17 | `mimidrv.sys` | Mimikatz | — | DumpProcess | 14 | 0 |
-| 18 | `kprocesshacker.sys` | Process Hacker | — | OpenProcess | 7 | 0 |
-| 20 | `DBUtilDrv2.sys` | Dell BIOS | CVE-2021-21551 | MapDriver | 13 | 0 |
-| 21 | `dbk64.sys` | Cheat Engine | — | MapDriver | 14 | 0 |
-| 22 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | ASUS GPU TweakII | — | MapDriver | 13 | 0 |
-| 23 | `hw.sys` | Marvin HW | CVE-2023-1679 | MapDriver | 15 | 0 |
-| 24 | `SysDrv3S.sys` | CODESYS | CVE-2022-22516 | MapDriver | 15 | 0 |
-| 25 | `amsdk.sys` | Zemana | — | DSECorruption | 8 | 0 |
-| 26 | `inpoutx64.sys` | HiRes | — | MapDriver | 14 | 0 |
-| 28 | `AsrDrv106.sys` | ASRock | — | MapDriver | 15 | 0 |
-| 29 | `ALSysIO64.sys` | Core Temp | — | MapDriver | 15 | 0 |
-| 30 | `AMDRyzenMasterDriver.sys` | AMD RyzenMaster | CVE-2020-12928 | MapDriver | 15 | 0 |
-| 31 | `physmem.sys` | Hilscher | — | MapDriver | 15 | 0 |
-| 40 | `nvoclock.sys` | NVIDIA OC | — | MapDriver | 15 | 0 |
-| 41 | `irec.sys` | Binalyze DFIR | — | DKOM | 8 | 0 |
-| 43 | `rzpnk.sys` | Razer Synapse | CVE-2017-9769 | MapDriver | 13 | 0 |
-| 44 | `PDFWKRNL.sys` | AMD Radeon | — | MapDriver | 15 | 0 |
-| 45 | `AODDriver.sys` | AMD OverDrive | — | MapDriver | 15 | 0 |
-| 53 | `HwRwDrv.sys` | Jun Liu HW R/W | — | MapDriver | 15 | 0 |
-| 55 | `throttlestop.sys` | ThrottleStop | — | MapDriver | 9 | 0 |
-| 56 | `TPwSav.sys` | Toshiba PowerSave | — | MapDriver | 15 | 0 |
+| # | Driver | Primitives (confirmed IOCTLs) | NEITHER I/O | Mitigations OFF |
+|---|--------|------------------------------|-------------|-----------------|
+| 1 | `segwindrvx64.sys` | PortIO, QueryPML4Value, ReadKVM, ReadPhysMem, VToPhys, WriteKVM, WritePhysMem |  | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 2 | `PDFWKRNL.sys` | QueryPML4Value, ReadKVM, ReadPhysMem, VToPhys, WriteKVM, WritePhysMem | YES | GUARD_CF, GS_COOKIE |
+| 3 | `PDFWKRNL.sys` | QueryPML4Value, ReadKVM, ReadPhysMem, VToPhys, WriteKVM, WritePhysMem | YES | GUARD_CF, GS_COOKIE |
+| 4 | `PDFWKRNL.sys` | QueryPML4Value, ReadKVM, ReadPhysMem, VToPhys, WriteKVM, WritePhysMem | YES | GUARD_CF, GS_COOKIE |
+| 5 | `PDFWKRNL.sys` | QueryPML4Value, ReadKVM, ReadPhysMem, VToPhys, WriteKVM, WritePhysMem | YES | GUARD_CF, GS_COOKIE |
+| 6 | `WinFlash64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 7 | `atillk64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 8 | `CP2X72C.SYS` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 9 | `CP2X72C.SYS` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 10 | `dbk64.sys` | OpenProcess, ReadKVM, WriteKVM |  | GUARD_CF, GS_COOKIE |
+| 11 | `dbk64.sys` | OpenProcess, ReadKVM, WriteKVM |  | GUARD_CF, GS_COOKIE |
+| 12 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 13 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 14 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 15 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 16 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 17 | `AODDriver.sys` | PortIO, QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 18 | `driver7-x86.sys` | PortIO |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 19 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 20 | `AODDriver.sys` | PortIO, QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 21 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | PortIO, QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 22 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | PortIO, QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 23 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 24 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 25 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 26 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 27 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 28 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 29 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 30 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 31 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 32 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 33 | `rtkiow8x64.sys ` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | GUARD_CF, GS_COOKIE |
+| 34 | `AsUpIO.sys, AsUpIO64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 35 | `AsUpIO.sys, AsUpIO64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | GUARD_CF, GS_COOKIE |
+| 36 | `DirectIo32.sys` | PortIO | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 37 | `DirectIo32.sys` | PortIO | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 38 | `driver7-x86-withoutdbg.sys` | PortIO | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 39 | `directio32_legacy.sys, DirectIo32.sys` | PortIO |  | GUARD_CF, GS_COOKIE |
+| 40 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 41 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 42 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 43 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 44 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 45 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 46 | `WinFlash64.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 47 | `directio64.sys` | OpenProcess |  | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 48 | `AODDriver.sys` | PortIO | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 49 | `AODDriver.sys` | PortIO |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 50 | `AODDriver.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 51 | `AODDriver.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 52 | `atlAccess.sys` | QueryPML4Value, ReadPhysMem, VToPhys, WritePhysMem |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 53 | `directio64.sys` | OpenProcess |  | GUARD_CF, GS_COOKIE |
+| 54 | `directio64.sys` | OpenProcess |  | GUARD_CF, GS_COOKIE |
+| 55 | `aswArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 56 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 57 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 58 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 59 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 60 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 61 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 62 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 63 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 64 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 65 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 66 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 67 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 68 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 69 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 70 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 71 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 72 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 73 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 74 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 75 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | GUARD_CF, GS_COOKIE |
+| 76 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 77 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 78 | `aswArPot.sys, avgArPot.sys` | ReadKVM, WriteKVM | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
 
-## Potential New KDU Providers
+## Confirmed Physical Brute-Force Candidates
 
-**238 drivers** in LOLDrivers have primitives compatible with KDU but are not yet KDU providers.
+These 115 drivers have confirmed physical memory R/W but lack virtual memory. KDU can brute-force PML4 via physical scanning to achieve MapDriver.
 
-### Tier 1 — Full Primitive Set (48 drivers)
+| # | Driver | Confirmed APIs | NEITHER I/O | Mitigations OFF |
+|---|--------|---------------|-------------|-----------------|
+| 1 | `CP2X72C.SYS` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 2 | `CP2X72C.SYS` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 3 | `CP2X72C.SYS` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 4 | `LHA.sys` | `MmGetPhysicalAddress, MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 5 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 6 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 7 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 8 | `sfdrvx64.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 9 | `sfdrvx64.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 10 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 11 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 12 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 13 | `sfdrvx32.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 14 | `sfdrvx64.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 15 | `sfdrvx32.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 16 | `sfdrvx32.sys` | `MmMapIoSpace` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 17 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 18 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 19 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 20 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 21 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 22 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 23 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 24 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 25 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 26 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 27 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 28 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 29 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 30 | `cpuz.sys` | `MmMapIoSpace, READ_PORT_UCHAR, READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| ... | *85 more* | | | |
 
-These drivers import both physical and virtual memory APIs with additional process or port I/O capabilities. They could support `MapDriver` — the most powerful KDU action.
+## Confirmed DKOM / DSECorruption Candidates
 
-| Driver | Company | Primitives | Potential Action | Score |
-|--------|---------|------------|-----------------|-------|
-| `driver7-x86-withoutdbg.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `directio32_legacy.sys, DirectIo32.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `pchunter.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 3 |
-| `RtsPer.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 11 |
-| `HwOs2Ec10x64.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `kEvP64.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 11 |
-| `DirectIo32.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `driver7-x86.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `ATSZIO.sys` | — | Physical Memory, Virtual Memory, Process, Port I/O | MapDriver | 15 |
-| `cg6kwin2k.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 14 |
-| `nvaudio.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `AMDPowerProfiler.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `IoAccess.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 11 |
-| `GEDevDrv.SYS` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 9 |
-| `driver7-x64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `CorsairLLAccess64.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 9 |
-| `wnbios.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 14 |
-| `PcieCubed.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 5 |
-| `SANDRA.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 10 |
-| `sysconp.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 15 |
-| `AsUpIO.sys, AsUpIO64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 14 |
-| `aswArPot.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `segwindrvx64.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 14 |
-| `TmComm.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 12 |
-| `amigendrv64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 14 |
-| `amifldrv64.sys, amifldrv.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `VBoxMouseNT.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 15 |
-| `Bs_Def.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `aswArPot.sys, avgArPot.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `atillk64.sys` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 15 |
-| `driver_89036534.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 13 |
-| `Agent64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `ACE-BASE.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 11 |
-| `elrawdsk.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `UCOREW64.SYS` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
-| `kerneld.amd64` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 15 |
-| `VBoxDrv.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 12 |
-| `iQVW64.SYS` | — | Physical Memory, Virtual Memory, Port I/O | MapDriver | 15 |
-| `asmmap64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 14 |
-| `gpcidrv64.sys` | — | Physical Memory, Virtual Memory, Process | MapDriver | 15 |
+These 52 drivers have confirmed virtual memory write primitives. They can manipulate kernel objects or patch `ci.dll` to disable signature enforcement.
 
-### Tier 2 — Partial Primitives (52 drivers)
+| # | Driver | Confirmed APIs | NEITHER I/O | Mitigations OFF |
+|---|--------|---------------|-------------|-----------------|
+| 1 | `echo_driver.sys` | `KeStackAttachProcess, ObOpenObjectByPointer, ObReferenceObjectByHandle, PsLookupProcessByProcessId` |  | GUARD_CF, GS_COOKIE |
+| 2 | `kprocesshacker.sys` | `ObReferenceObjectByHandle` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 3 | `echo_driver.sys` | `ObOpenObjectByPointer, ObReferenceObjectByHandle, PsLookupProcessByProcessId` |  | GUARD_CF, GS_COOKIE |
+| 4 | `DirectIo.sys` | `READ_PORT_UCHAR, WRITE_PORT_UCHAR, WRITE_PORT_ULONG` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 5 | `DirectIo.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 6 | `DirectIo.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 7 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 8 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 9 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 10 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 11 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 12 | `DirectIo32.sys` | `READ_PORT_ULONG, WRITE_PORT_UCHAR` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 13 | `Netfilter.sys` | `MmMapLockedPages, ObReferenceObjectByHandle` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 14 | `msr.sys` | `ZwMapViewOfSection` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 15 | `DirectIo.sys` | `WRITE_PORT_UCHAR` |  | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 16 | `jnprva.sys, neofltr.sys` | `ObReferenceObjectByHandle` |  | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 17 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 18 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 19 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 20 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 21 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 22 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 23 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 24 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 25 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 26 | `nvflsh32.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 27 | `nvflash.sys` | `WRITE_PORT_ULONG` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 28 | `gmer64.sys, superman.sys` | `KeStackAttachProcess, ObReferenceObjectByHandle` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 29 | `gmer64.sys, superman.sys` | `KeStackAttachProcess, ObReferenceObjectByHandle` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 30 | `K7RKScan.sys` | `PsLookupProcessByProcessId` | YES | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| ... | *22 more* | | | |
 
-These drivers have either physical memory OR virtual memory + process primitives. They could support DKOM, DSECorruption, or physical-only mapping.
+## Likely MapDriver Candidates (Tier 1 only)
 
-| Driver | Company | Primitives | Potential Action | Score |
-|--------|---------|------------|-----------------|-------|
-| `BS_RCIOW1064.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `PhlashNT.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `WinFlash64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `BS_I2cIo.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `GPU-Z.sys` | — | Physical Memory, Virtual Memory | MapDriver | 10 |
-| `iscflashx64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `bs_rcio64.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `phymem64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `VBoxUSB.Sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `BS_HWMIO64_W10.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `BSMEMx64.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `rtkiow8x64.sys ` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `AsmIo64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `RadHwMgr.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `driver_290bc782.sys` | — | Physical Memory, Virtual Memory | MapDriver | 12 |
-| `atlAccess.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `BS_HWMIo64.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `CP2X72C.SYS` | — | Physical Memory, Virtual Memory | MapDriver | 10 |
-| `BS_RCIO.sys` | — | Physical Memory, Process, Port I/O | MapDriver (physical only) | 15 |
-| `SMARTEIO64.SYS` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `TdkLib64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `phymem_ext64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `tdeio64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `SmSerl64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `BS_Flash64.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `otipcibus.sys` | — | Physical Memory, Virtual Memory | MapDriver | 15 |
-| `GtcKmdfBs.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `OpenLibSys.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `mydrivers.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `HWiNFO64I.SYS` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `ComputerZ.Sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `cpuz.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `cpuz_x64.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `PanIOx64.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `DirectIo.sys` | — | Virtual Memory, Process, Port I/O | DKOM / DSECorruption | 15 |
-| `hwdetectng.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `NTIOLib.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `cpuz141.sys` | — | Physical Memory, Port I/O | MapDriver (physical only) | 15 |
-| `msio32.sys` | — | Virtual Memory, Process, Port I/O | DKOM / DSECorruption | 15 |
-| `FH-EtherCAT_DIO.sys` | — | Physical Memory, Process | MapDriver (physical only) | 13 |
-| ... | ... | ... | ... | ... |
-| *12 more drivers* | | | | |
+These 114 drivers import the right APIs but haven't been Ghidra-confirmed yet. The dangerous imports may be used internally rather than exposed through IOCTLs.
 
-### Tier 3 — Single Primitive (0 drivers)
-
-Physical memory only — could support brute-force physical mapping but lack virtual memory for reliable exploitation.
-
-| Driver | Company | Primitives | Score |
-|--------|---------|------------|-------|
-
-## Import Primitive Heatmap
-
-Frequency of KDU-relevant imports across all 1,775 LOLDrivers:
-
-| Import | Count | % of Dataset | KDU Relevance |
-|--------|-------|-------------|---------------|
-| `MmMapIoSpace` | 784 | 44.2% | Physical memory mapping |
-| `ObReferenceObjectByHandle` | 738 | 41.6% | Handle → object pointer |
-| `PsLookupProcessByProcessId` | 519 | 29.2% | PID → EPROCESS lookup |
-| `MmMapLockedPagesSpecifyCache` | 481 | 27.1% | MDL-based mapping |
-| `ZwMapViewOfSection` | 457 | 25.7% | Section object mapping |
-| `HalGetBusDataByOffset` | 337 | 19.0% | PCI config space access |
-| `MmGetPhysicalAddress` | 271 | 15.3% | VA → PA translation |
-| `KeStackAttachProcess` | 269 | 15.2% | Cross-process attach |
-| `READ_PORT_ULONG` | 182 | 10.3% | Hardware port read |
-| `WRITE_PORT_ULONG` | 174 | 9.8% | Hardware port write |
-| `MmAllocateContiguousMemory` | 153 | 8.6% | Contiguous physical alloc |
-| `ZwDuplicateObject` | 103 | 5.8% | Handle duplication |
-| `MmCopyVirtualMemory` | 33 | 1.9% | Cross-process memory copy |
+| # | Driver | Imported Primitives | Mitigations OFF |
+|---|--------|-------------------|-----------------|
+| 1 | `RtsPer.sys` | OpenProcess, PortIO, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, GS_COOKIE |
+| 2 | `AODDriver.sys` | OpenProcess, PortIO, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 3 | `iqvw64e.sys, iQVW64.SYS, IQVW32.sys, NalDrv.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 4 | `rtkio.sys, rtkio64.sys, rtkiow8x64.sys, rtkiow10x64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 5 | `cg6kwin2k.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 6 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 7 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 8 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 9 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 10 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 11 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 12 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 13 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 14 | `asio.sys, AsIO32.sys, AsIO3.sys, AsIO3_64.sys, AsIO2.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 15 | `nvaudio.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 16 | `AMDPowerProfiler.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 17 | `pchunter.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 18 | `hw.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 19 | `IoAccess.sys` | PortIO, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| 20 | `GEDevDrv.SYS` | PortIO, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 21 | `GEDevDrv.SYS` | PortIO, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 22 | `driver7-x64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 23 | `directio64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 24 | `directio64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 25 | `directio64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 26 | `directio64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 27 | `directio64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, GS_COOKIE |
+| 28 | `wnbios.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 29 | `PcieCubed.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | DYNAMIC_BASE, NX_COMPAT, GUARD_CF |
+| 30 | `HwOs2Ec10x64.sys` | OpenProcess, ReadKVM, ReadPhysMem, WriteKVM, WritePhysMem | GUARD_CF, FORCE_INTEGRITY, GS_COOKIE |
+| ... | *84 more* | | |
 
 ## Methodology
 
-1. **Dataset**: 1,775 unique driver binaries from [LOLDrivers.io](https://loldrivers.io) catalog, downloaded via VirusTotal
-2. **Static analysis**: DriverAtlas Tier 1 (PE parsing, import analysis, IOCTL extraction) on all drivers
-3. **KDU mapping**: Cross-referenced driver filenames against KDU's 57 known providers (indices 0–56)
-4. **Primitive classification**: Categorized each driver's imports into KDU primitive groups (physical memory, virtual memory, process, port I/O)
-5. **Scoring**: Ranked candidates by primitive coverage — Tier 1 (physical + virtual + extras), Tier 2 (partial), Tier 3 (single primitive)
+1. **Tier 1** (all drivers): PE parsing extracts imports, device names, IOCTLs, and mitigations
+2. **Tier 2** (Ghidra): Headless decompilation traces which imports are called from which IOCTL handlers
+3. **KDU scoring**: Maps confirmed IOCTL-reachable APIs to KDU primitive types (ReadPhysicalMemory, WriteKernelVM, OpenProcess, etc.)
+4. **Action assessment**: Determines which KDU actions the primitives support (MapDriver > DKOM > DSECorruption > DumpProcess)
 
-**Important limitation**: Import presence doesn't mean IOCTL exposure. A driver importing `MmMapIoSpace` might use it internally without exposing it through an IOCTL handler. Tier 2 (Ghidra) deep analysis verifies which imports are actually reachable from user-mode IOCTLs.
+**Confirmed** = Ghidra verified the API call exists inside an IOCTL dispatch handler  
+**Likely** = The driver imports the API, but IOCTL reachability is unverified
 
 ---
 
