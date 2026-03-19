@@ -1,13 +1,13 @@
 ---
 hide:
   - toc
-description: "Windows kernel driver exploitation knowledge base — 147 CVEs across 64 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
+description: "Windows kernel driver exploitation knowledge base — 156 CVEs across 64 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
 ---
 
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 147 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 156 real CVEs across Microsoft inbox and third-party BYOVD drivers.
 </p>
 
 ## Recent Updates
@@ -127,7 +127,7 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 ## Corpus
 
 <div class="ks-stats-box" markdown>
-<span class="ks-stat-num">147</span> CVE case studies &nbsp;&middot;&nbsp;
+<span class="ks-stat-num">156</span> CVE case studies &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">64</span> unique drivers &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">57</span> exploited in the wild &nbsp;&middot;&nbsp;
 <span class="ks-stat-num">2</span> remotely exploitable<br>

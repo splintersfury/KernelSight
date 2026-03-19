@@ -1,5 +1,5 @@
 site_name: KernelSight
-site_description: Windows kernel driver exploitation knowledge base — 134 CVEs, 62 drivers, exploit chains, mitigations, and BYOVD analysis.
+site_description: Windows kernel driver exploitation knowledge base — 156 CVEs, 64 drivers, exploit chains, mitigations, and BYOVD analysis.
 repo_url: https://github.com/splintersfury/KernelSight
 site_url: https://splintersfury.github.io/KernelSight/
 

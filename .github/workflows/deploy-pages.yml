@@ -24,7 +24,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install mkdocs-material
+      - run: pip install mkdocs-material pyyaml
+
+      - name: Generate dashboard data
+        run: python scripts/build_dashboard_data.py
 
       - run: mkdocs build
 
