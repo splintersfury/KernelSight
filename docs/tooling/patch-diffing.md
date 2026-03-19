@@ -1,96 +1,78 @@
 # Patch Diffing
 
-Methodology and tools for identifying security-relevant changes between Windows driver versions.
+Every second Tuesday of the month, Microsoft publishes security updates that fix kernel vulnerabilities. The advisory lists the affected component and a CVE identifier, but the technical details are deliberately sparse. Patch diffing fills that gap by comparing the pre-patch and post-patch binaries to determine exactly what code changed, revealing the root cause of the vulnerability before any public writeup or proof of concept exists.
 
-## Overview
-
-Patch diffing compares two versions of a binary -- typically the pre-patch and post-patch builds of a Windows kernel component -- to identify the code changes that constitute a security fix. By reverse-engineering what changed, the root cause of the vulnerability can be determined, often before any public writeup or PoC exists.
-
-## Why Patch Diffing Matters
-
-- Reveals root cause of vulnerabilities from patch data alone, often before public technical analysis
-- Enables 1-day exploit development from Patch Tuesday advisories
-- Helps defensive teams understand exposure windows, prioritize patching, and build targeted detections
-- Supports automated vulnerability detection pipelines across hundreds of patched binaries per month
-
-## Tools
-
-### BinDiff
-
-BinDiff is a binary comparison tool developed by Google (formerly Zynamics). It works as an IDA Pro plugin or as a standalone application.
-
-- Matches functions between two binaries using control flow graph similarity, call graph analysis, and instruction-level heuristics
-- Best for: identifying renamed or moved functions, finding changed basic blocks within matched functions
-- Limitations: requires an IDA Pro license for full integration, can be slow on very large binaries (100MB+), sometimes mismatches functions with similar structure
-
-### Diaphora
-
-Diaphora is an open-source IDA plugin created by Joxean Koret for advanced binary diffing.
-
-- Offers more flexible matching heuristics than BinDiff, including partial matching and heuristic-based comparison
-- Supports pseudo-code diffing via HexRays decompiler output
-- Best for: deep analysis of specific function changes, identifying subtle modifications in complex functions
-
-### ghidriff
-
-ghidriff is a Python-based tool that leverages Ghidra's headless analysis mode for automated binary diffing.
-
-- Free and open-source (no IDA Pro license required)
-- Produces structured markdown diff reports suitable for automated processing
-- Best for: batch processing large numbers of binary pairs, CI/CD integration, automated triage pipelines
-
-### diffalyze
-
-diffalyze applies LLM-augmented analysis to binary diffs, using AI models to explain the security implications of detected changes.
-
-- Takes BinDiff or ghidriff output and generates natural-language explanations of patch semantics
-- Experimental but promising for scaling triage across the volume of monthly Patch Tuesday changes
-- Can classify changes as security-relevant vs. non-security with reasonable accuracy
+This capability matters for both offense and defense. Offensive researchers use patch diffs to understand 1-day vulnerabilities and develop exploits during the window between patch release and target update. Defensive teams use them to understand their exposure, prioritize patching, and build targeted detections. Automated pipelines like AutoPiff use them to classify the vulnerability at scale across hundreds of patched binaries per month.
 
 ## Build Acquisition with WinBIndex
 
-WinBIndex (winbindex.m417z.com) is an index of Windows Update packages that allows downloading specific PE file versions by build number.
+Before diffing, you need both versions of the binary. WinBIndex (winbindex.m417z.com) is an index of Windows Update packages that lets you download specific PE file versions by build number.
 
-- Indexes all major Windows components across all public builds
-- Enables downloading exact pre-patch and post-patch binaries given KB article numbers
-- Required for reproducible analysis since the same CVE fix may differ across Windows versions (10 vs. 11, different feature updates)
-- Supports searching by file name, build number, or update KB identifier
+The workflow starts with the Patch Tuesday advisory, which identifies the affected component and the KB article number for the fix. Map the pre-patch and post-patch KB articles to specific OS build numbers (the advisory or the Microsoft Update Catalog provides these). Then search WinBIndex by file name and build number to download both versions. This is important for reproducibility: the same CVE fix may differ across Windows versions (10 vs. 11, different feature updates), so you need the exact builds relevant to your target.
 
-## Patch Diffing Workflow
+## Diffing Tools
 
-1. **Identify target** -- Patch Tuesday advisory lists affected component and CVE identifier
-2. **Determine build numbers** -- Map the pre-patch and post-patch KB articles to specific OS build numbers
-3. **Acquire binaries** -- Download both versions from WinBIndex
-4. **Initial diff** -- Run BinDiff or ghidriff to generate function-level comparison
-5. **Triage changes** -- Focus on functions with small, targeted modifications (1-20 changed instructions), filtering out noise from compiler optimizations and unrelated changes
-6. **Analyze** -- Examine the semantics of changes: added bounds checks, NULL checks, lock acquisitions, input validation
-7. **Document** -- Classify the root cause (buffer overflow, use-after-free, race condition, type confusion) and assess exploitation potential
+### BinDiff
 
-## Common Patch Patterns
+BinDiff is the most established binary comparison tool, developed by Google (formerly Zynamics). It matches functions between two binaries using control flow graph similarity, call graph position, and instruction-level heuristics. The output highlights which functions were added, removed, or modified, and shows the specific basic blocks that changed within modified functions.
 
-- **Added length/bounds check before `memcpy`/`memmove`** -- Buffer overflow fix. The patch validates size parameters before a memory copy operation.
-- **Added `NULL` pointer check** -- Null dereference fix. The patch adds a conditional check before dereferencing a potentially NULL pointer.
-- **Added lock acquisition or interlocked operation** -- Race condition fix. The patch introduces synchronization around a shared resource access.
-- **Type field validation added** -- Type confusion fix. The patch verifies an object's type field before casting or dispatching.
-- **Reference count adjustment** -- Use-after-free fix. The patch adds or corrects reference counting to prevent premature object deallocation.
-- **Input validation on IOCTL buffer size** -- IOCTL handler fix. The patch checks `InputBufferLength` or `OutputBufferLength` before processing device I/O control requests.
+BinDiff works as an IDA Pro plugin or as a standalone application using exported IDB databases. The matching algorithms are mature and handle compiler optimizations well, though they can produce false matches on very large binaries (100MB+) where many functions share similar structure. BinDiff is the best choice for identifying renamed or moved functions and for understanding control flow changes at the basic block level.
 
-## AutoPiff Integration
+### Diaphora
 
-AutoPiff automates the patch diffing pipeline end-to-end, from binary acquisition through risk-scored reporting.
+Diaphora is an open-source IDA plugin by Joxean Koret that offers more flexible matching heuristics than BinDiff. Its most valuable feature is pseudo-code diffing via HexRays output, which shows the change in decompiled C rather than assembly. This makes it significantly easier to understand the semantic meaning of a patch, especially for complex functions where assembly-level changes span many basic blocks.
 
-- **Stage 0** (`autopiff-driver-monitor`) -- Monitors WinBIndex for new Windows builds and downloads updated driver binaries
-- **Stages 1-4** (`karton-driver-patch-differ`) -- Automated BinDiff-based structural comparison, function matching, and change extraction
-- **Stage 5** (`karton-driver-reachability`) -- Ghidra decompilation of changed functions with reachability analysis from user-accessible entry points
-- **Stage 6** (`karton-driver-ranking`) -- Risk scoring based on detected patch patterns and attack surface proximity
-- **Stages 7-8** (`karton-driver-report`, `autopiff-alerter`) -- Report generation and Telegram alerting for high-scoring findings
+Diaphora is the best choice for deep analysis of specific function changes and for understanding subtle modifications in complex functions where the C-level diff is more informative than the assembly-level diff.
 
-AutoPiff detection rules map directly to common patch patterns:
+### ghidriff
 
-- `added_len_check_before_memcpy` -- Bounds check added before memory copy
-- `added_null_check` -- NULL pointer validation added
-- `added_lock_acquisition` -- Synchronization primitive introduced
-- `added_type_validation` -- Object type field verified before use
+ghidriff is a Python-based tool that uses Ghidra's headless analysis mode for automated binary diffing. It requires no IDA Pro license, runs entirely from the command line, and produces structured markdown diff reports that can be processed programmatically.
+
+ghidriff is the best choice for batch processing large numbers of binary pairs, CI/CD integration, and automated triage pipelines. AutoPiff uses ghidriff (along with BinDiff) in its automated stages for function-level comparison.
+
+### diffalyze
+
+diffalyze applies LLM-augmented analysis to binary diffs, using AI models to generate natural-language explanations of patch semantics. It takes BinDiff or ghidriff output and classifies changes as security-relevant or non-security with reasonable accuracy. The tool is experimental but promising for scaling triage across the volume of monthly Patch Tuesday changes, where a human analyst cannot review every modified function across every patched component.
+
+## The Patch Diffing Workflow
+
+A complete patch diff analysis follows seven steps.
+
+**1. Identify target.** The Patch Tuesday advisory names the affected component and CVE.
+
+**2. Determine build numbers.** Map the pre-patch and post-patch KB articles to specific OS build numbers. The Microsoft Security Update Guide and the Update Catalog provide this mapping.
+
+**3. Acquire binaries.** Download both versions from WinBIndex by file name and build number.
+
+**4. Initial diff.** Run BinDiff or ghidriff to produce a function-level comparison. The output lists all functions with their match status (matched-identical, matched-changed, unmatched).
+
+**5. Triage changes.** Focus on functions with small, targeted modifications (1-20 changed instructions). Filter out noise from compiler optimizations, unrelated refactoring, and code reordering. Security fixes are almost always surgical: a few lines of validation added to an existing function. Large-scale restructuring is rarely a security fix.
+
+**6. Analyze.** For each candidate function, examine the semantic meaning of the change. The [patch patterns](../guides/patch-patterns.md) page catalogs the seven most common shapes. An added bounds check suggests a buffer overflow. An added lock suggests a race condition. An added type check suggests type confusion. The pattern tells you the vulnerability class.
+
+**7. Document.** Classify the root cause and assess exploitation potential. Map the vulnerability to the KernelSight taxonomy: vulnerability class, exploitation primitive, affected attack surface.
+
+## Recognizing Common Patch Patterns
+
+The majority of kernel security patches follow one of these recognizable shapes. Seeing a bounds check appear before `memcpy` or `memmove` indicates a buffer overflow fix. A new NULL pointer check before dereferencing indicates a null dereference fix. Lock acquisition or interlocked operations appearing around a shared resource access indicate a race condition fix. Type field validation before casting indicates a type confusion fix. Reference count adjustments around object acquisition and release indicate a use-after-free fix. Input validation on IOCTL buffer size indicates an IOCTL handler fix.
+
+Each of these patterns maps to AutoPiff detection rules that fire automatically during pipeline analysis. See [Patch Patterns](../guides/patch-patterns.md) for detailed before/after pseudocode examples.
+
+## AutoPiff: Automating the Pipeline
+
+AutoPiff automates every step of the patch diffing workflow, from binary acquisition through risk-scored reporting.
+
+**Stage 0** (`autopiff-driver-monitor`) monitors WinBIndex for new Windows builds and downloads updated driver binaries as they appear.
+
+**Stages 1-4** (`karton-driver-patch-differ`) perform automated BinDiff-based structural comparison, function matching, and change extraction.
+
+**Stage 5** (`karton-driver-reachability`) uses Ghidra headless decompilation on changed functions and performs reachability analysis from user-accessible entry points, filtering out changes that are not reachable from the IOCTL attack surface.
+
+**Stage 6** (`karton-driver-ranking`) applies risk scoring based on detected patch patterns and attack surface proximity. High scores indicate changes that are both security-relevant and user-reachable.
+
+**Stages 7-8** (`karton-driver-report`, `autopiff-alerter`) generate reports and send Telegram alerts for findings above the score threshold.
+
+AutoPiff's detection rules map directly to common patch patterns. `added_len_check_before_memcpy` fires on bounds check additions. `added_null_check` fires on NULL pointer validation. `added_lock_acquisition` fires on synchronization primitives. `added_type_validation` fires on type field verification. See [AutoPiff Integration](autopiff-integration.md) for setup and the full rule set.
 
 ## References
 

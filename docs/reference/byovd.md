@@ -1,22 +1,26 @@
 ---
-description: "BYOVD (Bring Your Own Vulnerable Driver) attack technique — how attackers use signed drivers like Dell DBUtil, RTCore64, Capcom.sys, and Paragon BioNTdrv to gain kernel access. 41 BYOVD drivers analysed."
+description: "BYOVD (Bring Your Own Vulnerable Driver) attack technique -- how attackers use signed drivers like Dell DBUtil, RTCore64, Capcom.sys, and Paragon BioNTdrv to gain kernel access. 41 BYOVD drivers analysed."
 ---
 
 # Bring Your Own Vulnerable Driver (BYOVD)
 
-Technique where attackers load a legitimately signed but vulnerable driver to gain kernel access.
+Most kernel exploits require finding a vulnerability, building a primitive, and navigating the mitigation stack. BYOVD skips all of that. The attacker drops a legitimately signed but vulnerable driver onto the target system, loads it through normal Windows mechanisms, and uses the driver's own functionality to gain kernel read/write. No memory corruption needed. No exploit development beyond a client that sends the right IOCTLs. The driver *is* the weapon.
 
-## Concept
-
-Windows enforces driver signing, requiring all kernel-mode drivers to be signed by a trusted certificate authority. However, this policy does not prevent loading old, signed drivers that contain known vulnerabilities. In a BYOVD attack, the adversary ships a signed but vulnerable driver alongside their malware payload. Because the driver carries a valid signature, Windows loads it, giving a path from user-mode to kernel-mode access.
+This technique has become the standard approach for ransomware groups and APTs that need kernel access. BlackByte uses RTCore64.sys to disable EDR. Lazarus Group uses ene.sys to patch security callbacks. Cuba ransomware commissioned custom vulnerable drivers. The pattern works because Windows enforces driver signing (the driver must be signed by a trusted CA) but does not prevent loading old, signed drivers that contain known vulnerabilities. A driver signed in 2015 with a critical vulnerability will load on Windows 11 in 2026 unless it appears on the Vulnerable Driver Blocklist.
 
 ## How BYOVD Works
 
-1. Attacker identifies a signed driver with a known kernel vulnerability (arbitrary read/write, physical memory mapping, or process termination capability)
-2. The vulnerable driver is deployed to the target system, typically through initial access malware or a dropper
-3. The driver is loaded using `sc.exe create` and `sc.exe start`, `NtLoadDriver`, or an exploitation framework such as KDU
-4. The known vulnerability in the loaded driver is exploited to obtain kernel read/write or code execution
-5. Kernel access is used for post-exploitation: disabling EDR kernel callbacks, installing rootkits, dumping credentials from LSASS, or manipulating security tokens
+The attack follows a consistent five-step pattern.
+
+First, the attacker identifies a signed driver with a known kernel vulnerability. The most valuable drivers expose arbitrary read/write (physical memory mapping via `MmMapIoSpace`), but process termination capabilities and MSR access are also useful. The [LOLDrivers Deep Analysis](loldrivers-analysis.md) scores 1,775 such drivers, and the [KDU Provider Compatibility](kdu-compatibility.md) analysis identifies 122 that could load unsigned kernel code.
+
+Second, the vulnerable driver is deployed to the target system through initial access malware or a dropper. The driver file is typically extracted from a resource embedded in the malware payload.
+
+Third, the driver is loaded using `sc.exe create` and `sc.exe start`, the `NtLoadDriver` system call, or an exploitation framework like KDU. Because the driver carries a valid Authenticode signature, Windows loads it without complaint (unless it appears on the blocklist and HVCI is enabled).
+
+Fourth, the known vulnerability in the loaded driver is exercised. For a physical memory mapping driver, this means sending IOCTLs that map arbitrary physical addresses into user-mode virtual memory. For a process termination driver, it means specifying the PID of the EDR process.
+
+Fifth, kernel access is used for the actual objective: disabling EDR kernel callbacks, installing rootkits, dumping credentials from LSASS, or manipulating security tokens for privilege escalation.
 
 ## Commonly Abused Drivers
 
@@ -30,64 +34,67 @@ Windows enforces driver signing, requiring all kernel-mode drivers to be signed 
 | `ene.sys` | ENE Technology | Physical memory R/W | Lazarus Group |
 | [HW64.sys](../case-studies/CVE-2020-15368.md) | Marvin Test Solutions | Port I/O and physical memory R/W | Various threat actors |
 
-## LOLDrivers Project
-
-The Living Off The Land Drivers (LOLDrivers) project is a community-maintained catalog of known vulnerable, malicious, and abused drivers, hosted at loldrivers.io.
-
-- Catalogs over 700 known vulnerable drivers with SHA256 hashes, vendor information, and vulnerability descriptions
-- Provides YARA rules and Sigma detection rules for each driver
-- Driver entries include Authenticode signer information for certificate-based blocking
-- Regularly updated as new vulnerable drivers are discovered in the wild
-- Used by SOC teams and detection engineers to build prevention and alerting rules
+These seven drivers appear most frequently in threat intelligence reports, but the [LOLDrivers catalog](https://loldrivers.io) tracks over 700 known vulnerable drivers, and DriverAtlas analysis shows that 1,404 of 1,775 analyzed drivers have the import profile to serve as potential KDU providers.
 
 ## Real-World Campaigns
 
 ### Lazarus Group
 
-The North Korean Lazarus Group used `ene.sys` (an ENE Technology hardware monitoring driver) to disable Windows security features including Microsoft Defender and other endpoint protection products. The driver was deployed through social engineering campaigns disguised as fake job offers targeting cryptocurrency exchanges and aerospace companies. Once loaded, the vulnerable driver provided physical memory access used to patch kernel security callbacks.
+The North Korean Lazarus Group used `ene.sys` (an ENE Technology hardware monitoring driver) to disable Windows security features including Microsoft Defender and other endpoint protection products. The driver was deployed through social engineering campaigns disguised as fake job offers targeting cryptocurrency exchanges and aerospace companies. Once loaded, the vulnerable driver provided physical memory access used to locate and zero out kernel notification callbacks registered by security products, effectively blinding endpoint detection.
 
 ### BlackByte Ransomware
 
-BlackByte operators used `RTCore64.sys` (MSI Afterburner's kernel-mode component) to disable EDR products before deploying their ransomware payload. The attack specifically targeted kernel notification callbacks registered by security products, zeroing them out to blind endpoint detection. This was part of a double-extortion scheme combining data theft with file encryption.
+BlackByte operators used `RTCore64.sys` (MSI Afterburner's kernel-mode component) to disable EDR products before deploying their ransomware payload. The attack specifically targeted kernel notification callbacks registered by security products, finding them in memory through known kernel structure offsets and zeroing them out. This was part of a double-extortion scheme combining data theft with file encryption.
 
 ### Cuba Ransomware
 
-The Cuba ransomware group deployed a custom BYOVD variant using `ApcHelper.sys`, combined with the BIRDDOG backdoor for initial access. This showed that threat actors invest in finding or commissioning new vulnerable drivers rather than relying solely on publicly known ones.
-
-## Detection Strategies
-
-- **Hash-based blocking** -- Block known vulnerable driver file hashes using WDAC (Windows Defender Application Control) or AppLocker policies
-- **Driver load monitoring** -- Monitor driver loading events via Sysmon Event ID 6, ETW kernel providers, or EDR telemetry
-- **Windows Vulnerable Driver Blocklist** -- The `DriverSiPolicy.p7b` file ships with Windows and blocks a Microsoft-curated list of known vulnerable drivers
-- **Microsoft Recommended Driver Block Rules** -- Regularly updated WDAC policy rules for enterprise deployment
-- **Behavioral detection** -- Monitor for `sc.exe` or `NtLoadDriver` calls from non-standard paths, especially temporary directories or user-writable locations
-- **Certificate-based rules** -- Block drivers signed by specific certificates known to have vulnerable drivers in their portfolio
-
-## Mitigations
-
-- **HVCI (Memory Integrity)** -- Hypervisor-protected Code Integrity blocks loading of many unsigned and known-vulnerable drivers by enforcing code integrity at the hypervisor level
-- **Microsoft Vulnerable Driver Blocklist** -- Enabled by default on Windows 11 22H2+ and Windows 11 devices with HVCI, blocks a curated set of vulnerable drivers at the kernel level
-- **WDAC custom policies** -- Enterprise environments can deploy custom Windows Defender Application Control policies that restrict driver loading to an explicit allow-list
-- **Attestation-signed driver requirements** -- Windows 11 24H2 tightens requirements for driver signing, requiring Microsoft attestation signing for new drivers
-
-## BYOVD Exploitation Frameworks
-
-Several open-source tools automate BYOVD exploitation:
-
-- **[KDU (Kernel Driver Utility)](https://github.com/hfiref0x/DSEFix)** — hfiref0x's framework that integrates dozens of vulnerable drivers as exploitation providers. Supports DSE bypass, arbitrary kernel R/W, and shellcode execution.
-- **[DSEFix](https://github.com/hfiref0x/DSEFix)** — Disables Driver Signature Enforcement using a vulnerable driver, allowing loading of unsigned drivers.
-- **[Turla Driver Loader (TDL)](https://github.com/hfiref0x/TDL)** — Loads unsigned drivers using vulnerable signed drivers as a proxy.
-- **[Stryker](https://github.com/hfiref0x/Stryker)** — Mitigation-aware BYOVD exploitation toolkit.
-
-## Additional Campaigns
+The Cuba ransomware group deployed a custom BYOVD variant using `ApcHelper.sys`, combined with the BIRDDOG backdoor for initial access. This campaign demonstrated that threat actors invest in finding or commissioning new vulnerable drivers rather than relying solely on publicly known ones, because custom drivers are less likely to be blocklisted.
 
 ### GhostEmperor
 
-The GhostEmperor APT, documented by [Kaspersky in 2021](https://securelist.com/ghostemperor-from-proxylogon-to-kernel-mode/104407/), used a BYOVD chain to load an unsigned rootkit on targeted systems. The campaign exploited ProxyLogon for initial access, loaded a signed vulnerable driver to bypass Driver Signature Enforcement, then used the driver's kernel R/W capabilities to load an unsigned rootkit payload.
+The GhostEmperor APT, [documented by Kaspersky in 2021](https://securelist.com/ghostemperor-from-proxylogon-to-kernel-mode/104407/), used a BYOVD chain to load an unsigned rootkit. The campaign exploited ProxyLogon for initial access, loaded a signed vulnerable driver to bypass Driver Signature Enforcement, then used the driver's kernel R/W capabilities to load an unsigned rootkit payload. This chain demonstrated the full BYOVD pipeline: initial access to driver deployment to rootkit installation.
+
+## Detection Strategies
+
+Detecting BYOVD requires monitoring at multiple levels because the individual steps (file write, service creation, driver load) are all legitimate operations when performed by authorized software.
+
+**Hash-based blocking** is the most direct approach. Block known vulnerable driver file hashes using WDAC (Windows Defender Application Control) or AppLocker policies. The LOLDrivers project provides SHA256 hashes for every cataloged driver.
+
+**Driver load monitoring** catches the moment the vulnerable driver enters the kernel. Monitor Sysmon Event ID 6 (driver loaded), ETW kernel providers, or EDR telemetry for driver loads from non-standard paths, especially temporary directories, user-writable locations, or paths containing randomly generated names.
+
+**Windows Vulnerable Driver Blocklist** is Microsoft's curated list of known vulnerable drivers, shipped as `DriverSiPolicy.p7b` with Windows. On HVCI-enabled systems, this list is enforced at the hypervisor level. On systems without HVCI, it is enforced only if explicitly enabled.
+
+**Microsoft Recommended Driver Block Rules** provide regularly updated WDAC policy rules for enterprise deployment, offering broader coverage than the default blocklist.
+
+**Behavioral detection** looks for patterns rather than specific hashes: `sc.exe` or `NtLoadDriver` calls from non-standard process trees, driver service creation immediately followed by driver start, and driver files written to disk shortly before loading.
+
+**Certificate-based rules** block all drivers signed by specific certificates known to have vulnerable drivers in their portfolio, providing coverage against both known and undiscovered vulnerable driver versions from the same vendor.
+
+## Mitigation Landscape
+
+**HVCI (Memory Integrity)** is the strongest defense. On HVCI-enabled systems, the Vulnerable Driver Blocklist is enforced at the hypervisor level, preventing known-vulnerable drivers from loading even with administrator privileges. HVCI also blocks the most dangerous BYOVD capabilities: CR4 modification (neutralizing Capcom.sys), W^X enforcement (preventing user-mode code execution from Ring 0), and code page modification. See [VBS / HVCI](../mitigations/vbs-hvci.md) for details.
+
+**The Vulnerable Driver Blocklist** is enabled by default on Windows 11 22H2+ with HVCI, but is opt-in on other configurations. Its coverage is purely reactive: drivers are added only after exploitation is observed in the wild, creating a window of exposure for newly discovered vulnerable drivers.
+
+**WDAC custom policies** allow enterprise environments to restrict driver loading to an explicit allow-list, which is the most restrictive approach but requires careful management to avoid breaking legitimate driver updates.
+
+**Attestation-signed driver requirements** in Windows 11 24H2 tighten the signing requirements for new drivers, requiring Microsoft attestation signing. This does not affect old drivers that were signed under previous requirements.
+
+## BYOVD Exploitation Frameworks
+
+Several open-source tools automate BYOVD exploitation, lowering the barrier for threat actors.
+
+**[KDU (Kernel Driver Utility)](https://github.com/hfiref0x/KDU)** integrates dozens of vulnerable drivers as exploitation providers, supporting DSE bypass, arbitrary kernel R/W, and shellcode execution. See [KDU Provider Compatibility](kdu-compatibility.md) for our analysis of which LOLDrivers could serve as KDU providers.
+
+**[DSEFix](https://github.com/hfiref0x/DSEFix)** disables Driver Signature Enforcement using a vulnerable driver, allowing loading of unsigned drivers.
+
+**[Turla Driver Loader (TDL)](https://github.com/hfiref0x/TDL)** loads unsigned drivers using vulnerable signed drivers as a proxy.
+
+**[Stryker](https://github.com/hfiref0x/Stryker)** is a mitigation-aware BYOVD exploitation toolkit that adapts its approach based on the target system's security configuration.
 
 ## LOLDrivers Integration
 
-The [LOLDrivers project](https://www.loldrivers.io/) catalogs known vulnerable and malicious drivers. KernelSight case studies cross-reference LOLDrivers entries for each documented driver. For driver hash databases, YARA rules, and Sigma detection rules beyond what KernelSight provides, see LOLDrivers.
+The [LOLDrivers project](https://www.loldrivers.io/) catalogs known vulnerable and malicious drivers with SHA256 hashes, vendor information, vulnerability descriptions, YARA rules, and Sigma detection rules. KernelSight case studies cross-reference LOLDrivers entries for each documented driver. The [LOLDrivers Deep Analysis](loldrivers-analysis.md) page presents our DriverAtlas scoring of all 1,775 LOLDrivers entries, and the [KDU Provider Compatibility](kdu-compatibility.md) page maps which of those drivers could serve as KDU exploitation providers.
 
 ## References
 

@@ -1,46 +1,56 @@
 # SMEP / SMAP
 
-Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Prevention (SMAP) are CPU-enforced mitigations that prevent the kernel from executing code in or directly accessing user-mode memory pages.
+Before 2013, the simplest kernel exploit in the world worked like this: find a function pointer you can overwrite, point it at user-mode memory, put your shellcode there, and wait for the kernel to call it. The shellcode ran at Ring 0 with full kernel privileges. No heap manipulation, no ROP chain, no information leak. Just a single write and a return to user space with SYSTEM.
 
-## Overview
+Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Prevention (SMAP) ended that era. These CPU-enforced mitigations prevent the kernel from executing code in or directly accessing user-mode memory pages, turning the trivial ret2user attack into a hardware fault. Their introduction in Windows 8.1 (SMEP) and Windows 10 RS1 (SMAP) is the single most consequential change in the history of Windows kernel exploitation, forcing a permanent shift from code execution to data-only attack strategies.
 
-SMEP and SMAP are hardware mitigations implemented at the CPU level to enforce strict separation between supervisor (ring-0) and user (ring-3) memory access. Intel introduced SMEP with the Ivy Bridge microarchitecture in 2012 and SMAP with Broadwell in 2014. AMD added support for both in their Zen architecture. On the Windows side, Microsoft enabled SMEP enforcement starting with Windows 8.1 and SMAP enforcement starting with Windows 10 RS1 (Anniversary Update, build 14393). Both features are controlled via bits in the CR4 control register and are enforced by the CPU's page fault logic in conjunction with page table entry flags.
+## How They Work
 
-Before these mitigations, a common kernel exploitation technique was "ret2user" -- corrupting a kernel function pointer to redirect execution to attacker-controlled shellcode mapped in user-mode memory. SMEP and SMAP blocked this by introducing hardware-level enforcement of the user/kernel boundary.
+Both mitigations are controlled via bits in the CR4 control register and enforced by the CPU's page fault logic in conjunction with page table entry flags.
 
-SMEP and SMAP eliminated an entire class of trivially reliable exploitation techniques. Before SMEP, kernel exploits could allocate executable memory in user space, write shellcode, and redirect a kernel function pointer to it. The exploit was deterministic and required no heap manipulation, no ROP chain, and no information disclosure. SMAP extended this to data references, closing the follow-up technique of placing fake kernel structures in user-mode memory.
+**SMEP (CR4 bit 20)** triggers a page fault (#PF) if code running at CPL 0 (kernel mode) attempts to fetch and execute instructions from a page whose User/Supervisor (U/S) bit in the page table entry is set to User. This check occurs during the instruction fetch stage and is evaluated against the U/S bit in the final PTE used by the page walk. The result is straightforward: the kernel cannot execute code that resides in user-mode address space, regardless of the page's execute permissions. Intel introduced SMEP with Ivy Bridge in 2012, and AMD added support with Zen. Windows first enforced it in Windows 8.1.
 
-## Mechanism
+**SMAP (CR4 bit 21)** extends the protection to data access. When enabled, the processor faults if kernel-mode code attempts to read from or write to a User-marked page, unless the EFLAGS.AC (Alignment Check) flag is explicitly set. The kernel uses `STAC` (Set AC Flag) and `CLAC` (Clear AC Flag) instructions to create narrow windows where user-mode access is permitted, such as the `ProbeForRead`/`ProbeForWrite` and `Mm` copy routines that implement controlled user-to-kernel data transfer. The AC flag window is kept as short as possible to minimize the attack surface during legitimate user-mode access. Intel introduced SMAP with Broadwell in 2014, and Windows enabled enforcement starting with Windows 10 RS1 (build 14393).
 
-**SMEP (CR4 bit 20):** When enabled, the processor generates a page fault (#PF) if code running at CPL 0 (kernel mode) attempts to fetch and execute instructions from a page whose User/Supervisor (U/S) bit in the page table entry is set to User. This means the kernel cannot execute code that resides in user-mode address space, regardless of the page's execute permissions. The SMEP check occurs during the instruction fetch stage and is evaluated against the U/S bit in the final page table entry (PTE) used by the page walk.
+The enforcement mechanism is based on the U/S bit in the page table hierarchy, not on virtual address ranges. A page is considered "user-mode" if any level of the page table walk has the U/S bit set to User. This distinction matters for bypass analysis: the protection can be circumvented by changing the page table metadata rather than the virtual address.
 
-**SMAP (CR4 bit 21):** When enabled, the processor generates a page fault if code running at CPL 0 attempts to read from or write to a page marked as User in the page table entries, unless the EFLAGS.AC (Alignment Check) flag is explicitly set. The kernel uses the `STAC` (Set AC Flag) and `CLAC` (Clear AC Flag) instructions to temporarily enable and disable user-mode access in controlled code paths such as `copy_from_user` equivalents (e.g., `ProbeForRead`/`ProbeForWrite` and the `Mm` copy routines). The AC flag window is kept as narrow as possible to minimize the attack surface during legitimate user-mode access.
+**CR4 Register Protection** is itself a security concern because clearing CR4 bit 20 or 21 disables the respective protection entirely. On systems without VBS, any Ring 0 code can modify CR4, which is why early SMEP bypasses simply used ROP to execute `mov cr4, <value>`. On VBS-enabled systems, the hypervisor intercepts CR4 writes via VM-exit traps and rejects attempts to clear the SMEP or SMAP bits, adding a second enforcement layer. On kCET-enabled systems (Windows 11 24H2), the ROP chains needed to reach a `mov cr4` gadget are detected by shadow stack validation before they can execute.
 
-The enforcement depends on the U/S bit in the page table hierarchy. A page is considered "user-mode" if any level of the page table walk has the U/S bit set to User. This means the protection is based on page table metadata, not on virtual address ranges.
+Feature detection occurs via CPUID: SMEP support is indicated by CPUID.(EAX=07H, ECX=0):EBX[bit 7], and SMAP by CPUID.(EAX=07H, ECX=0):EBX[bit 20]. The kernel checks these bits during boot and enables CR4 bits accordingly. If the CPU lacks support, the kernel runs without these protections.
 
-**CR4 Register Protection:**
+## What They Block
 
-- The SMEP and SMAP bits in CR4 are themselves a target for attackers. Clearing CR4 bit 20 or 21 disables the respective protection entirely.
-- On systems without VBS, CR4 can be modified by any code running in ring 0, which is why early SMEP bypasses simply used ROP to execute `mov cr4, <value>`.
-- On systems with VBS enabled, the hypervisor intercepts CR4 writes via VM-exit traps. The hypervisor validates the new CR4 value and rejects attempts to clear the SMEP or SMAP bits, adding a second layer of enforcement.
-- On kCET-enabled systems (Win 11 24H2), ROP chains that would reach a `mov cr4` gadget are detected by shadow stack validation before they can execute.
+SMEP and SMAP together eliminate the entire class of attacks that cross the user/kernel memory boundary for code or data access.
 
-## Primitives Blocked
+The classic **ret2user attack** is the primary casualty. An attacker who maps shellcode at a user-mode address and redirects a kernel function pointer to it will trigger a page fault the instant the CPU attempts to fetch the first instruction, because SMEP detects the user-mode U/S bit. Even if the attacker can control RIP, execution faults before a single instruction of shellcode runs.
 
-- **Direct shellcode execution in user memory (SMEP):** The classic ret2user attack, where the attacker maps shellcode at a user-mode address and redirects a kernel function pointer to it, is blocked because execution from user pages triggers a page fault.
-- **User-mode fake structure access (SMAP):** Attacks that overwrite a kernel pointer to reference a fake object in user-mode memory (e.g., a forged `_TOKEN` structure) are blocked because the kernel cannot read from user pages without explicit `STAC`.
-- **User-mode data staging for kernel callbacks (SMAP):** Kernel callbacks that dereference attacker-controlled pointers into user memory will fault if SMAP is active.
-- **Ret2user with mapped shellcode (SMEP):** Even if the attacker can control RIP, execution will fault when the CPU attempts to fetch instructions from the user-mode page.
-- **User-mode trampoline code (SMEP):** Techniques that place a short JMP or CALL trampoline in user space to redirect to kernel shellcode are blocked at the initial execution attempt.
+**User-mode fake structure access** is blocked by SMAP. Before SMAP, attackers could overwrite a kernel pointer to reference a forged object (a fake `_TOKEN`, a fake vtable) in user-mode memory. The kernel would dereference the corrupted pointer and operate on attacker-controlled data. With SMAP active, any kernel read from a user-mode page without explicit `STAC` triggers a fault.
 
-## Bypass History
+**User-mode data staging for kernel callbacks** fails for the same reason. Kernel callbacks that dereference attacker-controlled pointers into user memory will fault under SMAP. This blocks a class of attacks where the attacker sets up a carefully crafted data structure in user space and tricks the kernel into reading it through a corrupted pointer chain.
 
-- **CR4 bit-flip via ROP (2012-2016):** Early bypasses used ROP chains to overwrite CR4, clearing the SMEP bit. The gadget `mov cr4, <reg>` or `pop <reg>; mov cr4, <reg>` was sufficient. This technique is now blocked on systems with kCFG/kCET and HVCI, which prevent arbitrary ROP and protect CR4 writes.
-- **STAC instruction via ROP (ongoing without kCET):** On systems without hardware shadow stacks, an attacker with stack control can ROP to a `STAC` gadget, enabling user-mode access under SMAP. With kCET (Win 11 24H2+), return address tampering is detected.
-- **PTE remapping (ongoing):** With an arbitrary read/write primitive, the attacker can locate the PTE for a user-mode page and clear its U/S bit, making the CPU treat it as a supervisor page. This bypasses both SMEP and SMAP entirely because the page is no longer classified as user-mode. This remains viable as long as the attacker has an ARW primitive and can locate the PTE base.
-- **Data-only attacks (always viable):** Attacks that modify kernel data structures (e.g., token privilege manipulation, `PreviousMode` modification) without redirecting code execution are unaffected by SMEP and SMAP. These mitigations are irrelevant when the exploit does not cross the user/kernel memory boundary for code or data access.
-- **MDL remapping (historical):** Creating an MDL (Memory Descriptor List) for a user-mode buffer and mapping it into kernel address space with `MmMapLockedPagesSpecifyCache` created a kernel-mode alias for user pages. This alias had the U/S bit set to Supervisor, bypassing SMEP/SMAP. Modern Windows versions have restricted this technique.
-- **KUSER_SHARED_DATA abuse (limited, ongoing):** The `KUSER_SHARED_DATA` page at a fixed kernel address (`0xFFFFF78000000000`) is mapped as supervisor-mode readable/writable. Although this page cannot contain executable code (it is NX), its fixed address and writable nature make it useful as a data staging area in some data-only attacks, sidestepping SMAP entirely since the page is already in kernel space.
+**Trampoline code in user space** is blocked by SMEP. Techniques that place a short JMP or CALL trampoline in user memory to redirect into kernel shellcode elsewhere are caught at the initial fetch from the user page.
+
+## How Attackers Adapted
+
+The history of SMEP/SMAP bypasses traces the evolution from code execution to data-only exploitation.
+
+**CR4 bit-flip via ROP (2012-2016)** was the first and simplest bypass. Attackers constructed ROP chains using kernel gadgets to overwrite CR4, clearing the SMEP bit. A `mov cr4, <reg>` or `pop <reg>; mov cr4, <reg>` sequence was sufficient. This technique is now blocked on systems with kCFG/kCET (which prevent arbitrary ROP) and VBS/HVCI (which trap CR4 writes at the hypervisor level). It remains viable only on legacy systems without these protections.
+
+**STAC instruction via ROP** targets SMAP specifically. On systems without hardware shadow stacks, an attacker with stack control can ROP to a `STAC` gadget, setting the AC flag and enabling user-mode access. With kCET active on Windows 11 24H2, return address tampering is detected before the `STAC` gadget can execute.
+
+**PTE remapping** is the most durable bypass and remains viable on current systems. With an arbitrary read/write primitive, the attacker locates the PTE for a user-mode page and clears its U/S bit, making the CPU treat it as a supervisor page. This bypasses both SMEP and SMAP entirely because the page is no longer classified as user-mode. The technique requires an ARW primitive and the ability to locate the PTE base address. See [PTE Manipulation](../primitives/arw/pte-manipulation.md).
+
+**Data-only attacks** sidestep SMEP and SMAP completely by never crossing the user/kernel memory boundary. Attacks that modify kernel data structures (token privileges, `PreviousMode`, security descriptors) do not execute attacker code and do not access user-mode pages from kernel context. These mitigations are irrelevant when the exploit operates entirely within kernel address space through an existing read/write primitive. This approach has become dominant in modern exploitation.
+
+**MDL remapping** was a historical bypass where creating a Memory Descriptor List for a user-mode buffer and mapping it into kernel address space with `MmMapLockedPagesSpecifyCache` produced a kernel-mode alias with the U/S bit set to Supervisor. Modern Windows versions have restricted this technique.
+
+**KUSER_SHARED_DATA abuse** provides a limited data staging area. The `KUSER_SHARED_DATA` page at a fixed kernel address (`0xFFFFF78000000000`) is mapped as supervisor-mode readable/writable. Although NX prevents code execution from this page, its fixed address and writable nature make it useful for data-only attacks that need a known writable kernel location.
+
+## The Lasting Impact
+
+SMEP and SMAP fundamentally changed the economics of Windows kernel exploitation. Before these mitigations, kernel exploits were often trivially reliable one-shot attacks where a single corruption led directly to code execution. After their introduction, exploits must take one of three paths, each significantly more complex than the pre-SMEP world.
+
+The first path, constructing ROP/JOP chains within kernel code, is now blocked by kCFG/kCET on modern systems. The second, PTE remapping to create supervisor-mode aliases for user pages, requires an ARW primitive and the ability to locate the PTE base. The third, and now dominant, approach is entirely data-only: manipulating kernel structures without executing attacker code. This is why token manipulation, `PreviousMode` modification, and I/O Ring-based primitives have become the standard endgame for modern kernel exploits. SMEP and SMAP did not make exploitation impossible, but they permanently ended the era of trivial kernel code execution.
 
 ## Windows Version Availability
 
@@ -52,19 +62,7 @@ The enforcement depends on the U/S bit in the page table hierarchy. A page is co
 | Windows 11 21H2+ | SMEP + SMAP enabled | Combined with kCFG to protect CR4 |
 | Windows 11 24H2 | SMEP + SMAP + kCET | Hardware shadow stacks block ROP-based CR4 flip |
 
-All versions require a CPU that supports the respective feature (CPUID check). SMEP requires Ivy Bridge or newer (Intel) / Zen or newer (AMD). SMAP requires Broadwell or newer (Intel) / Zen or newer (AMD). On VBS-enabled systems, the hypervisor provides additional CR4 protection regardless of CPU generation.
-
-Feature detection is performed via CPUID: SMEP support is indicated by CPUID.(EAX=07H, ECX=0):EBX[bit 7], and SMAP support by CPUID.(EAX=07H, ECX=0):EBX[bit 20]. The Windows kernel checks these bits during boot and enables the CR4 bits accordingly. If the CPU does not support SMEP or SMAP, the kernel continues without these protections.
-
-## Impact on Exploit Development
-
-SMEP and SMAP changed the landscape of Windows kernel exploitation. Before these mitigations, kernel exploits were often trivially reliable one-shot attacks. After their introduction, exploits must either:
-
-1. Construct ROP/JOP chains within kernel code to achieve code execution (blocked by kCFG/kCET on modern systems)
-2. Use PTE remapping to create supervisor-mode aliases for user pages (requires ARW + PTE base leak)
-3. Adopt entirely data-only strategies that manipulate kernel structures without executing attacker code
-
-The third approach has become dominant in modern exploitation, driving the industry toward token manipulation, `PreviousMode` modification, and I/O Ring-based primitives.
+All versions require a CPU that supports the respective feature. SMEP requires Ivy Bridge or newer (Intel) / Zen or newer (AMD). SMAP requires Broadwell or newer (Intel) / Zen or newer (AMD). On VBS-enabled systems, the hypervisor provides additional CR4 protection regardless of CPU generation.
 
 ## Cross-References
 

@@ -1,5 +1,5 @@
 ---
-description: "Windows kernel exploit mitigations — SMEP, SMAP, kCFG, kCET, VBS, HVCI, KDP, pool hardening, Secure Pool, ACG, and KASLR. How each defence works and what bypasses exist."
+description: "Windows kernel exploit mitigations -- SMEP, SMAP, kCFG, kCET, VBS, HVCI, KDP, pool hardening, Secure Pool, ACG, and KASLR. How each defence works and what bypasses exist."
 ---
 
 # Mitigations
@@ -8,10 +8,14 @@ description: "Windows kernel exploit mitigations — SMEP, SMAP, kCFG, kCET, VBS
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &nbsp;|&nbsp; <span class="ks-active">Mitigations</span>
 </div>
 
-Mitigations are cross-cutting defenses that intersect every stage of the exploitation pipeline. Rather than fixing individual bugs, they raise the cost of exploitation by breaking assumptions that primitives rely on: preventing code execution from data pages, randomizing kernel addresses, or isolating structures in hypervisor-protected memory.
+A kernel vulnerability gives an attacker a single corruption. Turning that corruption into SYSTEM requires a chain of steps: leaking addresses, shaping memory, constructing read/write primitives, and finally modifying a privilege token or security descriptor. Mitigations work by breaking links in that chain. No single defense stops exploitation on its own. Instead, they compose into a defense-in-depth stack where each layer forces the attacker to solve an additional problem, and each additional problem demands another primitive that may not be available from the original bug.
+
+This philosophy is visible in the corpus. CVE-2024-21338 (appid.sys) gave Lazarus Group a controlled kernel callback, but SMEP blocked the obvious step of jumping to user-mode shellcode, kCFG constrained which functions the callback could target, and KASLR meant the callback address had to be leaked first. The exploit worked because it found data-only paths around every layer. But remove any one of those constraints from the attacker's burden and the chain becomes simpler, faster, more reliable. Defense-in-depth does not prevent exploitation; it taxes it.
+
+The stack is ordered by bypass difficulty. Hardware mitigations at the bottom are relatively straightforward to work around if the attacker already holds a write primitive. VBS-backed protections at the top require defeating the hypervisor, something no public exploit has accomplished through direct assault.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_006 — Defense-in-Depth Stack</span>
+  <span class="ks-figure-label">FIG_006 -- Defense-in-Depth Stack</span>
   <svg viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Defense-in-depth stack from hardware at bottom to VBS at top">
     <!-- Stack bars - bottom to top -->
     <!-- HW Layer -->
@@ -54,23 +58,29 @@ Mitigations are cross-cutting defenses that intersect every stage of the exploit
   <p class="ks-figure-caption">Each layer blocks specific primitive classes. VBS-backed protections at the top are the hardest to bypass.</p>
 </div>
 
-## Categories
+## How the Layers Interact
 
-| Mitigation | Description | Bypass Difficulty |
-|-----------|-------------|-------------------|
-| [SMEP / SMAP](smep-smap.md) | Supervisor mode execution/access prevention | Medium |
-| [kCFG / kCET](kcfg-kcet.md) | Kernel control flow integrity | High |
-| [VBS / HVCI](vbs-hvci.md) | Virtualization-based code integrity | Very High |
-| [KDP](kdp.md) | Kernel Data Protection | Very High |
-| [Pool Hardening](pool-hardening.md) | Segment heap, pool cookies, NX pool | Medium |
-| [Secure Pool](secure-pool.md) | VBS-protected pool allocations | Very High |
-| [ACG](acg.md) | Arbitrary Code Guard | High |
-| [KASLR](kaslr.md) | Kernel address space randomization | Low-Medium |
-| [KASLR Bypasses](kaslr-bypasses.md) | Catalog of KASLR defeat techniques | -- |
+The real power of this stack is compositional. Consider an attacker who finds a pool overflow in clfs.sys. Pool hardening (Segment Heap randomization, cookies) makes the initial corruption unreliable but not impossible. If the attacker achieves a write primitive, KASLR forces them to find an information leak or corrupt the security descriptor that gates `NtQuerySystemInformation` access. SMEP and SMAP prevent them from redirecting execution to user-mode shellcode, so they must use data-only techniques like token swapping. kCFG and kCET prevent control flow hijacking even within kernel code. And if HVCI is enabled, there is no writable-and-executable memory anywhere in the kernel address space.
 
-## Mitigation vs. Primitive
+Each mitigation removed from this chain makes the exploit simpler. On a system without HVCI, the attacker regains the ability to allocate executable memory. Without kCET, ROP chains become viable again. Without KASLR restrictions, a simple API call reveals every kernel address. The defense-in-depth model works because these layers are independent: bypassing one does not compromise the others.
 
-Which mitigations block which exploitation primitives:
+## Mitigation Catalog
+
+| Mitigation | What It Blocks | Bypass Difficulty |
+|-----------|----------------|-------------------|
+| [SMEP / SMAP](smep-smap.md) | Code execution and data access across the user/kernel boundary | Medium |
+| [kCFG / kCET](kcfg-kcet.md) | Control flow hijacking via function pointer and return address corruption | High |
+| [VBS / HVCI](vbs-hvci.md) | Runtime code generation, unsigned driver loading, and code page modification in the kernel | Very High |
+| [KDP](kdp.md) | Modification of security-critical kernel globals and driver configuration data | Very High |
+| [Pool Hardening](pool-hardening.md) | Pool header corruption, deterministic heap layout, and uninitialized data leaks | Medium |
+| [Secure Pool](secure-pool.md) | Pool overflow, use-after-free, and metadata corruption for VBS-protected allocations | Very High |
+| [ACG](acg.md) | Dynamic code generation and modification within protected user-mode processes | High |
+| [KASLR](kaslr.md) | Exploitation using hardcoded or predictable kernel addresses | Low-Medium |
+| [KASLR Bypasses](kaslr-bypasses.md) | Catalog of techniques that defeat kernel address randomization | -- |
+
+## Which Mitigations Block Which Primitives
+
+The table below maps each mitigation to the exploitation primitives it is designed to prevent. A filled cell means the mitigation directly blocks or significantly hinders that primitive class. Empty cells indicate the mitigation is irrelevant to that technique, not that the technique is safe.
 
 | | Pool Overflow | Write-What-Where | Token Swap | PTE Manip | Code Exec | Pool Spray |
 |---|---|---|---|---|---|---|
@@ -82,3 +92,7 @@ Which mitigations block which exploitation primitives:
 | Secure Pool | ■ | | ■ | | | ■ |
 | ACG | | | | | ■ | |
 | KASLR | | ■ | | ■ | | |
+
+The most important takeaway from this table is the empty column for token swapping outside of VBS/KDP/Secure Pool. Token manipulation requires only a read/write primitive and knowledge of the current process address. No hardware enforcement, no control flow integrity check, and no W^X policy touches the token swap itself. This is why [token swapping](../primitives/exploitation/token-swapping.md) has become the dominant terminal goal for modern kernel exploits, and why VBS-backed protections (which could theoretically move tokens into Secure Pool or KDP-protected memory) represent the most consequential future hardening.
+
+For how these mitigations evolved over time and how each deployment shifted attacker techniques, see the [Mitigation Timeline](../guides/mitigation-timeline.md). For how exploit chains navigate through these layers to reach SYSTEM, see [Exploit Chain Patterns](../guides/exploit-chain-patterns.md).

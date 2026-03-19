@@ -1,49 +1,81 @@
 # ALPC
 
-Advanced Local Procedure Call is the kernel-mode IPC mechanism underlying RPC, COM, and many core Windows communication channels. Attack surface exists in message handling, view section management, and handle passing operations.
+Consider what happens when a sandboxed browser renderer calls a COM method on an out-of-process server, or when a low-privilege service queries the Task Scheduler for pending jobs. Neither call looks like it touches the kernel directly. But both transit through Advanced Local Procedure Call, the kernel IPC mechanism that underpins RPC, COM, and hundreds of Windows service communication channels. Every ALPC message passes through `ntoskrnl.exe`, where the kernel deserializes message attributes, manipulates reference-counted objects, maps shared memory sections, and duplicates handles between processes. A bug in any of these operations is a bug in the kernel, reachable from virtually any process on the system, including AppContainer sandboxes.
 
-## Attack Surface Overview
+What makes ALPC particularly interesting as an attack surface is its combinatorial complexity. A single ALPC message can carry security attributes (for token impersonation), view attributes (for shared memory mapping), handle attributes (for cross-process handle duplication), context attributes, and work-on-behalf-of attributes, all simultaneously. Each attribute type triggers a different set of kernel operations during send and receive, and the interactions between these operations under concurrent access from multiple threads create a state space that is extremely difficult to test exhaustively.
 
-- **Key syscalls**: `NtAlpcCreatePort`, `NtAlpcConnectPort`, `NtAlpcSendWaitReceivePort`, `NtAlpcDisconnectPort`, `NtAlpcQueryInformation`, `NtAlpcSetInformation`
-- **Message attributes**: Security attributes (impersonation tokens), view attributes (shared memory sections), handle attributes (cross-process handle duplication), context attributes, and work-on-behalf-of attributes
-- **Kernel objects**: ALPC port objects (connection ports, server communication ports, client communication ports), message objects, section objects, and view regions managed by the kernel ALPC subsystem
-- **User-mode reach**: RPC calls via `NdrClientCall`, COM cross-process activation, direct ALPC syscalls, Task Scheduler, Print Spooler, and hundreds of Windows services that communicate via RPC/ALPC
-- **Indirect reach**: Any application using COM out-of-process servers, DCOM, WMI remote connections, or named pipe operations backed by ALPC triggers kernel ALPC code
-- **Key risk**: Message deserialization with multiple attribute types, concurrent port access from multiple threads, and view section mapping races create a large combinatorial attack surface in core kernel code
+## How ALPC works under the hood
 
-## Mechanism Deep-Dive
+``` mermaid
+graph TD
+    A["Server Process\nNtAlpcCreatePort()"] --> B["Connection Port\n(listens for clients)"]
+    B --> C["Client Process\nNtAlpcConnectPort()"]
+    C --> D{"Connection\nAccepted?"}
+    D -->|Yes| E["Server Comm Port\n+ Client Comm Port\n(paired objects)"]
+    E --> F["NtAlpcSendWaitReceivePort()\nMessage + Attributes"]
+    F --> G["Kernel Attribute Processing"]
+    G --> H["Security: Token capture"]
+    G --> I["View: Section mapping"]
+    G --> J["Handle: Cross-process dup"]
+    G --> K["Context: User pointer"]
+    style G fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+    style H fill:#152a4a,stroke:#f59e0b,color:#e2e8f0
+    style I fill:#152a4a,stroke:#f59e0b,color:#e2e8f0
+    style J fill:#152a4a,stroke:#f59e0b,color:#e2e8f0
+    style K fill:#152a4a,stroke:#f59e0b,color:#e2e8f0
+```
 
-ALPC is the successor to the original LPC mechanism and serves as the transport layer for nearly all local inter-process communication in Windows. When a server creates an ALPC connection port via `NtAlpcCreatePort`, clients can connect using `NtAlpcConnectPort`, which creates a pair of communication port objects -- one for the server side and one for the client side. Messages are exchanged via `NtAlpcSendWaitReceivePort`, which can both send a message and wait for a reply in a single syscall, minimizing context switches for performance-critical IPC.
+ALPC replaced the original LPC mechanism and serves as the transport layer for nearly all local inter-process communication in Windows. The lifecycle begins when a server creates a connection port via `NtAlpcCreatePort`. Clients connect using `NtAlpcConnectPort`, which produces a pair of communication port objects, one for the server side and one for the client side. Messages are exchanged through `NtAlpcSendWaitReceivePort`, which can send a message and wait for a reply in a single syscall, minimizing context switches for performance-critical IPC.
 
-The complexity of ALPC arises from its message attribute system. Each ALPC message can carry multiple attributes that trigger additional kernel operations during send and receive. A security attribute causes the kernel to capture the sender's token for impersonation by the receiver. A view attribute maps a section of shared memory into the receiver's address space, allowing efficient transfer of large data blocks without copying. A handle attribute duplicates a handle from the sender's process to the receiver's process, enabling cross-process resource sharing. Each of these operations involves kernel object manipulation with reference counting, access checks, and error handling on multiple failure paths. Bugs in attribute processing can affect kernel object reference counts (leading to use-after-free when a reference is dropped too many times) or bypass security checks (leading to privilege escalation through token or handle manipulation).
+The complexity that matters for security lives in the message attribute system. Each ALPC message can carry multiple attributes that trigger additional kernel operations during send and receive processing:
 
-The ALPC subsystem also supports "message zones" -- kernel-managed memory regions that store large messages when they exceed the small inline buffer limit. Message zones are backed by section objects mapped into both the port owner and the kernel. The kernel maintains metadata structures to track allocation and deallocation within these zones, and corruption of zone metadata can lead to arbitrary kernel memory access. The connection model introduces lifetime management complexity: when a client disconnects or a server port is closed, the kernel must clean up the communication port, drain pending messages, unmap associated views, and release duplicated handles, all while other threads may be concurrently sending or receiving on the same port.
+A **security attribute** causes the kernel to capture the sender's token for impersonation by the receiver. This involves reference counting on the token object, validating impersonation levels, and ensuring the receiver is authorized to impersonate the sender. If the validation is insufficient, a low-privilege process can craft a message that causes the receiver to impersonate at a higher privilege level.
 
-A default Windows installation has dozens of RPC services listening on ALPC ports, and every COM cross-process call transits through the ALPC subsystem. ALPC vulnerabilities in `ntoskrnl.exe` are reachable from virtually any process on the system, including sandboxed and AppContainer processes that can make RPC calls.
+A **view attribute** maps a section of shared memory into the receiver's address space, enabling efficient transfer of large data blocks without copying. The kernel must create and manage section objects, probe the mapping parameters, and handle the case where the mapping fails partway through. View sections that are mapped concurrently from multiple threads can race on the mapping operation itself.
 
-## Common Vulnerability Patterns
+A **handle attribute** duplicates a handle from the sender's process to the receiver's process, enabling cross-process resource sharing. The kernel must validate the source handle's access rights and object type. If validation is incomplete, handle smuggling can escalate privileges by granting the receiver access to objects the sender should not be able to share.
 
-- **Message attribute type confusion**: The kernel processes an attribute as one type (e.g., view attribute) when the caller crafted it as another type, leading to incorrect pointer dereference or size interpretation
-- **Port object use-after-free**: Concurrent disconnect and send/receive operations race on the port object's lifetime, leading to use of a freed communication port object
-- **View section mapping race**: A view attribute requests mapping of a shared section, but concurrent operations on the same section or port cause double-mapping or mapping into a freed address range
-- **Handle attribute validation bypass**: The handle duplication performed during handle attribute processing does not properly validate the source handle's access rights, allowing privilege escalation through handle smuggling
-- **Impersonation token capture**: Security attribute processing captures the sender's token for impersonation, but insufficient validation allows a low-privilege process to craft a message that causes the receiver to impersonate at a higher privilege level
-- **Message zone corruption**: Overflow or underflow in message zone allocation metadata corrupts adjacent message headers, enabling controlled kernel memory writes
-- **Connection callback re-entrancy**: Server-side connection callbacks invoked during `NtAlpcConnectPort` processing re-enter ALPC code in an unexpected state, causing state corruption
-- **Reference count imbalance**: Error paths in message send/receive fail to release references on port objects, view objects, or section objects, leading to reference count leaks (DoS) or extra decrements (use-after-free)
+Each of these attribute operations involves kernel object manipulation with reference counting, access checks, and error handling on multiple failure paths. When an error occurs partway through processing a message with multiple attributes, the kernel must unwind the operations it already completed. Missing a reference release on one error path produces either a reference count leak (denial of service through pool exhaustion) or an extra decrement (use-after-free when the reference reaches zero prematurely).
 
-## Driver Examples
+Beyond individual message processing, the ALPC subsystem supports "message zones," kernel-managed memory regions that store large messages exceeding the small inline buffer limit. Message zones are backed by section objects mapped into both the port owner and the kernel, and the kernel maintains metadata structures to track allocation and deallocation within these zones. Corruption of zone metadata can lead to arbitrary kernel memory access. The connection model adds further lifetime management complexity: when a client disconnects or a server port is closed, the kernel must clean up the communication port, drain pending messages, unmap associated views, and release duplicated handles, all while other threads may be concurrently sending or receiving on the same port.
 
-The ALPC subsystem is implemented entirely within `ntoskrnl.exe` as part of the executive. It is not a separate driver but a core kernel component. Indirectly, every Windows service that uses RPC (which is nearly all of them) relies on ALPC as the transport. Key services using ALPC include the Task Scheduler service, Print Spooler (`spoolsv.exe`), DCOM/COM activation (`svchost.exe` instances), Windows Error Reporting, the Security Account Manager (SAM), and the Local Security Authority (`lsass.exe`). The `csrss.exe` Windows subsystem process uses raw ALPC ports for console management and session notifications. Attack surface exists both in the kernel ALPC implementation within `ntoskrnl.exe` and in the user-space service logic that processes ALPC messages. Kernel-side bugs carry more impact.
+## Where ALPC vulnerabilities arise
 
-## Detection Approach
+The vulnerability patterns in ALPC cluster around three themes: object lifetime management, attribute processing errors, and concurrency races.
 
-- **Syscall fuzzing**: Use Syzkaller or custom syscall fuzzers to exercise the `NtAlpc*` syscall family with varied message sizes, attribute combinations, and concurrent operations. Focus on combining multiple attribute types in a single message and racing connect/disconnect with send/receive from multiple threads.
-- **RPC interface enumeration**: Use `RpcView` or `NtObjectManager` (James Forshaw's toolkit) to enumerate RPC endpoints backed by ALPC ports. Each RPC interface with methods accepting complex structures is an indirect ALPC attack vector. Focus on interfaces accessible from low-privilege or AppContainer contexts.
-- **Port object analysis**: In WinDbg, use `!alpc /p <port_address>` to inspect ALPC port objects, pending messages, connected clients, and associated sections. Monitor port handle counts and message queue depths to identify potential lifetime issues.
-- **Concurrency testing**: Create multiple threads that simultaneously connect, send, receive, and disconnect on the same ALPC port to stress reference counting and state management code paths.
-- **Patch diffing**: ALPC fixes in `ntoskrnl.exe` typically add reference count adjustments, lock acquisitions around attribute processing, or additional validation of message attribute fields. Diff the ALPC-related functions (prefixed with `Alpc` in the kernel symbols) across patches.
-- **Impersonation auditing**: Monitor `NtAlpcSendWaitReceivePort` calls that include security attributes and verify that token impersonation level and integrity checks are enforced correctly.
+### Object lifetime and reference counting
+
+ALPC manages multiple reference-counted kernel objects: port objects, message objects, section objects, and view objects. Every code path that acquires a reference must release it, and every error path must account for references already taken. In practice, the ALPC code in `ntoskrnl.exe` has thousands of lines of error handling, and missing a single `ObDereferenceObject` on one error path is enough for a vulnerability. An extra decrement causes the reference count to reach zero while other code still holds pointers to the object, producing a use-after-free. A missing decrement leaks the object, eventually exhausting pool memory.
+
+Concurrent disconnect and send/receive operations are particularly treacherous. When one thread calls `NtAlpcDisconnectPort` while another thread is in the middle of `NtAlpcSendWaitReceivePort` on the same port, the disconnect handler may free the communication port object while the send/receive path is still using it. The kernel must coordinate these operations through locks and state flags, and any gap in that coordination is a use-after-free window.
+
+### Attribute type confusion and validation gaps
+
+When the kernel processes message attributes, it parses a sequence of attribute entries, each tagged with a type identifier. If the kernel misinterprets the type of an attribute, it may dereference a pointer as a view attribute structure when the caller constructed it as a handle attribute structure, reading incorrect offsets and triggering an out-of-bounds access or type confusion.
+
+Handle attribute validation bypass is a subtler variant. During handle duplication, the kernel should verify that the source handle's access rights are appropriate for the requested operation. If the validation is incomplete or checks the wrong access mask, the receiver ends up with a handle to an object with more access than the sender was authorized to grant.
+
+### Connection callback re-entrancy
+
+Server-side connection callbacks invoked during `NtAlpcConnectPort` processing can re-enter ALPC code in an unexpected state. If the callback itself performs ALPC operations (sending messages, querying port information), the re-entrant call encounters partially initialized state, causing corruption of port metadata or message queues. This re-entrancy pattern is difficult to catch through code review because it depends on what the callback implementation does, which is outside the kernel's direct control.
+
+## The scope of exposure
+
+A default Windows installation has dozens of RPC services listening on ALPC ports, and every COM cross-process call transits through the ALPC subsystem. The Task Scheduler, Print Spooler (`spoolsv.exe`), DCOM/COM activation, Windows Error Reporting, the Security Account Manager, and the Local Security Authority (`lsass.exe`) all communicate via ALPC. The `csrss.exe` Windows subsystem process uses raw ALPC ports for console management and session notifications. This means ALPC vulnerabilities in `ntoskrnl.exe` are reachable from virtually any process, including sandboxed and AppContainer processes that retain the ability to make RPC calls. The kernel attack surface is not limited to processes that know about ALPC; any process that uses COM or RPC exercises it implicitly.
+
+## Detection approaches
+
+**Syscall fuzzing** is the most direct way to find ALPC bugs. Syzkaller or custom syscall fuzzers can exercise the `NtAlpc*` syscall family with varied message sizes, attribute combinations, and concurrent operations. The key insight is to combine multiple attribute types in a single message and to race connect/disconnect with send/receive from multiple threads. Single-attribute, single-threaded testing misses the combinatorial bugs that dominate ALPC's vulnerability history.
+
+**RPC interface enumeration** provides an indirect attack map. Tools like `RpcView` or James Forshaw's `NtObjectManager` enumerate RPC endpoints backed by ALPC ports. Each RPC interface with methods accepting complex structures is an indirect ALPC attack vector. The focus should be on interfaces accessible from low-privilege or AppContainer contexts, since those represent the realistic attacker position.
+
+**Port object analysis** in WinDbg using `!alpc /p <port_address>` reveals ALPC port objects, pending messages, connected clients, and associated sections. Monitoring port handle counts and message queue depths helps identify potential lifetime issues. Watching for ports with unusually high pending message counts can indicate a denial-of-service condition or a reference leak in progress.
+
+**Concurrency testing** through dedicated stress harnesses is essential. Creating multiple threads that simultaneously connect, send, receive, and disconnect on the same ALPC port stresses reference counting and state management code paths. The bugs this finds tend to be high-severity because race conditions in kernel object management typically produce use-after-free or double-free primitives.
+
+**Patch diffing** on `ntoskrnl.exe` reveals ALPC fixes as reference count adjustments, lock acquisitions around attribute processing, or additional validation of message attribute fields. The ALPC-related functions are prefixed with `Alpc` in the kernel symbols, making them straightforward to isolate across patch versions.
+
+**Impersonation auditing** monitors `NtAlpcSendWaitReceivePort` calls that include security attributes and verifies that token impersonation level and integrity checks are enforced correctly. A mismatch between the sender's privilege level and the impersonation token captured by the receiver indicates a potential privilege escalation path.
 
 ## Related CVEs
 
@@ -64,3 +96,5 @@ ALPC vulnerabilities primarily reside in `ntoskrnl.exe` and are detected by gene
 - `bounds_check_added` -- Size or bounds validation added to message attribute processing
 - `access_check_added` -- Security access check added to ALPC operation that previously lacked validation
 - `error_path_cleanup_added` -- Resource cleanup (reference release, memory free) added to error handling path that previously leaked
+
+Because ALPC bugs tend to be concurrency and lifetime issues rather than simple buffer overflows, the most productive detection strategy combines patch diffing (to find the specific fix) with concurrency fuzzing (to find new instances of the same bug class). The combinatorial nature of ALPC attribute processing means that even after years of security attention, new attribute interaction bugs continue to surface. For the exploitation side of what happens after an ALPC bug gives you a corrupted object, see [pool spray](../primitives/exploitation/pool-spray-feng-shui.md) and the [use-after-free](../vuln-classes/use-after-free.md) vulnerability class.

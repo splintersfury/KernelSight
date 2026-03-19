@@ -1,54 +1,34 @@
 # Secure Pool
 
-VBS-backed kernel pool that provides hypervisor-enforced integrity for selected allocations, isolating them from corruption by VTL 0 kernel exploits.
+Standard pool hardening raises the cost of heap exploitation through software checks: cookies, safe unlinking, randomized layout. Every one of these checks can be bypassed with a sufficient information disclosure primitive or enough spray iterations. Secure Pool takes a different approach entirely. By placing critical allocations in VBS-protected memory with hypervisor-enforced guard pages and metadata stored in VTL 1, it creates a pool region where the fundamental exploitation techniques (overflow into adjacent objects, header corruption, use-after-free reclamation) are blocked at the hardware level rather than detected by software.
 
-## Overview
+Microsoft introduced the Secure Pool in Windows 10 21H2 (build 19044) as a specialized allocator that uses VBS infrastructure to provide guarantees that no software-level hardening can match. It represents the strongest form of heap protection available in Windows, but its effectiveness is constrained by the same factor that limits [KDP](kdp.md): adoption. Only a small fraction of kernel objects currently reside in Secure Pool.
 
-Microsoft introduced the Secure Pool in Windows 10 21H2 (build 19044) as a specialized memory allocator that uses VBS to provide stronger guarantees than the standard kernel pool. Standard pool hardening relies on software checks (cookies, safe unlinking) that can be bypassed with sufficient primitives. Secure Pool protections are enforced at the hypervisor level through VTL 1 and SLAT. Allocations in the Secure Pool are isolated from adjacent memory corruption and have their metadata stored in the Secure Kernel's address space, making them immune to pool overflow and use-after-free techniques that remain effective against the standard pool.
+## How It Works
 
-The Secure Pool is the strongest form of heap protection available in Windows, but its effectiveness is limited by adoption: only a small fraction of kernel objects are allocated from it.
+**Allocation API.** Kernel components allocate from the Secure Pool using `ExAllocatePool3` with the `POOL_FLAG_USE_SECURE_POOL` flag or through `ExSecurePoolAlloc`. The allocation request is forwarded to the Secure Kernel (VTL 1), which manages the Secure Pool independently of the standard VTL 0 pool allocator. The caller receives a pointer to memory that is accessible from VTL 0 for normal read/write operations, but the surrounding metadata and guard regions are invisible to VTL 0.
 
-## Mechanism
+**Hypervisor-enforced isolation** is the core property. Secure Pool memory pages are controlled by VTL 1 EPT/NPT entries. The Secure Kernel configures SLAT permissions so that VTL 0 can read and write the allocation contents (as needed by the kernel during normal operation), but cannot access adjacent metadata or guard regions. Guard pages with no VTL 0 read/write permission are placed between individual Secure Pool allocations. Any overflow or underflow from one allocation triggers a hypervisor-level page fault before reaching adjacent allocations, regardless of the overflow size or direction.
 
-**Allocation API:**
+**Metadata protection** eliminates the entire class of pool header attacks. Pool metadata (chunk headers, free lists, allocation tracking) is stored entirely in VTL 1 address space. VTL 0 code, even with a full arbitrary read/write primitive, cannot access or modify Secure Pool metadata because it resides in a different Virtual Trust Level. Cookie leakage, header forging, and free-list corruption are all impossible because the data they target does not exist in VTL 0 memory.
 
-- Kernel components allocate from the Secure Pool using `ExAllocatePool3` with the `POOL_FLAG_USE_SECURE_POOL` flag or through `ExSecurePoolAlloc`.
-- The allocation request is forwarded to the Secure Kernel (VTL 1), which manages the Secure Pool independently of the standard VTL 0 pool allocator.
-- The caller receives a pointer to memory that is accessible from VTL 0 for normal read/write operations, but the surrounding metadata and guard regions are invisible to VTL 0.
+**Free operation protection** addresses use-after-free and type confusion. When a Secure Pool allocation is freed, the Secure Kernel validates the request through VTL 1 and can immediately unmap the freed pages from VTL 0. Any use-after-free access triggers a fault rather than succeeding silently. Double-free is detected at the hypervisor level. Type confusion attacks where an attacker frees an object and reclaims the memory with a different object type are prevented because the Secure Kernel tracks allocation state independently of VTL 0 data structures and can enforce type-safe reallocation.
 
-**Hypervisor-Enforced Isolation:**
+## What Secure Pool Blocks
 
-- Secure Pool memory pages are controlled by VTL 1 EPT/NPT entries. The Secure Kernel configures SLAT permissions so that VTL 0 can read/write the allocation (as needed by the kernel) but cannot access adjacent metadata or guard regions.
-- Guard pages are placed between individual Secure Pool allocations. These guard pages have no VTL 0 read/write permission in the EPT, so any overflow or underflow from one allocation triggers a hypervisor-level page fault before reaching adjacent allocations.
-- The isolation is spatial: each allocation is surrounded by inaccessible memory, preventing linear corruption from reaching neighboring objects.
+The protections are comprehensive for objects that reside in Secure Pool. **Pool overflow into adjacent allocations** is blocked by hypervisor-enforced guard pages. **Pool header manipulation** is impossible because headers do not exist in VTL 0 memory. **Pool spray targeting Secure Pool objects** is ineffective because the Secure Kernel controls allocation placement independently of the standard VTL 0 allocator. **Use-after-free** is converted into an immediate fault by revoking VTL 0 access to freed pages via EPT. **Type confusion via pool reuse** is prevented by Secure Kernel tracking of allocation types.
 
-**Metadata Protection:**
+## The Adoption Gap
 
-- Pool metadata (chunk headers, free lists, allocation tracking) is stored entirely in VTL 1 address space.
-- VTL 0 code, even with a full arbitrary read/write primitive, cannot access or modify Secure Pool metadata because it resides in a different Virtual Trust Level.
-- This eliminates the entire class of pool header corruption attacks that have historically been the backbone of pool exploitation.
+Secure Pool shares the same fundamental limitation as KDP: it only protects objects that explicitly opt in.
 
-**Free Operation Protection:**
+**Very few kernel objects currently use Secure Pool.** The vast majority of kernel allocations, including `_TOKEN`, `_EPROCESS`, `_OBJECT_HEADER`, and driver-specific objects, remain in the standard kernel pool. Every data-only exploit in the corpus targets these unprotected objects. Until Secure Pool adoption reaches the structures that attackers actually target, the mitigation covers only a narrow subset of the kernel attack surface.
 
-- When a Secure Pool allocation is freed, the Secure Kernel validates the request through VTL 1.
-- Protections against double-free and use-after-free are enforced at the hypervisor level, with the Secure Kernel tracking allocation state independently of VTL 0 data structures.
-- Freed pages can be immediately unmapped from VTL 0, causing any use-after-free access to fault rather than succeed silently.
-- The free validation prevents type confusion attacks where an attacker frees an object and reclaims the memory with a different object type.
+**VTL 0 access is still permitted for allocation contents.** The kernel needs to read and write Secure Pool allocations during normal operation. An attacker with an arbitrary read/write primitive who knows a Secure Pool allocation's address can still read and modify its contents. The protection prevents adjacent corruption and metadata manipulation, but if the attacker can directly target a specific Secure Pool object's data, Secure Pool does not prevent that modification. The isolation is spatial (preventing overflow from neighboring objects) rather than access-control-based (preventing all unauthorized writes to the object itself).
 
-## Primitives Blocked
+**VBS dependency** means that on systems where VBS is not enabled or has been disabled, Secure Pool APIs may succeed but without hypervisor-backed enforcement. The allocations fall back to standard pool semantics with no additional security benefit.
 
-- **Pool overflow into adjacent Secure Pool allocation:** Guard pages enforced by the hypervisor between allocations prevent linear overflow from reaching adjacent objects, regardless of how the overflow occurs or its size.
-- **Pool header manipulation:** Since all metadata resides in VTL 1, there are no pool headers in VTL 0 memory for the attacker to corrupt. Cookie leakage and forging attacks are irrelevant.
-- **Pool spray targeting Secure Pool objects:** The Secure Kernel controls allocation placement independently of the standard VTL 0 allocator. Standard pool spray techniques do not influence Secure Pool layout.
-- **Use-after-free on Secure Pool objects:** The Secure Kernel can immediately revoke VTL 0 access to freed allocations via EPT, converting a use-after-free into an immediate fault.
-- **Type confusion via pool reuse:** The Secure Kernel can enforce type-safe allocation by tracking the intended object type and preventing reuse with a different type during reallocation.
-
-## Bypass History
-
-- **Limited adoption (primary bypass, ongoing):** Very few kernel objects currently use Secure Pool. The vast majority of kernel allocations -- including `_TOKEN`, `_EPROCESS`, `_OBJECT_HEADER`, and driver-specific objects -- remain in the standard kernel pool. Exploits simply target unprotected objects. Until adoption reaches critical mass, this mitigation covers only a narrow subset of the kernel attack surface.
-- **VTL 0 access still permitted for reads/writes (by design):** The kernel needs to read and write Secure Pool allocations during normal operation. This means an attacker with an arbitrary read/write primitive can still read and modify the contents of a Secure Pool allocation if they know its address. The protection is against adjacent corruption and metadata manipulation, not against direct content modification of a known allocation.
-- **VBS dependency:** On systems where VBS is not enabled (or has been disabled), Secure Pool APIs may still succeed but without hypervisor-backed enforcement, reducing to standard pool semantics with no additional security benefit.
-- **Interaction with standard pool objects:** Secure Pool objects often contain pointers to standard pool objects and vice versa. An attacker can corrupt the standard pool object that a Secure Pool object references, achieving an indirect attack.
+**Interaction with standard pool objects** creates indirect attack paths. Secure Pool objects often contain pointers to standard pool objects and vice versa. An attacker can corrupt the standard pool object that a Secure Pool object references, achieving an indirect attack that bypasses the Secure Pool's spatial isolation.
 
 ## Windows Version Availability
 
@@ -62,11 +42,13 @@ The Secure Pool is the strongest form of heap protection available in Windows, b
 
 Requires VBS to be enabled and active. Without VBS, Secure Pool provides no additional protection over the standard pool. The feature has no performance impact on non-Secure-Pool allocations.
 
-## Impact on Exploit Development
+## Where Secure Pool Matters Most
 
-Secure Pool's real-world impact depends on adoption rate. Currently, exploits can simply choose targets that are not in the Secure Pool. As Microsoft moves more objects into Secure Pool (tokens, security descriptors, process objects), pool overflow and use-after-free exploitation will become harder. The long-term goal is for all security-sensitive kernel allocations to reside in Secure Pool, reducing pool corruption vulnerabilities to denial-of-service rather than privilege escalation.
+Secure Pool's real-world impact depends entirely on which objects move into it. Currently, exploits can simply choose targets that are not in the Secure Pool. As Microsoft migrates more objects (tokens, security descriptors, process objects), pool overflow and use-after-free exploitation will become harder. The long-term vision is that all security-sensitive kernel allocations reside in Secure Pool, reducing pool corruption from a privilege escalation vector to a denial-of-service outcome.
 
-In practice, certain newer kernel objects may be unexpectedly resistant to pool-based techniques. Verify whether a target object type uses Secure Pool before pursuing a pool corruption strategy against it.
+For researchers, this creates a practical concern: newer kernel objects may be unexpectedly resistant to pool-based techniques. Before pursuing a pool corruption strategy against a specific object type, verify whether that type uses Secure Pool on the target build. The shift can happen silently between Windows versions as Microsoft moves objects into the protected allocator.
+
+The combination of Secure Pool for heap objects and [KDP](kdp.md) for static/global data represents Microsoft's long-term strategy for hardening the data plane against data-only attacks. Neither is complete yet, but both are expanding with each release, and the trajectory suggests that the most critical kernel structures will eventually be protected from the write primitives that current exploits depend on.
 
 ## Cross-References
 

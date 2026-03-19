@@ -1,62 +1,87 @@
 # NULL Pointer Dereference
 
-Accessing memory through a pointer that is NULL (zero), reading from or writing to the zero page in kernel context.
+On a modern 64-bit Windows system, dereferencing a NULL pointer in the kernel does one thing: it crashes the entire machine. Not the process, not the thread, the whole system. A blue screen, a reboot, and every user on the box loses their session. This makes NULL dereference the most democratic of kernel vulnerabilities: an unprivileged user can take down a server that serves thousands, with a single IOCTL call.
 
-## Description
+On older systems, the story was different, and far worse. This page covers both eras: the historical exploitability of NULL dereference for code execution, the modern reality of denial-of-service, and the cases where the boundary between the two is less clear than it appears.
 
-NULL pointer dereference vulnerabilities occur when a kernel driver accesses memory through a pointer that has not been assigned a valid address, defaulting to virtual address zero. In the Windows kernel, dereferencing a NULL pointer causes a bugcheck (BSOD) because the zero page is unmapped. The system crashes with a `KERNEL_DATA_INPAGE_ERROR`, `PAGE_FAULT_IN_NONPAGED_AREA`, or `SYSTEM_SERVICE_EXCEPTION` stop code, resulting in a denial-of-service condition.
+## The zero page, then and now
 
-On older Windows versions (32-bit Windows 7 and earlier), user-mode processes could map the zero page using `NtAllocateVirtualMemory` with a base address of zero. This allowed controlled data to be placed at address 0x0, so when the kernel dereferenced a NULL pointer, it would read attacker-controlled data instead of crashing. If the NULL pointer was used for a function call, execution could be redirected to user-mode code running at ring-0 privilege. On modern 64-bit Windows (8.0+), the zero page is unconditionally reserved and cannot be mapped from user mode, making NULL pointer dereferences almost exclusively a denial-of-service issue.
+To understand NULL dereference exploitation, you need to understand what happens at virtual address zero.
 
-NULL dereferences remain relevant beyond simple DoS. They can indicate deeper logic flaws -- the missing NULL check often reveals that an error path is not properly handled, which may have additional security consequences. Certain NULL dereference patterns can still lead to exploitable conditions on modern systems, particularly write-at-offset-from-NULL patterns (e.g., `NULL->field_at_offset_0x40 = attacker_value`) that may overlap with valid mapped memory in edge cases.
+On 32-bit Windows 7 and earlier, user-mode processes could map the zero page using `NtAllocateVirtualMemory` with a base address of zero. The call would succeed, and the process would have valid, readable, writable, executable memory at address 0x0. When the kernel then dereferenced a NULL pointer, it would not crash. Instead, it would read (or execute) whatever the attacker had placed at address zero. If the NULL pointer was a function pointer, execution transferred to user-mode code running at ring-0 privilege. If it was a data pointer, the kernel read attacker-controlled fake structures. This was a clean, reliable, often one-shot privilege escalation.
 
-## Common Patterns in Drivers
+Windows 8 changed the landscape fundamentally. The zero page (virtual addresses 0x0 through 0xFFFF) is now unconditionally reserved by the kernel. No user-mode process can map it. Additionally, SMEP (Supervisor Mode Execution Prevention) on Intel processors prevents the kernel from executing code at user-mode addresses, even if they were somehow mapped. Together, these mitigations reduced NULL dereference from "reliable code execution" to "reliable system crash."
 
-- Missing NULL check after `ObReferenceObjectByHandle` returns `STATUS_INVALID_HANDLE` or other failure -- the output object pointer is not set but the driver proceeds to use it
-- Missing NULL check after pool allocation failure (`ExAllocatePoolWithTag` returning NULL on low-memory conditions) -- the driver dereferences the NULL return value
-- Missing NULL check on `MmGetSystemAddressForMdlSafe` return -- this function returns NULL if the mapping fails, but the driver uses the result unconditionally
-- Function pointer in an optional structure field (e.g., callback table entry, dispatch routine) called without verifying it is non-NULL
-- Chained pointer dereference where an intermediate pointer can be NULL: `obj->parent->child->method()` crashes if `parent` is NULL
-- Missing NULL check after `IoGetCurrentIrpStackLocation` in unusual IRP handling scenarios
-- Optional file object fields (`FsContext`, `FsContext2`) accessed without NULL check when the file was opened in a mode that does not populate these fields
-- Return value of `IoGetDeviceObjectPointer` or `IoGetAttachedDeviceReference` used without NULL validation
-- Event callback function pointer in an optional extension structure invoked without NULL check when the extension was not initialized
-- WDF object context retrieved via `WdfObjectGetTypedContext` used without verifying the context was actually allocated during object creation
+But "reliable system crash" is not nothing. In cloud and multi-tenant server environments, a denial-of-service that requires no privileges and crashes the entire host affects every VM, every container, every user on the system. Repeated triggering can prevent boot if the crash occurs in an early initialization path. Cloud providers treat kernel NULL dereference bugs as security vulnerabilities precisely because of this blast radius.
 
-## Exploitation Implications
+## How NULL dereferences happen
 
-On modern x64 Windows 10 and later, NULL pointer dereferences are primarily a denial-of-service vector. An unprivileged user can trigger a system-wide crash (BSOD) by invoking the vulnerable code path, which is particularly impactful on servers and shared systems. Repeated triggering can prevent system boot if the crash occurs early in the boot process.
+NULL dereferences are, in a sense, the simplest vulnerability class. A function returns NULL to indicate failure, and the caller does not check. But the patterns through which this simplicity manifests in real driver code are varied enough to warrant examination.
 
-On legacy 32-bit systems or in specific configurations, NULL dereferences can be exploited for code execution. The attacker maps the zero page with `NtAllocateVirtualMemory`, places a fake object (with controlled vtable pointers or data fields) at address zero, and triggers the NULL dereference. The kernel reads the fake object and dispatches through the attacker-controlled function pointer, executing arbitrary code at ring-0. While this is largely a historical technique, some hypervisor and embedded Windows configurations may still be vulnerable.
+### Missing allocation failure checks
 
-A special case is the NULL dereference of a function pointer. When the kernel calls through a NULL function pointer (e.g., `object->callback(args)` where `callback` is NULL), it attempts to execute code at address zero. On legacy systems with the zero page mapped as executable, this leads directly to code execution. On modern systems it causes an immediate bugcheck.
+`ExAllocatePoolWithTag` returns NULL when the system cannot satisfy the allocation (low memory, pool exhaustion, or Driver Verifier fault injection). If the driver does not check for NULL and immediately dereferences the returned pointer, the system crashes. This pattern is most common in error paths that are rarely exercised: the allocation always succeeds in testing, so the NULL path is never tested.
 
-Write-at-offset-from-NULL patterns (e.g., `*(NULL + user_controlled_offset) = value`) are more interesting on modern systems because the offset could potentially reach mapped memory, though this requires very specific circumstances.
+The modern `ExAllocatePool2` API also returns NULL on failure (rather than bugchecking, as `ExAllocatePoolWithQuotaTag` does), making proper NULL checking even more important for drivers migrating to the new API.
 
-NULL dereferences in kernel code are treated more seriously than their user-mode counterparts because they cause a system-wide crash rather than a single process termination. In cloud and server environments, a reliable NULL dereference trigger from an unprivileged user is a meaningful denial-of-service vulnerability affecting all tenants on a shared host.
+### Missing MDL mapping checks
 
-## Typical Primitives Gained
+`MmGetSystemAddressForMdlSafe` returns NULL if it cannot map the MDL's physical pages into system virtual address space. This can happen under memory pressure or when the MDL describes pages that cannot be locked. The driver receives NULL and, if it proceeds to read or write through the result, crashes the system. The older `MmGetSystemAddressForMdl` (without "Safe") bugchecks on failure rather than returning NULL, which is arguably worse because the driver has no opportunity to handle the error.
 
-- Denial of service (BSOD) -- the primary impact on modern x64 Windows systems
-- Code execution on legacy 32-bit systems via zero-page mapping and fake object placement
-- Information disclosure if the NULL dereference is a read that returns data to user mode (reading from unmapped page causes bugcheck, so this is rare)
-- Logic bypass if the NULL check guards a security-relevant code path -- skipping the NULL path may bypass authorization
+### Missing handle lookup checks
+
+`ObReferenceObjectByHandle` can fail for many reasons: invalid handle, wrong object type, insufficient access rights. When it fails, the output object pointer is not set to a valid value. If the driver does not check the return status and proceeds to use the output pointer, it dereferences uninitialized or NULL memory.
+
+### Function pointers in optional structures
+
+Kernel drivers frequently use tables of function pointers for dispatch (completion routines, callback tables, filter dispatch tables). When a table entry is optional, the pointer may be NULL if the corresponding functionality is not registered. Calling through a NULL function pointer (`object->OptionalCallback(args)`) attempts to execute code at address zero, causing an immediate bugcheck on modern systems.
+
+CVE-2024-35250 in `ks.sys` (kernel streaming) involved a NULL pointer dereference that, despite being "just" a NULL deref, was classified as an elevation of privilege vulnerability. The NULL deref occurred in a specific kernel streaming configuration path, and the circumstances around it enabled more than simple denial of service.
+
+### Chained dereferences
+
+A common C pattern, `obj->parent->child->method()`, crashes if any intermediate pointer is NULL. The driver may check that `obj` is non-NULL but assume that `obj->parent` is always valid. Under error conditions or race scenarios, intermediate fields can be NULL even when the top-level object is valid.
+
+## Beyond denial of service
+
+While modern NULL dereference is primarily a DoS vector, several edge cases push it beyond simple crashing.
+
+**Write-at-offset-from-NULL** patterns are the most interesting. When the kernel writes through an expression like `*(NULL + user_controlled_offset) = value`, the offset can reach mapped memory if it is large enough to escape the reserved zero page (past 0xFFFF). In practice, this requires very specific circumstances and careful control over the offset, but it transforms a NULL deref into a limited arbitrary write.
+
+**Logic bypass** is another angle. If a NULL check guards a security-relevant code path, and the NULL dereference occurs *after* the security check but *before* the checked pointer is used, the crash itself may not be the issue. The issue is that the security check's failure path is reachable, and on that path, the driver may perform or skip operations that affect system security state before hitting the NULL deref.
+
+CVE-2023-36802 in `mskssrv.sys` and CVE-2023-29360 in the same driver both involved NULL pointer conditions in kernel streaming code that interacted with type confusion and reference counting issues. The NULL deref was a symptom of a deeper object lifecycle flaw, not the vulnerability in isolation.
+
+## Typical primitives gained
+
+- **Denial of service (BSOD)**, the primary and most common impact on modern x64 Windows
+- **Code execution on legacy 32-bit systems** via zero-page mapping and fake object placement (historical, pre-Windows 8)
+- **Logic bypass** if the NULL check guards a security-relevant code path and the failure path has security consequences
+- **Limited arbitrary write** in write-at-offset-from-NULL patterns where the offset escapes the reserved zero page
 
 ## Mitigations
 
-- **Zero page reservation** -- Windows 8+ unconditionally reserves the zero page (VA 0x0-0xFFFF), preventing user-mode mapping and making NULL dereferences non-exploitable for code execution on modern systems
-- **SMEP (Supervisor Mode Execution Prevention)** -- Even if the zero page were mapped, SMEP prevents kernel-mode execution of user-mode pages, adding defense-in-depth
-- **MmGetSystemAddressForMdlSafe** -- The "Safe" variant of this function returns NULL on failure instead of bugchecking, allowing callers to handle the error gracefully
-- **ExAllocatePool2 with error handling** -- The modern pool API returns NULL on failure (rather than bugchecking), making proper NULL checking essential
-- **Low Resources Simulation** -- Driver Verifier's fault injection mode systematically fails allocations to test error handling, exposing missing NULL checks during development
+The mitigation story for NULL dereference is one of the most successful in Windows kernel security.
 
-## Detection Strategies
+**Zero page reservation** on Windows 8+ unconditionally reserves virtual addresses 0x0 through 0xFFFF, preventing user-mode mapping. This single mitigation eliminated the entire code execution exploitation path for NULL dereferences. It is always on, requires no configuration, and cannot be bypassed from user mode.
 
-- **Patch diffing**: Look for added NULL checks (`if (ptr == NULL) return STATUS_...`) after function calls that can return NULL. AutoPiff detects these as `pool_allocation_null_check_added` and `mdl_null_check_added`.
-- **Static analysis**: Track all pointer-returning function calls and verify that every caller checks for NULL before dereference. Focus on `ExAllocatePoolWithTag`, `MmGetSystemAddressForMdlSafe`, `ObReferenceObjectByHandle`, and `IoAllocateIrp`.
-- **Compiler analysis**: PREfast (Static Driver Verifier) and the `/analyze` flag in MSVC detect many NULL dereference patterns in Windows drivers through SAL annotation checking.
-- **Driver Verifier**: Enable Low Resources Simulation (fault injection) to force allocation failures and expose missing NULL checks on error paths. This systematically triggers the code paths where NULL dereferences hide.
-- **Code review**: Focus on error handling paths -- most NULL dereferences occur because the success path is well-tested but the failure path (allocation failure, handle lookup failure) is rarely exercised.
+**SMEP (Supervisor Mode Execution Prevention)** adds defense-in-depth. Even if the zero page were somehow mapped (through a hypervisor bug, for instance), SMEP prevents kernel-mode execution of user-mode pages. The combination of zero page reservation and SMEP makes code execution through NULL dereference essentially impossible on modern hardware.
+
+**MmGetSystemAddressForMdlSafe** is the "Safe" variant of the MDL mapping function, returning NULL on failure instead of bugchecking. This gives drivers the opportunity to handle the error gracefully, but only if they actually check the return value.
+
+**Low Resources Simulation** in Driver Verifier systematically fails allocations, MDL mappings, and other operations that can return NULL. This exposes missing NULL checks during development by exercising the error paths that normal testing never reaches. Running a driver under Low Resources Simulation for even a few hours typically reveals multiple missing NULL checks.
+
+**ExAllocatePool2** returns NULL on failure rather than raising an exception, making error handling more explicit. Combined with the `/sdl` compiler flag that initializes some locals to zero, the modern development environment makes NULL dereference bugs harder to introduce, though far from impossible.
+
+## Detection strategies
+
+**Patch diffing** for NULL dereference fixes looks for added `if (ptr == NULL) return STATUS_...` checks after function calls that can return NULL. These are among the simplest patches to identify in binary diffs: a new comparison-and-branch inserted before a dereference. AutoPiff detects these through several rules that target specific allocation and mapping functions.
+
+**Static analysis** is the most systematic approach. Track all pointer-returning function calls and verify that every caller checks for NULL before dereference. Focus on `ExAllocatePoolWithTag`, `ExAllocatePool2`, `MmGetSystemAddressForMdlSafe`, `ObReferenceObjectByHandle`, and `IoAllocateIrp`. PREfast (Static Driver Verifier) with SAL annotations detects many of these patterns at compile time.
+
+**Driver Verifier with Low Resources Simulation** is the most effective dynamic approach. It forces allocation failures and exposes missing NULL checks on error paths. This systematically triggers the code paths where NULL dereferences hide, paths that normal functional testing never exercises because allocations almost never fail in practice.
+
+**Code review** should focus specifically on error handling paths. Most NULL dereferences occur because the success path is well-tested but the failure path (allocation failure, handle lookup failure, MDL mapping failure) is never exercised. Ask one question at every function call that can fail: what happens to the output pointer if this call returns an error?
 
 ## Related CVEs
 
@@ -70,8 +95,10 @@ NULL dereferences in kernel code are treated more seriously than their user-mode
 
 ## AutoPiff Detection
 
-- `pool_allocation_null_check_added` -- Detects patches adding NULL validation after `ExAllocatePoolWithTag` or `ExAllocatePool2` return values before pointer dereference
-- `mdl_null_check_added` -- Detects addition of NULL check on `Irp->MdlAddress` or the return value of MDL mapping functions
-- `mdl_safe_mapping_replacement` -- Detects replacement of `MmGetSystemAddressForMdl` (which crashes on failure) with the `Safe` variant that returns NULL on mapping failure
-- `added_null_check` -- Detects general NULL pointer validation additions before dereference operations in driver code
-- `null_pointer_validation_added` -- Detects addition of NULL validation on optional object fields, function pointers, or handle lookup results
+- `pool_allocation_null_check_added` detects patches adding NULL validation after `ExAllocatePoolWithTag` or `ExAllocatePool2` return values before pointer dereference
+- `mdl_null_check_added` detects addition of NULL check on `Irp->MdlAddress` or the return value of MDL mapping functions
+- `mdl_safe_mapping_replacement` detects replacement of `MmGetSystemAddressForMdl` (which crashes on failure) with the `Safe` variant that returns NULL on mapping failure
+- `added_null_check` detects general NULL pointer validation additions before dereference operations in driver code
+- `null_pointer_validation_added` detects addition of NULL validation on optional object fields, function pointers, or handle lookup results
+
+NULL dereference is often dismissed as "just a crash," but that framing misses two things. First, a kernel crash is a system-wide event, not a process-local one, and in multi-tenant environments, the blast radius is every user on the machine. Second, the NULL dereference is frequently a symptom of a deeper bug: a missing error check, a lifecycle management flaw, or a race condition that leaves an object in an invalid state. The NULL check that the patch adds is the immediate fix, but the interesting question is always: *why* was the pointer NULL in the first place? That question often leads to a more severe vulnerability hiding behind the crash.

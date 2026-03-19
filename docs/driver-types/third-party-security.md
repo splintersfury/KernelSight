@@ -1,26 +1,55 @@
 # Third-Party Security Drivers
 
-Anti-virus, EDR, anti-rootkit, and anti-cheat kernel modules — abused for process termination, callback manipulation, and code execution.
+<div class="ks-pipeline-pos">
+  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+</div>
+
+Capcom.sys is an anti-cheat driver that intentionally disables SMEP and executes a user-supplied function pointer in ring 0. It does this by design: the anti-cheat protection mechanism requires running user code with kernel privileges to inspect game memory for cheating tools. The "vulnerability" is that any process on the system, not just the Capcom game, can call the IOCTL and get arbitrary code execution in the kernel. This is the paradox at the heart of third-party security drivers: the capabilities that make them effective at their security function (process termination, callback management, kernel object inspection) are exactly the capabilities that attackers want.
 
 !!! note "Distinct from Security / Policy Drivers"
     This category covers **third-party** security product kernel drivers (AV, EDR, anti-cheat). For Microsoft's built-in security enforcement drivers (appid.sys, ci.sys), see [Security / Policy Drivers](security-policy.md).
 
-## Architecture
+## Why Security Drivers Are Different
 
-- **Driver model**: WDM or minifilter, typically with kernel callback registrations
-- **Key drivers**: `Capcom.sys` (Capcom), `echo_driver.sys` (Echo AC), `viragt64.sys` (TG Soft), `Truesight.sys` (RogueKiller), `amsdk.sys` (WatchDog)
-- **Interface**: Kernel callbacks (PsSetCreateProcessNotifyRoutine, ObRegisterCallbacks), IOCTL for management, direct kernel function invocation
-- **Privilege**: Run with full kernel privileges; designed to monitor and control system behavior
+Third-party security drivers, including antivirus, EDR, anti-rootkit, and anti-cheat kernel modules, differ from the other driver categories in a fundamental way. Their vulnerability is not a bug in the traditional sense. There is no buffer overflow to trigger, no integer overflow to exploit, no race condition to win. Instead, the driver's legitimate functionality, when accessed by an unauthorized caller, provides exactly the capabilities an attacker needs.
 
-## Attack Surface
+The five drivers in the KernelSight corpus illustrate the range of capabilities that security drivers intentionally expose:
 
-- **Kernel callback registration**: Security drivers register callbacks for process/thread creation, object access, and image load. Attackers abuse these to manipulate or remove callbacks.
-- **IOCTL process control**: IOCTLs that can terminate processes, modify process memory, or query process information — intended for security management but abusable
-- **Code execution primitives**: Some drivers (Capcom.sys) intentionally disable SMEP and execute user-supplied function pointers in ring 0
-- **Callback removal**: Drivers that expose IOCTLs to enumerate and remove kernel notification callbacks, blinding EDR products
-- **Handle manipulation**: Opening handles to protected processes with full access rights, bypassing object callback protections
+Capcom.sys disables SMEP and jumps to a user-mode function pointer in ring 0, giving the caller arbitrary kernel code execution. echo_driver.sys enumerates and removes kernel notification callbacks, blinding EDR products that depend on those callbacks for visibility. viragt64.sys terminates arbitrary processes by PID, allowing ransomware to kill antivirus before encrypting files. Truesight.sys duplicates handles to protected processes and terminates them, bypassing PPL (Protected Process Light) protections that are supposed to prevent exactly this. amsdk.sys terminates security product processes with insufficient access control on the termination IOCTL.
 
-## Common Vulnerability Patterns
+Each of these capabilities exists because the security product needs it. An anti-cheat driver needs to inspect process memory. An anti-rootkit needs to examine kernel callbacks. An antivirus driver needs to terminate malicious processes. The problem is not that these capabilities exist, but that the access control on the IOCTLs that expose them is insufficient to prevent abuse by unauthorized callers.
+
+## Architecture and Attack Surface
+
+Third-party security drivers are typically WDM or minifilter drivers that register kernel callbacks through `PsSetCreateProcessNotifyRoutine`, `ObRegisterCallbacks`, and `CmRegisterCallback`. They create device objects with IOCTL interfaces for management, and they interact directly with security-sensitive kernel objects.
+
+``` mermaid
+graph TD
+    A["Attacker Process"] -->|"DeviceIoControl"| B["Security Driver<br/>Legitimately Signed"]
+    B -->|"Process Term"| C["ZwTerminateProcess<br/>Kill AV/EDR"]
+    B -->|"Callback Removal"| D["PspNotifyRoutines<br/>Blind EDR"]
+    B -->|"Handle Dup"| E["ObOpenObjectByPointer<br/>Bypass PPL"]
+    B -->|"Ring-0 Exec"| F["User Function Ptr<br/>Kernel Code Exec"]
+
+    style A fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+    style B fill:#152a4a,stroke:#ef4444,color:#e2e8f0
+    style C fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+    style D fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+    style E fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+    style F fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+```
+
+The attack surfaces cluster into four categories, each representing a different security product capability being repurposed.
+
+**Ring-0 code execution** (Capcom.sys) is the most extreme case. The driver's IOCTL handler takes a user-mode function pointer, disables SMEP (Supervisor Mode Execution Prevention) by clearing the corresponding bit in CR4, and calls the function pointer from ring 0. After the function returns, SMEP is re-enabled. This gives the attacker unrestricted kernel code execution through a single IOCTL call. tandasat and FuzzySecurity documented the exploitation; Capcom.sys became one of the most famous BYOVD examples in the security community.
+
+**Process termination** (viragt64.sys, amsdk.sys) is the most operationally useful capability for ransomware actors. Both drivers expose IOCTLs that accept a process ID and terminate the corresponding process using kernel-level termination functions that bypass user-mode protections. Trend Micro documented Kasseika ransomware using viragt64.sys to terminate AV/EDR processes before beginning encryption. Check Point documented Silver Fox APT using amsdk.sys for the same purpose. The "vulnerability" in both cases is insufficient access control: the IOCTL should verify that the caller is the legitimate security management application, but it does not.
+
+**Callback manipulation** (echo_driver.sys) targets the kernel notification system that EDR products depend on. Windows provides kernel callbacks for process creation, thread creation, image load, and registry operations. EDR products register callbacks through `PsSetCreateProcessNotifyRoutine` and similar APIs to gain visibility into system activity. echo_driver.sys exposes an IOCTL that enumerates the internal callback array (`PspNotifyRoutines`) and allows removing individual entries. kite03's GitHub PoC demonstrates the technique: by removing all process creation callbacks, the attacker blinds every EDR product on the system in a single operation.
+
+**Handle elevation** (Truesight.sys) targets Protected Process Light (PPL), a security mechanism that prevents even administrator-level processes from opening handles to certain protected processes (like antimalware services). Truesight.sys, as an anti-rootkit tool, legitimately needs to examine protected processes. It exposes IOCTLs that duplicate handles to protected processes with full access rights, bypassing the PPL protection. Check Point Research documented attackers repurposing this capability to obtain handles to PPL-protected processes, enabling them to read memory, inject code, or terminate the process. The driver's anti-rootkit capabilities were repurposed against defenders.
+
+## Vulnerability Patterns and Detection
 
 | Pattern | Description | AutoPiff Rules |
 |---------|-------------|----------------|
@@ -34,39 +63,24 @@ Anti-virus, EDR, anti-rootkit, and anti-cheat kernel modules — abused for proc
 
 | CVE | Driver | Description | Class | ITW |
 |-----|--------|-------------|-------|-----|
-| [Capcom.sys](../case-studies/Capcom-sys.md) | `Capcom.sys` | Capcom anti-cheat — ring-0 code exec, SMEP bypass | Logic Bug | Yes |
-| [echo_driver.sys](../case-studies/echo-driver-sys.md) | `echo_driver.sys` | Echo AC — kernel callback manipulation | Logic Bug | No |
-| [viragt64.sys](../case-studies/viragt64-sys.md) | `viragt64.sys` | TG Soft VirIT — process termination via IOCTL | Logic Bug | Yes |
-| [Truesight.sys](../case-studies/Truesight-sys.md) | `Truesight.sys` | RogueKiller — EDR bypass | Logic Bug | Yes |
-| [amsdk.sys](../case-studies/amsdk-sys.md) | `amsdk.sys` | WatchDog — process termination | Logic Bug | Yes |
+| [Capcom.sys](../case-studies/Capcom-sys.md) | `Capcom.sys` | Capcom anti-cheat, ring-0 code exec, SMEP bypass | Logic Bug | Yes |
+| [echo_driver.sys](../case-studies/echo-driver-sys.md) | `echo_driver.sys` | Echo AC, kernel callback manipulation | Logic Bug | No |
+| [viragt64.sys](../case-studies/viragt64-sys.md) | `viragt64.sys` | TG Soft VirIT, process termination via IOCTL | Logic Bug | Yes |
+| [Truesight.sys](../case-studies/Truesight-sys.md) | `Truesight.sys` | RogueKiller, EDR bypass | Logic Bug | Yes |
+| [amsdk.sys](../case-studies/amsdk-sys.md) | `amsdk.sys` | WatchDog, process termination | Logic Bug | Yes |
 
-## Key Drivers
+Four of five are confirmed exploited in the wild. All five are logic bugs, not memory corruption vulnerabilities. This is the signature of the third-party security driver category: the bugs are design-level issues, not implementation errors.
 
-### Capcom.sys (Capcom)
-- **Role**: Anti-cheat protection driver for Capcom game titles
-- **Attack vector**: Disables SMEP and jumps to a user-mode function pointer in ring 0
-- **Note**: tandasat and FuzzySecurity documented the exploitation; one of the most famous BYOVD examples. The driver was designed to execute user code in kernel mode for anti-cheat checks.
+## The BYOVD Threat Model
 
-### echo_driver.sys (Echo AC)
-- **Role**: Echo anti-cheat kernel driver
-- **Attack vector**: IOCTL allows enumerating and removing kernel notification callbacks
-- **Note**: kite03 GitHub PoC demonstrates callback removal to blind EDR products
+Third-party security drivers represent a specific evolution of the BYOVD threat. While [vendor utility drivers](vendor-utility.md) provide generic hardware access (physical memory, MSR, I/O ports), security drivers provide *tactical* capabilities: kill AV, blind EDR, bypass PPL, execute kernel code. An attacker who loads a vendor utility driver needs to build their own exploitation logic on top of the primitive. An attacker who loads Truesight.sys or viragt64.sys gets a ready-made tool for the specific operational step they need.
 
-### viragt64.sys (TG Soft VirIT)
-- **Role**: TG Soft VirIT antivirus kernel driver
-- **Attack vector**: IOCTL allows terminating arbitrary processes by PID
-- **Note**: Trend Micro documented abuse by Kasseika ransomware to terminate AV/EDR processes before encryption
+This distinction matters for defense. Microsoft's Vulnerable Driver Blocklist blocks known driver hashes, but the blocklist is reactive: it requires each driver to be identified, analyzed, and added. The LOLDrivers project catalogs known-abusable drivers, but the pipeline from discovery to blocklist entry takes time. And because these drivers are legitimately signed by their developers (Adlice, TG Soft, WatchDog Development, Capcom), the signing certificate is valid, and the driver passes signature verification even when it is loaded by an attacker.
 
-### Truesight.sys (RogueKiller)
-- **Role**: Adlice RogueKiller anti-rootkit kernel driver
-- **Attack vector**: IOCTLs expose process handle duplication and termination capabilities
-- **Note**: Check Point Research 2025 documented abuse for EDR bypass; driver's anti-rootkit capabilities repurposed against defenders
+## Research Outlook
 
-### amsdk.sys (WatchDog)
-- **Role**: WatchDog Development security product kernel driver
-- **Attack vector**: Process termination IOCTL with insufficient access control
-- **Note**: Check Point documented Silver Fox APT using this driver to terminate security products
+The supply of third-party security drivers available for BYOVD abuse continues to grow. Every AV vendor, EDR product, anti-rootkit tool, and anti-cheat system installs a kernel driver, and many of these drivers expose process termination, callback management, or other security-sensitive operations through IOCTLs with inadequate access control.
 
-## Research Notes
+Researchers should audit security product drivers with a specific question: "What operations does this driver expose, and what happens if the caller is not the intended management application?" The answer frequently reveals capabilities that are directly useful for attackers, protected only by the assumption that the driver will only be loaded in the context of the legitimate security product.
 
-Third-party security drivers are designed to interact with security-sensitive kernel objects (process callbacks, object callbacks, image load notifications), and their legitimate functionality (process termination, callback management) is exactly what attackers need for EDR evasion. The "vulnerability" is often insufficient access control on IOCTLs, not a memory corruption bug. Anti-cheat drivers like Capcom.sys are the extreme case: intentional ring-0 code execution from user mode. PPL bypass is a key capability, as these drivers can often open handles to protected processes. Attackers increasingly target AV vendor drivers to kill security products before deploying malware.
+For Microsoft's built-in security enforcement drivers (appid.sys, ci.sys), which share the "logic bug" pattern but operate at a different privilege level, see [Security / Policy Drivers](security-policy.md). For the vendor utility drivers that provide generic hardware access primitives, see [Vendor Utility Drivers](vendor-utility.md).

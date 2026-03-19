@@ -8,7 +8,11 @@ description: "10 Windows kernel vulnerability classes — buffer overflow, use-a
   Driver Type &rarr; Attack Surface &rarr; <span class="ks-active">Vuln Class</span> &rarr; Primitive &rarr; Case Study
 </div>
 
-Once attacker-controlled input reaches the kernel through an attack surface, the question becomes: what goes wrong? Vulnerability classes describe the category of bug — the specific failure in validation, memory management, or concurrency control that enables memory corruption or privilege boundary violation.
+Every kernel exploit begins with a bug, and every bug belongs to a class. Once attacker-controlled input crosses the user/kernel boundary through an [attack surface](../attack-surfaces/), something has to go wrong inside the driver for that input to become dangerous. The vulnerability class describes *what* goes wrong: a size that is not checked, a pointer that outlives its object, a value that is read twice from memory the attacker controls. Understanding these classes is not just taxonomy for its own sake. It shapes how you read patches, where you focus during code review, and which AutoPiff rules you write.
+
+The landscape is not uniform. Some classes, like [buffer overflow](buffer-overflow.md) and [use-after-free](use-after-free.md), dominate the CVE record because they arise naturally from the way C code manages memory and because the Windows pool allocator makes them reliably exploitable. Others, like [logic bugs](logic-bugs.md), are rarer in CVE counts but disproportionately impactful when they appear, since they bypass memory safety mitigations entirely. [TOCTOU/double-fetch](toctou-double-fetch.md) bugs occupy a middle ground: they require a race to trigger, which sounds unreliable until you realize that modern multi-core processors make the race winnable on almost every attempt.
+
+The diagram below traces the path from initial trigger to exploitation primitive. A single trigger condition (say, an unchecked size field) can flow through different corruption types depending on context, and each corruption type yields a different primitive. This is why the same IOCTL handler bug might be classified as an integer overflow by one analyst and a buffer overflow by another; both are correct, because the integer overflow *causes* the buffer overflow. The classes are not mutually exclusive. They are lenses.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_004 — Bug to Primitive Flow</span>
@@ -66,6 +70,12 @@ Once attacker-controlled input reaches the kernel through an attack surface, the
   <p class="ks-figure-caption">Each trigger condition leads to a corruption type, which yields a specific exploitation primitive.</p>
 </div>
 
+## How to read this section
+
+Each vulnerability class page follows a consistent structure. It opens with the mechanics of how the bug class arises in real driver code, then walks through exploitation implications and the primitives an attacker gains. Detection strategies cover both manual approaches and AutoPiff rule references, so you can connect the theory to tooling immediately.
+
+The classes are ordered roughly by exploitation frequency in the Windows kernel CVE record, but they are deeply interconnected. An [integer overflow](integer-overflow.md) produces a buffer overflow. A [race condition](race-conditions.md) produces a use-after-free. A [TOCTOU](toctou-double-fetch.md) bypasses a bounds check and enables a pool overflow. Reading across classes, rather than treating each in isolation, is how you develop intuition for the patterns that actually appear in Patch Tuesday diffs.
+
 ## Categories
 
 | Class | Description | Typical Primitive | Key CVEs |
@@ -80,6 +90,12 @@ Once attacker-controlled input reaches the kernel through an attack surface, the
 | [Arbitrary R/W Primitives](arbitrary-rw-primitives.md) | Patterns yielding arb R/W | [Direct IOCTL R/W](../primitives/arw/direct-ioctl-rw.md) | CVE-2024-21338, CVE-2023-21768 |
 | [NULL Deref](null-deref.md) | NULL pointer dereference | DoS (BSOD), legacy code exec | CVE-2024-35250 |
 | [Logic Bugs](logic-bugs.md) | Design-level logic errors | Direct privilege escalation | CVE-2024-26229, CVE-2024-21302 |
+
+## The interplay between classes
+
+One of the most important things to internalize is that vulnerability classes rarely exist in isolation during real exploitation. A typical Patch Tuesday CVE might involve an integer overflow that causes an undersized pool allocation, which leads to a heap buffer overflow, which corrupts an adjacent object's function pointer. That is three vulnerability classes collaborating in a single exploit chain. The [case studies](../case-studies/) section traces these chains in detail, showing how a trigger in one class flows through to a primitive via another.
+
+Similarly, the boundary between [race conditions](race-conditions.md) and [use-after-free](use-after-free.md) is porous. Many UAF bugs are caused by races, and the race condition page covers the concurrency mechanics while the UAF page covers the memory reclamation exploitation. Reading both gives you the complete picture.
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../primitives/">Primitives</a> &rarr; How is the corruption converted into a reliable exploitation capability?

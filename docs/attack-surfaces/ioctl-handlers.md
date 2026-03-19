@@ -1,49 +1,145 @@
 # IOCTL Handlers
 
-Device I/O control request handlers are the primary user-to-kernel communication interface for Windows drivers, and the single most exploited kernel attack surface.
+Every Windows kernel exploit needs a way in. For local privilege escalation, the way in is almost always an IOCTL. The `DeviceIoControl` API is callable from any process, including sandboxed ones and low-integrity contexts. It sends a request directly from user mode into a kernel driver's dispatch routine, carrying attacker-controlled input buffers of attacker-specified sizes. No other kernel entry point combines this level of accessibility with this much attacker control over the data that reaches kernel code.
 
-## Attack Surface Overview
+A single driver might handle dozens of distinct IOCTL codes, each taking a different input structure and exercising a different code path. Every one of those code paths must independently validate buffer sizes, probe user-mode pointers, check access permissions, and handle concurrent requests safely. One missing check on one code path in one driver is enough for a local privilege escalation. This is why IOCTL handlers account for more kernel CVEs than any other attack surface category.
 
-- **Entry point**: The driver's `IRP_MJ_DEVICE_CONTROL` dispatch routine, registered in the `DriverObject->MajorFunction` table
-- **User-mode trigger**: Any process calls `DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, ...)`
-- **Buffering methods**: The IOCTL code's two low bits select the transfer method -- `METHOD_BUFFERED` (I/O Manager copies both buffers via `Irp->AssociatedIrp.SystemBuffer`), `METHOD_IN_DIRECT` / `METHOD_OUT_DIRECT` (input copied, output MDL-mapped via `Irp->MdlAddress`), and `METHOD_NEITHER` (raw user pointers in `IrpSp->Parameters.DeviceIoControl.Type3InputBuffer` and `Irp->UserBuffer`)
-- **IOCTL code encoding**: The 32-bit control code encodes device type (bits 16-31), required access (bits 14-15), function number (bits 2-13), and transfer method (bits 0-1), defined via the `CTL_CODE` macro
-- **Access control**: Device objects may restrict handle creation via `FILE_DEVICE_SECURE_OPEN`, security descriptors, or namespace ACLs -- but many drivers leave devices world-accessible
-- **Key risk**: `METHOD_NEITHER` passes raw user-mode pointers directly to the kernel driver without any buffering or probing by the I/O Manager
+## How IOCTL dispatch actually works
 
-## Mechanism Deep-Dive
+To find bugs in IOCTL handlers, you need to understand the full path a request takes from user mode to driver code.
 
-When a user-mode process calls `DeviceIoControl`, the I/O Manager constructs an `IRP` with major function code `IRP_MJ_DEVICE_CONTROL` and dispatches it to the driver's registered handler. The IOCTL code itself is a 32-bit value encoding the device type, access requirements, function number, and transfer method. The driver typically implements a `switch` statement over the IOCTL code to route each request to the appropriate handler logic.
+``` mermaid
+graph TD
+    A["User Process\nDeviceIoControl()"] --> B["I/O Manager\nBuild IRP"]
+    B --> C{"Transfer\nMethod?"}
+    C -->|METHOD_BUFFERED| D["Allocate kernel buffer\nCopy input in\nIrp→AssociatedIrp.SystemBuffer"]
+    C -->|METHOD_DIRECT| E["Copy input\nMDL-map output\nIrp→MdlAddress"]
+    C -->|METHOD_NEITHER| F["Pass raw user ptrs\nType3InputBuffer\n⚠ No probing"]
+    D --> G["Driver Dispatch\nswitch(IoControlCode)"]
+    E --> G
+    F --> G
+    G --> H["Per-IOCTL Handler\n(must validate sizes,\nprobe pointers)"]
+    style F fill:#2d1b1b,stroke:#ef4444,color:#e2e8f0
+    style H fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+```
 
-For `METHOD_BUFFERED` transfers, the I/O Manager allocates a kernel buffer large enough for the larger of the input and output buffers, copies the user input into it, and after the driver completes the IRP, copies the result back to user space. This provides inherent isolation but the driver must still validate that the buffer sizes are sufficient for the expected structure. For `METHOD_IN_DIRECT` and `METHOD_OUT_DIRECT`, the output buffer is described by an MDL that the I/O Manager probes and locks, giving the driver direct access to the user pages. `METHOD_NEITHER` provides no buffering at all -- the driver receives raw user-mode pointers and is entirely responsible for probing and capturing the data safely.
+Here is what happens when a process calls `DeviceIoControl`:
 
-IOCTL vulnerabilities combine direct user reachability with a wide variety of control codes per driver. A driver like `ks.sys` handles dozens of distinct control codes across multiple device types, and each code path must independently validate buffer sizes, pointer alignment, and access permissions. A single missing check on one code path is sufficient for local privilege escalation. The `DeviceIoControl` API is callable from sandboxed processes and low-privilege contexts, so IOCTL bugs are often used for sandbox escapes and local privilege escalation chains.
+1. The process calls `DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, ...)`.
+2. The I/O Manager constructs an IRP with major function code `IRP_MJ_DEVICE_CONTROL`.
+3. The IOCTL code itself is a 32-bit value encoding four fields via the `CTL_CODE` macro:
 
-The access control model for device objects adds another dimension. When a driver calls `IoCreateDevice` or `IoCreateDeviceSecure`, it may specify a security descriptor limiting which users can open handles. However, if the driver does not set `FILE_DEVICE_SECURE_OPEN`, the I/O Manager only checks the security descriptor on the device namespace root, not on individual opens to named paths under the device. This means a driver that exposes a device at `\\Device\\MyDriver` without `FILE_DEVICE_SECURE_OPEN` may allow unprivileged processes to open `\\Device\\MyDriver\AnySubPath` and reach the IOCTL handler.
+```c
+// CTL_CODE layout (32-bit IOCTL code)
+// Bits 31-16: Device type (e.g., FILE_DEVICE_UNKNOWN = 0x22)
+// Bits 15-14: Required access (FILE_ANY_ACCESS, FILE_READ_ACCESS, FILE_WRITE_ACCESS)
+// Bits 13-2:  Function number (driver-defined)
+// Bits 1-0:   Transfer method (METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER)
+```
 
-## Common Vulnerability Patterns
+4. Based on the transfer method encoded in bits 0-1, the I/O Manager sets up the buffers differently (more on this below).
+5. The IRP is dispatched to the driver's registered `IRP_MJ_DEVICE_CONTROL` handler from the `DriverObject->MajorFunction` table.
+6. The driver typically implements a switch statement over the IOCTL code to route each request:
 
-- **Missing input/output buffer length validation**: The driver casts `SystemBuffer` to a structure pointer without verifying `InputBufferLength >= sizeof(EXPECTED_STRUCT)`, leading to out-of-bounds reads or writes from uninitialized pool memory
-- **`METHOD_NEITHER` without probing**: Driver dereferences `Type3InputBuffer` directly without calling `ProbeForRead` / `ProbeForWrite` inside a `__try/__except` block, allowing user-mode to pass kernel addresses
-- **Switch statement missing default case**: The IOCTL dispatch `switch` lacks a default handler, causing fall-through into unintended code paths or returning `STATUS_SUCCESS` without processing
-- **Type confusion**: The IOCTL buffer is cast to different structure types depending on a field within the buffer itself, but the size validation only checks against the smallest variant
-- **Double-fetch from `METHOD_NEITHER` buffers**: The driver reads a length field, validates it, then re-reads it from the same user-mode address -- a concurrent thread can modify the value between the two reads
-- **Insufficient device object ACL**: The driver creates a device object without `FILE_DEVICE_SECURE_OPEN` or with a permissive SDDL string, allowing unprivileged processes to open handles
-- **Shared dispatch across device objects**: A single IOCTL handler serves multiple device objects with different trust levels, but does not check which device the IRP targets
-- **Integer overflow in size arithmetic**: The driver adds a user-supplied count to a base size for allocation, and the addition wraps around 32-bit integer bounds, resulting in an undersized allocation followed by an oversized copy
-- **Output buffer information leak**: The driver writes a structure to the output buffer without first zeroing it, leaking uninitialized kernel pool data (including kernel pointers) to user mode
+```c
+NTSTATUS DispatchDeviceControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(Irp);
+    ULONG ioctl = irpSp->Parameters.DeviceIoControl.IoControlCode;
+    ULONG inLen = irpSp->Parameters.DeviceIoControl.InputBufferLength;
+    ULONG outLen = irpSp->Parameters.DeviceIoControl.OutputBufferLength;
 
-## Driver Examples
+    switch (ioctl) {
+        case IOCTL_DO_THING:
+            // Handler for this specific control code
+            // Must validate inLen, outLen before touching buffers
+            break;
+        case IOCTL_DO_OTHER_THING:
+            // ...
+            break;
+        // Missing default case = potential fall-through bug
+    }
+    // ...
+}
+```
 
-Nearly every WDM and KMDF driver exposes IOCTL handlers. Frequently targeted drivers include `ks.sys` and `ksthunk.sys` (kernel streaming), `afd.sys` (ancillary function driver for Winsock), `csc.sys` (client-side caching), `appid.sys` (AppLocker), `win32kbase.sys` (GDI system calls), and virtually all third-party antivirus, EDR, and GPU drivers. Kernel streaming drivers handle complex media pipeline structures with deeply nested variable-length fields. Third-party drivers from antivirus vendors (Avast, ESET, Kaspersky), virtualization products (VMware, VirtualBox), and hardware peripheral companies frequently contain IOCTL vulnerabilities, as they typically receive less code review than Microsoft inbox drivers.
+This dispatch routine is where the driver's attack surface lives. Every `case` label is a separate entry point that must stand on its own in terms of validation and safety.
 
-## Detection Approach
+### The three buffering methods
 
-- **Static analysis**: Identify `IRP_MJ_DEVICE_CONTROL` handler registration in the `DriverEntry`, then trace the dispatch switch. For each IOCTL code, verify that `InputBufferLength` and `OutputBufferLength` are checked before any buffer dereference. Flag any `METHOD_NEITHER` code paths lacking `ProbeForRead`/`ProbeForWrite` with SEH.
-- **Fuzzing**: Tools such as `kAFL`, `IOCTL Fuzzer`, or custom `DeviceIoControl` harnesses can enumerate valid IOCTL codes (by scanning the dispatch switch) and fuzz input buffers with varying sizes. Coverage-guided fuzzing is effective because IOCTL handlers are typically self-contained functions.
-- **Dynamic analysis**: Monitor device object creation with `!devobj` in WinDbg, check security descriptors with `!sd`, and trace IOCTL dispatch with breakpoints on the handler to observe buffer access patterns.
-- **Device enumeration**: Use `NtQueryDirectoryObject` or the WinObj tool to enumerate all device objects in the `\\Device` namespace. Attempt to open each device from a low-privilege process to identify accessible attack surface.
-- **Patch diffing**: Compare consecutive driver versions to detect newly added size checks, probe calls, or ACL changes -- this is the core AutoPiff approach.
+The transfer method determines how the I/O Manager handles the user-mode buffers, and this distinction is critical for understanding where vulnerabilities arise.
+
+**METHOD_BUFFERED** is the safest option. The I/O Manager allocates a kernel buffer large enough for the larger of the input and output buffers, copies the user input into it before dispatch, and copies the result back to user space after the driver completes the IRP. The driver accesses both input and output through `Irp->AssociatedIrp.SystemBuffer`. The kernel buffer provides inherent isolation from user-mode manipulation, but the driver must still validate that `InputBufferLength` is large enough for the expected structure before casting and dereferencing.
+
+**METHOD_IN_DIRECT / METHOD_OUT_DIRECT** use a hybrid approach. The input buffer is copied into a system buffer (like METHOD_BUFFERED), but the output buffer is described by an MDL (Memory Descriptor List) that the I/O Manager probes and locks. The driver accesses the output through `Irp->MdlAddress`. This gives the driver direct access to the user's physical pages without the overhead of a copy, but the pages are locked and cannot be remapped during the operation.
+
+**METHOD_NEITHER** provides no buffering at all. The driver receives raw user-mode pointers: `IrpSp->Parameters.DeviceIoControl.Type3InputBuffer` for input and `Irp->UserBuffer` for output. The I/O Manager does nothing to validate, probe, or protect these pointers. The driver is entirely responsible for calling `ProbeForRead` / `ProbeForWrite` inside a `__try/__except` block before accessing the data. This is where the most dangerous IOCTL vulnerabilities live.
+
+## Where things go wrong
+
+IOCTL vulnerabilities cluster into three broad categories: input validation failures, access control gaps, and concurrency issues. Each category produces different bug patterns and requires different detection approaches.
+
+### Input validation failures
+
+The most common IOCTL vulnerability is also the simplest: the driver casts `SystemBuffer` to a structure pointer without first checking that `InputBufferLength` is at least `sizeof(EXPECTED_STRUCT)`. When the user provides a buffer smaller than expected, the cast succeeds (it is just a pointer reinterpretation), but any subsequent field access reads past the end of the allocated kernel buffer into uninitialized pool memory. Depending on the access pattern, this produces out-of-bounds reads (information disclosure), out-of-bounds writes (memory corruption), or both.
+
+Type confusion is a subtler variant. Some drivers multiplex a single IOCTL code for multiple operations, using a field within the input buffer to select the operation type. The buffer is then cast to different structure types depending on this selector. If the size validation checks against the smallest variant but the selected operation expects the largest, the driver reads beyond the buffer boundary. CVE-2024-35250 in `ks.sys` shows how this plays out in a real driver: an untrusted pointer dereference in the IOCTL dispatch led to a Pwn2Own win.
+
+Integer overflow in size arithmetic is another classic. The driver reads a count field from the user buffer, multiplies it by an element size, and adds a header size to compute an allocation length. If the multiplication or addition wraps around 32-bit integer bounds, the result is a small allocation followed by a large copy, producing a heap overflow. CVE-2024-38054 in `ksthunk.sys` (kernel streaming thunk layer) demonstrated exactly this pattern with `KSSTREAM_HEADER` thunking.
+
+Output buffer information leaks round out this category. When a driver writes a structure to the output buffer without first zeroing it, the padding bytes and alignment gaps contain whatever was previously in that kernel pool memory. This can include kernel pointers (defeating KASLR), fragments of other processes' data, or cryptographic material. These leaks are often treated as low-severity individually, but they are critical enablers for exploitation chains that need a kernel base address.
+
+### The METHOD_NEITHER problem
+
+`METHOD_NEITHER` deserves its own discussion because it is responsible for a disproportionate share of critical IOCTL vulnerabilities. When a driver uses this transfer method, the I/O Manager hands it raw user-mode pointers with no validation whatsoever. The driver must call `ProbeForRead` or `ProbeForWrite` to verify that the pointer actually points to user-mode memory (not kernel memory), and it must do so inside a `__try/__except` block because the user can free or remap the memory at any time.
+
+Drivers that skip the probe allow a devastating attack: the user passes a kernel-mode address as the "buffer," and the driver reads from or writes to arbitrary kernel memory. This is an instant read-what-where or write-what-where primitive with no additional exploitation needed.
+
+Even drivers that probe correctly face a second hazard: double-fetch. The driver reads a length field from the user buffer, validates it, and then reads the same field again to use it. Between the two reads, a concurrent thread modifies the value. The kernel validated length 100 but copies length 10,000. The same technique surfaces in CVE-2024-30088, where `AuthzBasepCopyoutInternalSecurityAttributes` in ntoskrnl validated a user-mode buffer address and then re-read it after a concurrent thread remapped the address range.
+
+The correct pattern for METHOD_NEITHER handling is to probe the user buffer, capture its contents into a kernel-allocated copy in a single read, and then work exclusively with the kernel copy. Any code path that touches the user buffer more than once is a potential TOCTOU vulnerability.
+
+### Access control gaps
+
+The vulnerability might not be in the handler logic at all, but in who can reach it. When a driver calls `IoCreateDevice`, it can specify a security descriptor limiting which users can open handles to the device object. However, if the driver does not set `FILE_DEVICE_SECURE_OPEN`, the I/O Manager only checks the security descriptor on the device namespace root, not on individual opens to named paths under the device. An unprivileged process can potentially open `\\Device\\MyDriver\anything` and reach the IOCTL handler.
+
+CVE-2024-21338 in `appid.sys` (the AppLocker driver) is the canonical example. The driver exposed IOCTL `0x22A018` without adequate access control, giving any process the ability to trigger kernel read/write operations. The Lazarus Group exploited this in the wild for months before the patch.
+
+A related pattern occurs when a single IOCTL dispatch routine serves multiple device objects with different trust levels. If the handler does not check which device object the IRP targets, a request to the low-privilege device can exercise code paths intended only for the high-privilege one. CVE-2024-26229 in `csc.sys` (Client-Side Caching) demonstrated a missing access check enabling elevation of privilege through this exact pattern.
+
+### Concurrency issues
+
+IOCTL handlers that maintain state across calls, or that share state with other dispatch routines, must handle concurrent requests safely. Two threads sending IOCTLs to the same device simultaneously can race on shared data structures. If the handler reads and modifies a global or device-extension field without locking, the result is a classic TOCTOU or data race. This is less common than input validation bugs but produces high-severity vulnerabilities when it occurs, because race conditions in kernel code often lead to use-after-free or double-free conditions.
+
+## Third-party drivers: the intentional exposure problem
+
+The vulnerability patterns above describe *bugs*: unintentional failures in validation or access control. Third-party vendor utility drivers present a fundamentally different problem. These drivers intentionally expose privileged operations through IOCTLs as part of their design. Physical memory read/write, MSR access, I/O port operations: capabilities that should never be accessible from user mode are wrapped in IOCTLs with minimal or no access control.
+
+These drivers are not buggy; they are architecturally insecure. They exist because hardware vendors needed a way for their user-mode utilities to talk to hardware, and writing a WDM driver with unrestricted IOCTLs was the path of least resistance. Attackers (including nation-state groups) use them as "bring your own vulnerable driver" (BYOVD) tools, loading a signed driver with known dangerous IOCTLs to gain kernel read/write primitives without needing an actual exploit.
+
+| Driver | Vendor | IOCTLs Exposed | Case Study |
+|--------|--------|---------------|------------|
+| `DBUtil_2_3.sys` | Dell | Physical/virtual memory R/W, MSR R/W | [CVE-2021-21551](../case-studies/CVE-2021-21551.md) |
+| `RTCore64.sys` | MSI | Physical memory R/W, MSR, I/O port | [CVE-2019-16098](../case-studies/CVE-2019-16098.md) |
+| `gdrv.sys` | Gigabyte | Kernel memory R/W, MSR | [CVE-2018-19320](../case-studies/CVE-2018-19320.md) |
+| `iqvw64e.sys` | Intel | Physical/virtual memory R/W | [CVE-2015-2291](../case-studies/CVE-2015-2291.md) |
+| `HW.sys` | Marvin Test | Physical memory R/W, I/O port | [CVE-2020-15368](../case-studies/CVE-2020-15368.md) |
+| `AMDRyzenMasterDriver.sys` | AMD | Physical memory R/W | [CVE-2020-12928](../case-studies/CVE-2020-12928.md) |
+| `Capcom.sys` | Capcom | Ring-0 code execution | [Capcom.sys](../case-studies/Capcom-sys.md) |
+
+See [Vendor Utility Drivers](../driver-types/vendor-utility.md) for the full category overview.
+
+## Detection approaches
+
+**Static analysis** is the most systematic approach for auditing IOCTL handlers. Start by identifying the `IRP_MJ_DEVICE_CONTROL` handler registration in `DriverEntry`, then trace the dispatch switch. For each IOCTL code, verify that `InputBufferLength` and `OutputBufferLength` are checked before any buffer dereference. Flag any `METHOD_NEITHER` code paths that lack `ProbeForRead`/`ProbeForWrite` calls wrapped in SEH. Automated tools can enumerate the IOCTL codes handled by scanning the switch statement's comparison values, producing a map of the driver's attack surface.
+
+**Fuzzing** is highly effective for IOCTL handlers because they are typically self-contained functions with well-defined input boundaries. Tools like `kAFL`, `IOCTL Fuzzer`, or custom `DeviceIoControl` harnesses enumerate valid IOCTL codes (by scanning the dispatch switch in the binary) and fuzz input buffers with varying sizes, types, and content. Coverage-guided fuzzing finds the subtle bugs that static analysis misses, particularly in deeply nested parsing logic.
+
+**Dynamic analysis** with WinDbg provides ground truth. Monitor device object creation with `!devobj`, inspect security descriptors with `!sd`, and set breakpoints on the IOCTL handler to observe buffer access patterns. Watching what the driver actually does with the buffer (particularly whether it probes METHOD_NEITHER pointers) reveals vulnerabilities that source-level analysis might miss due to macro expansion or inline function complexity.
+
+**Device enumeration** from a low-privilege process maps the accessible attack surface. Using `NtQueryDirectoryObject` or WinObj to enumerate all device objects in the `\\Device` namespace, then attempting to open each device, identifies which drivers are reachable without elevation. This is the first step in any local privilege escalation audit.
+
+**Patch diffing** through AutoPiff closes the loop. Comparing consecutive driver versions reveals newly added size checks, probe calls, or ACL changes, pinpointing exactly which IOCTL code path was vulnerable and what the fix looks like. This is often faster than auditing from scratch, and it confirms that a vulnerability existed in the previous version.
 
 ## Related CVEs
 
@@ -60,25 +156,11 @@ Nearly every WDM and KMDF driver exposes IOCTL handlers. Frequently targeted dri
 
 AutoPiff detects IOCTL hardening patches with these rules:
 
-- `ioctl_input_size_validation_added` -- Input or output buffer size validation added for a specific IOCTL code
-- `method_neither_probe_added` -- `ProbeForRead` or `ProbeForWrite` call added for `METHOD_NEITHER` buffer access
-- `ioctl_code_default_case_added` -- Default case added to the IOCTL dispatch switch statement
-- `device_acl_hardening` -- Device object security descriptor or ACL hardened
-- `new_ioctl_handler` -- New IOCTL handler function detected (attack surface expansion rule)
-- `ioctl_output_buffer_zeroed` -- Output buffer zeroed before use to prevent kernel information disclosure
+- `ioctl_input_size_validation_added` flags input or output buffer size validation added for a specific IOCTL code
+- `method_neither_probe_added` flags `ProbeForRead` or `ProbeForWrite` calls added for `METHOD_NEITHER` buffer access
+- `ioctl_code_default_case_added` flags a default case added to the IOCTL dispatch switch statement
+- `device_acl_hardening` flags device object security descriptor or ACL hardening
+- `new_ioctl_handler` flags new IOCTL handler functions (an attack surface expansion rule, useful for tracking growing attack surface between versions)
+- `ioctl_output_buffer_zeroed` flags output buffer zeroing before use to prevent kernel information disclosure
 
-### Third-Party IOCTL Examples
-
-Third-party vendor utility drivers are among the most exploited IOCTL-based attack surfaces. Unlike Microsoft inbox drivers where the vulnerability is a missing check, these drivers intentionally expose privileged IOCTLs:
-
-| Driver | Vendor | IOCTLs Exposed | Case Study |
-|--------|--------|---------------|------------|
-| `DBUtil_2_3.sys` | Dell | Physical/virtual memory R/W, MSR R/W | [CVE-2021-21551](../case-studies/CVE-2021-21551.md) |
-| `RTCore64.sys` | MSI | Physical memory R/W, MSR, I/O port | [CVE-2019-16098](../case-studies/CVE-2019-16098.md) |
-| `gdrv.sys` | Gigabyte | Kernel memory R/W, MSR | [CVE-2018-19320](../case-studies/CVE-2018-19320.md) |
-| `iqvw64e.sys` | Intel | Physical/virtual memory R/W | [CVE-2015-2291](../case-studies/CVE-2015-2291.md) |
-| `HW.sys` | Marvin Test | Physical memory R/W, I/O port | [CVE-2020-15368](../case-studies/CVE-2020-15368.md) |
-| `AMDRyzenMasterDriver.sys` | AMD | Physical memory R/W | [CVE-2020-12928](../case-studies/CVE-2020-12928.md) |
-| `Capcom.sys` | Capcom | Ring-0 code execution | [Capcom.sys](../case-studies/Capcom-sys.md) |
-
-See [Vendor Utility Drivers](../driver-types/vendor-utility.md) for the full category overview.
+The IOCTL attack surface is the starting point for most kernel exploitation research. But finding a vulnerable IOCTL is only half the work. The next question is what primitive the bug gives you, and how to turn that primitive into a reliable exploit. That journey typically leads to [pool spray](../primitives/exploitation/pool-spray-feng-shui.md) for memory corruption bugs, or [token manipulation](../primitives/arw/token-manipulation.md) for arbitrary read/write primitives.

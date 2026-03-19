@@ -1,65 +1,46 @@
 # KASLR
 
-Kernel Address Space Layout Randomization randomizes the base addresses of the kernel image, HAL, drivers, and pool regions to prevent exploitation using hardcoded addresses.
+Nearly every kernel exploit begins the same way: the attacker needs to know where something is. A token to swap, an EPROCESS to read, a function to call. Kernel Address Space Layout Randomization makes those addresses unpredictable by randomizing the base addresses of the kernel image, HAL, drivers, and pool regions on every boot. Without KASLR, kernel exploitation is dramatically simpler. With it, the attacker must first solve an information disclosure problem before they can use whatever corruption primitive they hold.
 
-## Overview
+This makes KASLR the most frequently bypassed mitigation in the corpus. It appears as a prerequisite step in virtually every exploit chain documented in the [case studies](../case-studies/index.md), and the techniques for defeating it have evolved from simple API calls to security descriptor corruption and hardware side-channels.
 
-Microsoft introduced basic kernel address randomization in Windows Vista and has improved it across subsequent releases. KASLR forces exploits to obtain a kernel address leak first, because kernel image base addresses, driver load addresses, pool regions, and kernel stack addresses all vary between boots. Windows 8 improved entropy and randomized driver load order. Windows 10 progressively restricted the APIs that could leak kernel addresses (particularly `NtQuerySystemInformation`), and Windows 11 22H2/24H2 added further entropy and restricted additional information disclosure vectors.
+## How It Works
 
-Nearly every kernel exploit requires defeating KASLR as a prerequisite, making information disclosure vulnerabilities (or KASLR bypass techniques) a necessary component of exploit chains.
+Microsoft introduced basic kernel address randomization in Windows Vista and has improved it across each subsequent release. The randomization operates at several levels, each adding a layer of uncertainty for the attacker.
 
-## Mechanism
+**Kernel image base randomization** is the foundational mechanism. On each boot, `ntoskrnl.exe` is loaded at one of approximately 256 possible base addresses on x64 systems, providing 8 bits of entropy within a 32MB range. The HAL (`hal.dll`) is loaded at a randomized address adjacent to the kernel image. The Windows Boot Manager (bootmgr) performs this randomization during the boot process, before the kernel begins execution, so the selected base address is fixed for the lifetime of the boot session.
 
-**Kernel Image Base Randomization:**
+**Driver load address randomization** was strengthened starting with Windows 10. Boot-start and system-start drivers are loaded at randomized addresses, and the load order itself is shuffled where dependency constraints permit. This means drivers are no longer at predictable offsets relative to the kernel base, forcing the attacker to leak each driver's address independently or compute offsets from a known module base.
 
-- On each boot, `ntoskrnl.exe` is loaded at one of approximately 256 possible base addresses on x64 systems (8 bits of entropy), selected from a 32MB range.
-- The HAL (`hal.dll`) is loaded at a randomized address adjacent to the kernel image.
-- The randomization is performed by the Windows Boot Manager (bootmgr) during the boot process, before the kernel begins execution.
+**Pool and stack randomization** adds entropy to the data side. Kernel pool regions (paged and non-paged) are allocated at randomized virtual addresses. Kernel-mode thread stacks have randomized base addresses and include stack cookies for overflow detection. The initial stack pointer offset within a stack page is also randomized, though with limited entropy.
 
-**Driver Load Address Randomization:**
+**API restrictions** represent Microsoft's progressive effort to close the software-based information disclosure paths. Before Windows 10 20H1, `NtQuerySystemInformation` with `SystemModuleInformation` returned kernel module load addresses to any process at any integrity level. This was the easiest KASLR bypass for years. Windows 10 20H1 restricted these queries to Medium integrity level and above, blocking sandboxed (Low IL) processes. Subsequent releases tightened `SystemExtendedHandleInformation` (which leaked kernel object addresses through the handle table), `SystemBigPoolInformation` (which exposed large pool allocation addresses), and ETW providers that logged kernel pointers in event data. Windows 11 24H2 expanded the randomization range for the kernel image and restricted `EnumDeviceDrivers` for non-elevated callers.
 
-- Starting with Windows 10, the load order and base addresses of boot-start and system-start drivers are randomized.
-- Drivers are no longer loaded at predictable addresses relative to the kernel base.
-- The driver load order itself is shuffled where dependencies permit.
+Despite this progressive hardening, the restrictions have never been total. `NtQuerySystemInformation` still returns some kernel information to Medium IL processes, because fully restricting it would break too many applications. This compromise is the root of the ongoing cat-and-mouse game between Microsoft's API hardening and attacker techniques for regaining access to the restricted data.
 
-**Pool and Stack Randomization:**
+## What KASLR Blocks
 
-- Kernel pool regions (paged and non-paged) are allocated at randomized virtual addresses.
-- Kernel-mode thread stacks have randomized base addresses and include stack cookies for overflow detection.
-- The initial stack pointer offset within a stack page is randomized (limited entropy).
+Without KASLR, an attacker with a write-what-where primitive can immediately target known-good addresses for kernel functions, ROP gadgets, EPROCESS structures, and token objects. KASLR forces the attacker to solve four problems before the write becomes useful.
 
-**API Restrictions (Progressive):**
+First, hardcoded kernel address exploitation fails because addresses change each boot. An exploit compiled to write to a fixed offset from `ntoskrnl.exe` base will crash on any system where the base differs. Second, static ROP gadget addresses are unusable because the gadget locations depend on the kernel base. Third, even with a relative offset from the kernel base to a target structure, the absolute address is unknown without an information leak. Fourth, mapping shellcode at a known kernel address (for example, via pool spray) requires knowing where the pool regions start, and those are randomized too.
 
-- Windows 10 20H1: `NtQuerySystemInformation` with `SystemModuleInformation` class restricted to processes running at Medium Integrity Level or above (blocks Low IL sandboxed processes).
-- Windows 10 21H2+: Additional restrictions on `SystemExtendedHandleInformation`, which previously leaked kernel object addresses.
-- Windows 11: `SystemBigPoolInformation` restrictions, ETW-based leak mitigations.
+The net effect is that KASLR converts every write primitive into a two-step problem: first leak an address, then use it. This is why information disclosure vulnerabilities and KASLR bypass techniques appear as a mandatory stage in almost every [exploit chain pattern](../guides/exploit-chain-patterns.md).
 
-**Additional Entropy (22H2/24H2):**
+## How Attackers Defeat It
 
-- Windows 11 22H2 expanded the randomization range for the kernel image.
-- Windows 11 24H2 added further entropy to kernel stack randomization and restricted additional information leak vectors.
+The dedicated [KASLR Bypasses](kaslr-bypasses.md) page catalogs every technique in detail. The summary below covers the major categories.
 
-## Primitives Blocked
+**NtQuerySystemInformation (pre-20H1)** was the dominant bypass for years. `SystemModuleInformation`, `SystemExtendedHandleInformation`, and `SystemBigPoolInformation` classes returned kernel pointers to any caller. Progressively restricted starting in 20H1, but still available to Medium IL processes, meaning a sandbox escape that elevates to Medium IL can still use this API.
 
-- **Hardcoded kernel address exploitation:** Exploits that rely on known, fixed addresses for kernel functions, gadgets, or data structures fail because addresses change each boot.
-- **Static ROP gadget addresses:** ROP chains that use hardcoded gadget offsets from a known kernel base are unusable without first leaking the actual base address.
-- **Known-offset EPROCESS/token access:** Even with a relative offset from the kernel base to the target structure, the absolute address is unknown without an info leak.
-- **Fixed-address kernel shellcode placement:** Mapping shellcode at a known kernel address (e.g., via pool spray) requires knowing pool region addresses, which are randomized.
+**SepMediumDaclSd corruption** represents a newer, more powerful approach. The integrity level restriction on `NtQuerySystemInformation` is enforced via a DACL check against the global `SepMediumDaclSd` security descriptor. An attacker with a write or [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) can zero the DACL (for example, via `RtlClearAllBits`), removing the restriction entirely and allowing Low IL processes to query kernel module addresses. Used in [CVE-2026-21241](../case-studies/CVE-2026-21241.md). See [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md).
 
-## Bypass History
+**WIL Feature Flag bypass** adds a second gate that must be defeated alongside the DACL. Even after the DACL check passes, Microsoft added a secondary control via the Windows Implementation Library (WIL) feature flag system. The runtime flag `Feature_RestrictKernelAddressLeaks__private_featureState` controls whether kernel addresses are scrubbed from `NtQuerySystemInformation` output. This flag is stored in kernel memory as a simple integer, and an attacker with a [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) can flip its state bits to disable the scrubbing. Combined with `SepMediumDaclSd` corruption, this two-step approach fully defeats the `NtQuerySystemInformation` restrictions on modern Windows. Demonstrated in [CVE-2026-21241](../case-studies/CVE-2026-21241.md).
 
-See the dedicated [KASLR Bypasses](kaslr-bypasses.md) page for a comprehensive bypass catalog.
+**Driver-specific information disclosure** vulnerabilities leak uninitialized stack or pool data containing kernel pointers. These are patched individually as they are discovered (CVE-2023-32019, CVE-2024-38256), but new ones appear regularly.
 
-**Known Leak Vectors (summary):**
+**Timing side-channels** bypass software restrictions entirely. The `prefetch` instruction executes faster when the target virtual address is in the current page tables. On Intel CPUs, probing the 256 candidate kernel base addresses via `prefetch` + `rdtsc` latency identifies the correct base within milliseconds, requiring no software vulnerability at all. See the [24H2 NT Exploit writeup](https://exploits.forsale/24h2-nt-exploit/).
 
-- **NtQuerySystemInformation (pre-20H1):** `SystemModuleInformation`, `SystemExtendedHandleInformation`, and `SystemBigPoolInformation` classes returned kernel pointers to any caller. This was the easiest and most common KASLR bypass for years. Progressively restricted starting in 20H1.
-- **NtQuerySystemInformation (post-20H1):** Still available to Medium IL processes. Sandbox escapes that elevate to Medium IL can still use this API. Full restriction has not been implemented due to application compatibility.
-- **SepMediumDaclSd corruption:** The integrity level restriction on `NtQuerySystemInformation` is enforced via a DACL check against the global `SepMediumDaclSd` security descriptor. An attacker with a write or [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) can zero the DACL (e.g., via `RtlClearAllBits`), removing the restriction entirely and allowing Low IL processes to query kernel module addresses. Used in [CVE-2026-21241](../case-studies/CVE-2026-21241.md). See [ACL / SD Manipulation](../primitives/exploitation/acl-sd-manipulation.md).
-- **WIL Feature Flag bypass (`Feature_RestrictKernelAddressLeaks`):** Even after the DACL check passes, Microsoft added a secondary gate via the Windows Implementation Library (WIL) feature flag system. The runtime flag `Feature_RestrictKernelAddressLeaks__private_featureState` controls whether kernel addresses are scrubbed from `NtQuerySystemInformation` output. This flag is stored in kernel memory as a simple integer, and an attacker with a [bit-manipulation primitive](../primitives/exploitation/bit-manipulation.md) (e.g., `RtlSetBit`) can flip the flag's state bits to disable the scrubbing. Combined with `SepMediumDaclSd` corruption, this two-step approach fully defeats the `NtQuerySystemInformation` restrictions on modern Windows. Demonstrated in [CVE-2026-21241](../case-studies/CVE-2026-21241.md).
-- **Driver-specific info disclosure:** Individual driver vulnerabilities that leak uninitialized stack or pool data containing kernel pointers. These are patched individually as they are discovered (e.g., CVE-2023-32019, CVE-2024-38256).
-- **Timing side-channels:** Microarchitectural side-channels (cache timing, TLB state) can be used to infer kernel page mappings. These attacks are low-bandwidth but do not require any software vulnerability.
-- **ETW-based leaks:** Event Tracing for Windows providers that log kernel pointers in event data. Microsoft has been progressively sanitizing ETW output.
-- **KUSER_SHARED_DATA:** The shared data page at a fixed user-mode address contains some kernel timing information that can be used for limited side-channel inferences, though not direct address leakage.
+**ETW-based leaks** and **KUSER_SHARED_DATA** provide smaller, more limited windows for information disclosure that Microsoft has been progressively closing.
 
 ## Related CVEs
 

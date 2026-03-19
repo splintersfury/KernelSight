@@ -8,7 +8,9 @@ description: "19 Windows kernel exploitation primitives — arbitrary read/write
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study
 </div>
 
-A vulnerability class describes what went wrong; a primitive describes what is gained. This section catalogs the exploitation building blocks -- controlled capabilities that convert a memory corruption bug into privilege escalation. Primitives split into two families: techniques that achieve arbitrary kernel read/write, and techniques that leverage that R/W for exploitation.
+Finding a vulnerability in a kernel driver is only half the story. A buffer overflow, a use-after-free, a missing bounds check -- these tell you what went wrong, but they do not tell you what an attacker can do with it. The answer depends on the *primitive* the vulnerability yields: the controlled capability that transforms a memory corruption bug into something an attacker can actually use. A pool overflow in `cldflt.sys` might corrupt an adjacent pipe attribute entry, giving the attacker a controlled read beyond the allocation boundary. A missing `ProbeForWrite` in `afd.sys` might let user-mode code write to an arbitrary kernel address. The vulnerability class describes the flaw; the primitive describes the power it grants.
+
+This section catalogs those building blocks. Primitives split into two families that reflect the two-phase structure of nearly every modern Windows kernel exploit. The first phase achieves arbitrary kernel read/write, converting a constrained corruption into full memory access. The second phase leverages that access for exploitation, targeting the specific kernel data structures that control privilege, identity, and access.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_005 — Primitive Taxonomy</span>
@@ -77,9 +79,11 @@ A vulnerability class describes what went wrong; a primitive describes what is g
   <p class="ks-figure-caption">19 primitives split between achieving arbitrary R/W (left) and leveraging it for exploitation (right).</p>
 </div>
 
+The relationship between these two families is sequential but not always one-to-one. A single pool overflow might yield a relative read through a corrupted pipe attribute, which leaks enough kernel pointers to set up an I/O Ring write, which ultimately overwrites a process token. Each primitive in the chain builds on the previous one. Understanding what each primitive provides, what it requires as input, and where it sits in the exploitation timeline is what separates a crash from a privilege escalation.
+
 ## Arbitrary Read/Write Primitives
 
-Vulnerability patterns and driver behaviors that yield controlled kernel memory access.
+These are the techniques that convert a vulnerability into controlled kernel memory access. Some are direct and immediate, like an IOCTL that simply hands you physical memory read/write with no corruption needed. Others are indirect, requiring multiple steps of pool grooming and corruption chaining before stable R/W emerges. The [primitive matrix](exploitation/primitive-matrix.md) tracks which of these remain viable across Windows versions and mitigation configurations.
 
 | Primitive | Description |
 |-----------|-------------|
@@ -96,7 +100,7 @@ Vulnerability patterns and driver behaviors that yield controlled kernel memory 
 
 ## Exploitation Primitives
 
-Techniques for converting a vulnerability into reliable exploitation.
+Once arbitrary kernel R/W is established, the question becomes: what do you do with it? These techniques answer that question. Pool spray shapes memory layout to make corruption predictable. Named pipe objects and WNF state data serve as both spray material and corruption targets. I/O Ring provides a clean, stable R/W channel on modern Windows. And at the end of the chain, token swapping or ACL manipulation converts memory access into actual privilege escalation. The [primitive matrix](exploitation/primitive-matrix.md) maps these techniques against Windows versions and mitigations, showing how the exploitation landscape has shifted from GDI bitmap abuse on Windows 7 to data-only I/O Ring chains on Windows 11 24H2.
 
 | Primitive | Description |
 |-----------|-------------|
@@ -109,6 +113,7 @@ Techniques for converting a vulnerability into reliable exploitation.
 | [PreviousMode Manipulation](exploitation/previous-mode-manipulation.md) | KTHREAD.PreviousMode overwrite |
 | [Token Swapping](exploitation/token-swapping.md) | Process token pointer replacement |
 | [ACL / SD Manipulation](exploitation/acl-sd-manipulation.md) | Security descriptor modification |
+| [Bit-Manipulation Primitives](exploitation/bit-manipulation.md) | kCFG-compliant bitmap function abuse |
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../case-studies/">Case Studies</a> &rarr; See the full chain in action across 28 real CVEs.

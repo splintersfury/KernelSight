@@ -1,6 +1,6 @@
 # amsdk.sys
 
-> WatchDog Development security driver — process termination abused by Silver Fox APT
+> WatchDog Development security driver, process termination abused by Silver Fox APT
 
 ## Summary
 
@@ -12,6 +12,14 @@
 | **Abused Version** | Multiple versions |
 | **Status** | Blocklisted — added to Microsoft Vulnerable Driver Blocklist |
 | **Exploited ITW** | Yes |
+
+## The Story
+
+There is a certain irony in a security product becoming the weapon. `amsdk.sys` is the kernel driver for a WatchDog Development security product, designed to protect systems by monitoring and terminating malicious processes. The driver ships with a process termination IOCTL that accepts a process ID and calls kernel-mode APIs to kill the target. This is standard functionality for security software that needs to stop malware. The problem is that the IOCTL does not verify who is asking.
+
+Check Point documented the Silver Fox APT group weaponizing this exact capability. The attack is straightforward: bring `amsdk.sys` to the target via BYOVD, open the device, enumerate the running security products, and send the termination IOCTL for each one. With the defenders dead, the APT payload executes unopposed.
+
+The driver does not validate the caller's identity, privilege level, or purpose. Any process with access to the device object can terminate any other process on the system.
 
 ## BYOVD Context
 
@@ -26,24 +34,11 @@
 - Process termination by PID
 - Process enumeration
 
-## Root Cause
+## How It Gets Used
 
-`amsdk.sys` is the kernel driver for a WatchDog Development security product. The driver provides process termination capabilities via IOCTL — a standard feature for security software that needs to kill malicious processes. The IOCTL accepts a process ID and terminates the target process using kernel-mode APIs.
+The attacker does not need any memory corruption, race condition, or sophisticated exploitation technique. The attack chain is purely logical. First, `amsdk.sys` is deployed on the target system through BYOVD, dropped to disk and loaded as a service. The attacker opens a handle to the device object, which accepts connections from any authenticated user. Then the attacker enumerates running processes, identifying AV and EDR products by name or service registration. For each security product, a termination IOCTL is issued. Within seconds, every defensive process on the box is dead. The primary APT payload then executes in an environment with no active monitoring.
 
-The vulnerability is insufficient access control. The termination IOCTL does not validate the caller's identity, privilege level, or purpose. Any process with access to the device object can terminate any process on the system.
-
-Check Point documented the abuse of `amsdk.sys` by the Silver Fox APT group. The attackers use the driver to terminate security products before executing their primary campaign objectives.
-
-## Exploitation
-
-The process termination attack pattern:
-
-1. Deploy `amsdk.sys` on the target system via BYOVD
-2. Open the device handle
-3. Enumerate running processes to identify security products
-4. Send the termination IOCTL for each AV/EDR process
-5. Security products are terminated
-6. Execute primary APT payload
+This is the process termination variant of BYOVD, a pattern that has become increasingly common as threat actors realize they do not need kernel read/write primitives when they can simply kill the defenders instead.
 
 ## Detection
 
@@ -79,6 +74,10 @@ rule amsdk_sys {
 - Rapid sequential termination of multiple security product processes
 - Service creation for WatchDog driver by a non-WatchDog process
 - Temporal correlation: security termination followed by APT activity (C2, lateral movement, data exfiltration)
+
+## Broader Significance
+
+`amsdk.sys` represents the process-killer class of BYOVD, where the attacker does not need kernel memory corruption. The driver's own intended functionality becomes the weapon. Defenders should treat any signed driver with a process termination IOCTL as a potential BYOVD target, especially when the IOCTL lacks caller validation. The Silver Fox campaign proved that security products that expose powerful kernel capabilities without access control are not protecting the system; they are arming the adversary.
 
 ## References
 

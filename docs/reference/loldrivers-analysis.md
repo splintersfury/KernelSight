@@ -1,9 +1,11 @@
 # LOLDrivers Deep Analysis
 
-> Automated deep analysis of every driver in the [LOLDrivers.io](https://www.loldrivers.io/) catalog, powered by [DriverAtlas](https://github.com/splintersfury/DriverAtlas).
+The [LOLDrivers.io](https://www.loldrivers.io/) catalog tracks known vulnerable and malicious drivers by hash and vendor, but it does not assess what each driver can actually do. How many expose physical memory mapping through IOCTL-reachable code paths? How many lack basic compile-time mitigations like CFG or FORCE_INTEGRITY? How many carry enough ROP gadgets to build a useful chain? [DriverAtlas](https://github.com/splintersfury/DriverAtlas) answers these questions by performing automated deep analysis of every driver in the catalog.
 
-**Last updated:** 2026-03-12  
-**Drivers analyzed:** 1775 (Tier 1) / 1775 (Tier 2 deep)  
+The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, device names, IOCTLs, mitigation flags, and ROP gadget counts. Tier 2 uses Ghidra headless decompilation to trace which dangerous imports are actually reachable from IOCTL dispatch handlers, distinguishing between drivers that merely import `MmMapIoSpace` (which could be used only internally) and those that expose it through a user-accessible IOCTL. The table below presents the full results, sorted by risk score.
+
+**Last updated:** 2026-03-12
+**Drivers analyzed:** 1775 (Tier 1) / 1775 (Tier 2 deep)
 
 ## Key Statistics
 

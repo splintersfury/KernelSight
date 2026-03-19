@@ -2,12 +2,14 @@
 
 > Visual breakdown of 147 CVEs across 64 drivers -- what gets exploited, how often, and where the patterns cluster.
 
+The KernelSight corpus is not a random sample. It is a curated collection of Windows kernel CVEs that have published exploit research: writeups, proof-of-concept code, in-the-wild campaign reports, or detailed binary analysis. The selection bias is deliberate. A CVE with no public analysis cannot teach patterns. A CVE with a full exploit chain walkthrough reveals how vulnerability classes connect to exploitation primitives and how mitigations shape attacker behavior. This page presents the data, and the patterns that emerge from it, in visual form.
+
 ## CVEs by Driver Family
 
-The top 10 driver families account for roughly 68% of the corpus. clfs.sys leads at 15, followed by ntoskrnl.exe and the Kernel Streaming stack at 14 each, then afd.sys at 13.
+The top 10 driver families account for roughly 68% of the corpus. The concentration is striking: clfs.sys leads at 15, followed by ntoskrnl.exe and the Kernel Streaming stack at 14 each, then afd.sys at 13. The remaining 47 CVEs spread across 54 additional drivers, meaning most drivers contribute one or two entries each while a small number generate bugs repeatedly.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG — CVEs by Driver Family (Top 10)</span>
+  <span class="ks-figure-label">FIG -- CVEs by Driver Family (Top 10)</span>
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing CVE counts by driver family">
     <!-- clfs.sys -->
     <text class="ks-label" x="175" y="35" text-anchor="end">clfs.sys</text>
@@ -53,12 +55,14 @@ The top 10 driver families account for roughly 68% of the corpus. clfs.sys leads
   <p class="ks-figure-caption">"win32k family" combines win32k.sys, win32kbase.sys, and win32kfull.sys. "KS stack" combines ks.sys, ksthunk.sys, and mskssrv.sys. Remaining 47 CVEs span 54 additional drivers.</p>
 </div>
 
+The dominance of clfs.sys is notable because CLFS (Common Log File System) is a relatively small driver serving a narrow purpose (transaction logging). Its position at the top of the chart reflects not the size of its codebase but the exploitability of its attack surface: complex on-disk structures parsed in kernel context with historically poor bounds checking. The Kernel Streaming stack's 14 entries are a more recent phenomenon, largely driven by DEVCORE's systematic audit work in 2024-2025.
+
 ## Kernel CVE Volume by Year
 
-Windows kernel-mode components average 90--140 CVEs per year. The chart below counts every CVE in the NVD whose description mentions a kernel-mode component -- ntoskrnl, win32k, CLFS, AFD, NTFS, TCP/IP, DWM, cloud files mini-filter, or kernel-mode driver.
+Windows kernel-mode components average 90-140 CVEs per year. The chart counts every CVE in the NVD whose description mentions a kernel-mode component: ntoskrnl, win32k, CLFS, AFD, NTFS, TCP/IP, DWM, cloud files mini-filter, or kernel-mode driver.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG — Windows Kernel-Mode CVEs by Year (NVD)</span>
+  <span class="ks-figure-label">FIG -- Windows Kernel-Mode CVEs by Year (NVD)</span>
   <svg viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart showing Windows kernel-mode CVE counts from NVD by year, 2015 to 2026">
     <!-- Y-axis -->
     <text class="ks-annotation" x="55" y="213" text-anchor="end">0</text>
@@ -118,32 +122,32 @@ Windows kernel-mode components average 90--140 CVEs per year. The chart below co
     <text class="ks-annotation" x="632" y="179">27</text>
     <text class="ks-annotation" x="632" y="228" text-anchor="middle">2026*</text>
   </svg>
-  <p class="ks-figure-caption">Counts from NVD keyword search across kernel-mode component descriptions. 2017's spike coincides with Microsoft's switch from security bulletins to per-CVE advisories. 2026* is partial (Jan--Feb only).</p>
+  <p class="ks-figure-caption">Counts from NVD keyword search across kernel-mode component descriptions. 2017's spike coincides with Microsoft's switch from security bulletins to per-CVE advisories. 2026* is partial (Jan-Feb only).</p>
 </div>
 
-Annual volume stays between 90 and 140 with no clear upward trend since 2017. The swings mostly track advisory timing rather than actual changes in the kernel's attack surface. Microsoft's 2017 shift from monthly bulletins to individual CVE IDs pushed that year's count up artificially. The 2019 and 2021 dips coincide with lighter Patch Tuesday months, not fewer vulnerabilities.
+Annual volume stays between 90 and 140 with no clear upward trend since 2017. The swings mostly track advisory timing rather than actual changes in the kernel's attack surface. Microsoft's 2017 shift from monthly bulletins to individual CVE IDs pushed that year's count up artificially. The 2019 and 2021 dips coincide with lighter Patch Tuesday months, not fewer vulnerabilities. The stability of this number, despite a decade of mitigation deployment, suggests that the rate of vulnerability introduction roughly matches the rate of hardening.
 
 ### Corpus Coverage
 
-The KernelSight corpus samples 147 of roughly 1,200 kernel-mode CVEs disclosed since 2015 -- about 12%. The sampling is deliberate: the corpus tracks CVEs that have published exploit research, not a random cross-section of Patch Tuesday fixes.
+The KernelSight corpus samples 147 of roughly 1,200 kernel-mode CVEs disclosed since 2015, about 12%. The sampling is deliberate: the corpus tracks CVEs with published exploit research, not a random cross-section of Patch Tuesday fixes.
 
 | Period | NVD Total | Corpus | Coverage |
 |--------|-----------|--------|----------|
-| 2015--2021 | 689 | 12 | 1.7% |
+| 2015-2021 | 689 | 12 | 1.7% |
 | 2022 | 92 | 9 | 9.8% |
 | 2023 | 105 | 17 | 16.2% |
 | 2024 | 110 | 23 | 20.9% |
 | 2025 | 129 | 72 | 55.8% |
 | 2026 (partial) | 27 | 14 | 51.9% |
 
-Coverage concentrates on 2025--2026 because those years have the most public exploit writeups. The 2022--2024 jump reflects backfilling CVEs with published exploit research (CLFS ransomware chain, Project Zero registry audit, DEVCORE kernel streaming work). Most pre-2022 entries are BYOVD drivers where the vulnerability existed years before formal CVE assignment.
+Coverage concentrates on 2025-2026 because those years have the most public exploit writeups. The 2022-2024 jump reflects backfilling CVEs with published research: the CLFS ransomware exploitation chain, Project Zero's registry race audit, DEVCORE's kernel streaming work. Most pre-2022 entries are BYOVD drivers where the vulnerability existed years before formal CVE assignment.
 
 ## Vulnerability Class Breakdown
 
-Buffer overflows are most common, followed closely by use-after-free, which dominates the exploited-in-the-wild cases. BYOVD drivers account for most "Arbitrary R/W" entries -- intentional design choices rather than bugs.
+Buffer overflows are the most common class, followed closely by use-after-free, which dominates the exploited-in-the-wild cases. The "Arbitrary R/W" category is dominated by BYOVD drivers that provide kernel read/write as an intentional design feature rather than a bug.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG — Vulnerability Class Distribution</span>
+  <span class="ks-figure-label">FIG -- Vulnerability Class Distribution</span>
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing vulnerability class distribution">
     <!-- Buffer Overflow -->
     <text class="ks-label" x="175" y="35" text-anchor="end">Buffer Overflow</text>
@@ -200,13 +204,13 @@ Buffer overflows are most common, followed closely by use-after-free, which domi
 <span class="ks-stat-num">106</span> Microsoft inbox drivers
 </div>
 
-Nearly 39% of the corpus has been exploited in the wild. The two remote CVEs are [CVE-2022-21907](../case-studies/CVE-2022-21907.md) (http.sys) and [CVE-2024-38063](../case-studies/CVE-2024-38063.md) (tcpip.sys). Everything else requires local access or a BYOVD drop.
+Nearly 39% of the corpus has been exploited in the wild, a rate that reflects the selection bias toward CVEs with published exploit research. The two remote CVEs are [CVE-2022-21907](../case-studies/CVE-2022-21907.md) (http.sys) and [CVE-2024-38063](../case-studies/CVE-2024-38063.md) (tcpip.sys). Everything else requires local access or a BYOVD drop, reinforcing the pattern that kernel exploits serve as post-initial-access tools rather than entry vectors.
 
-BYOVD drivers are over-represented in the ITW column -- they give attackers kernel R/W without any memory corruption. See [BYOVD](../reference/byovd.md) for the full pattern.
+BYOVD drivers are over-represented in the ITW column because they give attackers kernel R/W without any memory corruption development effort. A ransomware operator who drops RTCore64.sys or iqvw64e.sys gets the same primitive that a researcher spends weeks building from a pool overflow. See [BYOVD](../reference/byovd.md) for the full pattern and [LOLDrivers Deep Analysis](../reference/loldrivers-analysis.md) for the 1,775-driver ecosystem assessment.
 
 ## Driver x Vulnerability Class Heatmap
 
-Where do specific bug types concentrate? This table crosses the top 8 driver families against the most common vulnerability classes.
+Where do specific bug types concentrate? This table crosses the top 8 driver families against the most common vulnerability classes, revealing which drivers have which characteristic vulnerability patterns.
 
 | Driver | Buf Ovf | UAF | Race | Type Conf | Info Disc | Arb R/W | Int Ovf | Other |
 |--------|---------|-----|------|-----------|-----------|---------|---------|-------|
@@ -219,13 +223,9 @@ Where do specific bug types concentrate? This table crosses the top 8 driver fam
 | **dwmcore** | 2 | 1 | | 1 | | | | 4 |
 | **ntfs** | 3 | | | | 3 | | | 1 |
 
-Notable clusters:
+The heatmap reveals characteristic vulnerability profiles for each driver family. **clfs.sys skews heavily toward buffer overflow** because its primary vulnerability pattern is corrupt on-disk offsets causing OOB writes in the BLF parser, accounting for 8 of its 15 CVEs. **afd.sys skews toward UAF** because socket teardown races dominate its vulnerability history, with 7 of 13 CVEs stemming from concurrent access to socket objects without adequate synchronization. **ntoskrnl.exe spreads across classes** with no single dominant pattern across 14 CVEs, reflecting the diversity of its codebase: registry races, UAF, integer overflow, arbitrary R/W, and logic bugs all appear. **win32k splits between UAF and races** driven by callback reentrancy and concurrent window operations. **ntfs.sys splits between buffer overflow and info disclosure** because crafted VHD images hit both through MFT parsing.
 
-- **clfs.sys skews buffer overflow.** Corrupt on-disk offsets cause OOB writes in the BLF parser, accounting for 8 of 15 CVEs.
-- **afd.sys skews UAF.** Socket teardown races account for 7 of 13 CVEs.
-- **ntoskrnl.exe spreads across classes.** Registry races, UAF, integer overflow, arb R/W, and logic bugs -- no single dominant class across 14 CVEs.
-- **win32k splits between UAF and races.** Callback reentrancy and concurrent window ops feed both.
-- **ntfs.sys splits between buffer overflow and info disclosure.** Crafted VHD images hit both through MFT parsing.
+These profiles are useful for targeting research. If you are auditing clfs.sys, look for unchecked offsets from on-disk structures. If you are auditing afd.sys, look for lock gaps around socket object teardown. The heatmap compresses years of vulnerability history into a targeting guide.
 
 ## Cross-References
 

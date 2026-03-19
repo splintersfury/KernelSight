@@ -8,7 +8,9 @@ description: "9 Windows kernel attack surfaces — IOCTL handlers, filesystem IR
   Driver Type &rarr; <span class="ks-active">Attack Surface</span> &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
 </div>
 
-Once a target driver is identified, the next question is: how does user-mode code reach it? Windows kernel drivers expose multiple attack surfaces depending on their type and the IRP/callback interfaces they implement. The attack surface determines what data an attacker controls and what code path the input traverses.
+A kernel exploit begins with a question that sounds simple but carries enormous consequences: how does user-mode code reach the vulnerable driver? The answer determines everything that follows. It dictates what data the attacker controls, how much of it they control, what validation (if any) sits between them and the bug, and whether the vulnerability is reachable from a sandbox, a low-integrity process, or even a remote machine with no authentication at all.
+
+Windows kernel drivers do not expose a single entry point. They expose many, and each one operates under different rules. An IOCTL handler receives structured input buffers through `DeviceIoControl` with attacker-controlled sizes. A filesystem minifilter parses reparse data buffers embedded in on-disk structures that might arrive on a USB stick. A network protocol driver reassembles fragmented IPv6 packets from the wire. An ALPC message carries multiple attribute types that trigger kernel object operations during deserialization. These are fundamentally different trust boundaries with fundamentally different bug patterns, and treating them as interchangeable leads to blind spots in both offense and defense.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_003 — User-Kernel Boundary</span>
@@ -68,7 +70,9 @@ Once a target driver is identified, the next question is: how does user-mode cod
   <p class="ks-figure-caption">User-mode APIs cross the syscall boundary into kernel handler dispatch. Each path represents a distinct attack surface.</p>
 </div>
 
-## Categories
+## The nine surfaces
+
+The table below maps each attack surface to the kinds of drivers it applies to and the entry points it exposes. But the real differences between these surfaces are not captured in a table; they live in the details of how input reaches kernel code, what validation the I/O Manager performs (or does not perform) before the driver ever sees the data, and what concurrency model governs request processing. The individual pages explore these differences in depth.
 
 | Surface | Description | Key Drivers |
 |---------|-------------|-------------|
@@ -82,7 +86,9 @@ Once a target driver is identified, the next question is: how does user-mode cod
 | [Shared Memory](shared-memory.md) | Kernel-user shared memory regions | mskssrv.sys, ksthunk.sys |
 | [WMI / ETW](wmi-etw.md) | WMI and ETW interfaces | Instrumented drivers |
 
-## Attack Surface vs. Driver Type
+## How attack surfaces map to driver types
+
+Not every driver exposes every surface. A filesystem minifilter has no reason to handle IOCTLs (though some do). A network stack driver has no reason to register registry callbacks. The matrix below shows which attack surfaces are relevant to which [driver types](../driver-types/index.md), and this mapping is the first filter when scoping an audit: once you know what kind of driver you are looking at, you can focus on the surfaces it is likely to expose and ignore the rest.
 
 | | IOCTL | FS IRP | Network | Shared Mem | Registry CB | ALPC |
 |---|---|---|---|---|---|---|
@@ -95,6 +101,8 @@ Once a target driver is identified, the next question is: how does user-mode cod
 | Core Kernel | | | | | | ■ |
 | Security / Policy | ■ | | | | ■ | |
 | Storage / Caching | ■ | | | | | |
+
+That said, the matrix is a starting point, not a complete picture. Drivers occasionally expose unexpected surfaces. A filesystem driver might register WMI data blocks for management telemetry. A security driver might use ALPC for policy distribution. The only way to know for certain is to check the driver's `DriverEntry` and `AddDevice` routines for the registration calls that attach it to each surface.
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../vuln-classes/">Vulnerability Classes</a> &rarr; What goes wrong when attacker-controlled data reaches kernel code?

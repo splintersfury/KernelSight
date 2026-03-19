@@ -8,7 +8,9 @@ description: "12 categories of Windows kernel drivers — file system, network s
   <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
 </div>
 
-Every kernel exploitation chain begins with a target component. Windows kernel drivers are categorized by their role and the subsystem they interact with — each type has distinct IRP handling patterns, accessible attack surfaces, and historical vulnerability profiles.
+When you sit down to audit a Windows kernel driver, the first question is not "where is the bug?" but "what kind of driver is this?" The answer shapes everything that follows: which system calls reach it, what objects it manages, what memory it touches, and which exploitation primitives are realistic once you find a flaw. A heap overflow in a file system driver that parses on-disk metadata is a fundamentally different research target than a logic bug in a vendor utility driver that hands you physical memory read/write by design.
+
+KernelSight organizes kernel drivers into twelve categories based on their role in the Windows kernel architecture. Each category carries distinct IRP handling patterns, accessible attack surfaces, and historical vulnerability profiles. A driver's category predicts its bug classes with surprising consistency: CLFS drivers produce pool corruptions from metadata parsing, Win32k drivers produce use-after-free and type confusion from object lifecycle complexity, and vendor utility drivers produce arbitrary read/write from intentional design choices that were never meant to face adversarial callers. Understanding these patterns before you start reversing saves weeks of unfocused analysis.
 
 <div class="ks-figure" markdown>
   <span class="ks-figure-label">FIG_002 — Windows Kernel Architecture</span>
@@ -117,7 +119,7 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
   <span class="card-icon">&#x1F4D3;</span>
   <span class="card-title">Log / Transaction</span>
   <span class="card-drivers">clfs.sys</span>
-  <span class="card-desc">CLFS base log metadata parsing &mdash; the most exploited single driver. User-reachable via CreateLogFile.</span>
+  <span class="card-desc">CLFS base log metadata parsing, the most exploited single driver. User-reachable via CreateLogFile.</span>
   <span class="card-stats">
     <span class="stat"><strong>4</strong> CVEs</span>
     <span class="stat"><span class="badge badge-itw">3 ITW</span></span>
@@ -241,6 +243,10 @@ Every kernel exploitation chain begins with a target component. Windows kernel d
 | Vendor Utility | | | | | | | ■■■■■■■■■■■■■■ |
 | Performance & GPU | | | | | | ■ | ■■■ |
 | Third-Party Security | | | | | | | ■■■■■ |
+
+The heatmap above reveals a pattern worth studying. Microsoft's own kernel components cluster around memory corruption bugs: buffer overflows, integer overflows, type confusions, and use-after-free. Third-party and vendor drivers cluster around logic bugs, because their "vulnerability" is typically an intentional design choice (physical memory access, MSR writes, process termination IOCTLs) exposed without adequate access control. These two clusters demand different research approaches. Memory corruption bugs require deep binary analysis and patch diffing. Logic bugs require understanding the driver's intended functionality and asking "who else can call this?"
+
+The [Attack Surfaces](../attack-surfaces/) section explores how user-mode code actually reaches each of these driver types.
 
 <div class="ks-next-pipeline">
   Next in the pipeline: <a href="../attack-surfaces/">Attack Surfaces</a> &rarr; How does user-mode code reach these drivers?

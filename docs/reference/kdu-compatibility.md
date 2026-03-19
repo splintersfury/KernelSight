@@ -5,10 +5,12 @@ description: Which LOLDrivers could be weaponized as KDU providers? Automated an
 
 # KDU Provider Compatibility Analysis
 
-Which [LOLDrivers](https://loldrivers.io) could be weaponized as [KDU](https://github.com/hfiref0x/KDU) providers? This page answers that question by mapping each driver's confirmed IOCTL-reachable primitives to KDU's provider requirements.
+KDU (Kernel Driver Utility) by hfiref0x is the most widely used framework for BYOVD exploitation. It uses vulnerable signed drivers as "providers" to perform actions ranging from loading unsigned kernel code to manipulating kernel objects. Each action requires specific memory primitives: MapDriver needs both physical and virtual memory read/write, DKOM needs virtual memory write, and DSECorruption needs the ability to patch `ci.dll!g_CiOptions`.
 
-**Last updated:** 2026-03-12  
-**Drivers analyzed:** 1775 (Tier 1) / 1775 (Tier 2 Ghidra)  
+This page maps every driver in the [LOLDrivers](https://loldrivers.io) catalog against [KDU's](https://github.com/hfiref0x/KDU) provider requirements. The analysis goes beyond import checking: Tier 2 Ghidra analysis confirms which dangerous APIs are actually reachable from IOCTL dispatch handlers, distinguishing between drivers that import `MmMapIoSpace` for internal use and those that expose it to any process that can open the device handle.
+
+**Last updated:** 2026-03-12
+**Drivers analyzed:** 1775 (Tier 1) / 1775 (Tier 2 Ghidra)
 
 ## Key Findings
 

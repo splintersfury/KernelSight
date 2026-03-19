@@ -1,48 +1,90 @@
 # Shared Memory
 
-Kernel-managed shared memory sections and MDL mappings provide data paths between user mode and kernel mode, but introduce double-fetch, mapping, and access control vulnerabilities.
+When the kernel maps a page of memory that a user-mode thread can also write to, every read from that page is a gamble. The kernel reads a value, checks it, and proceeds to use it. But between the check and the use, the user-mode thread overwrites the value with something the kernel never validated. This is the fundamental problem with shared memory as a kernel attack surface: the data is not copied into a safe kernel buffer; it lives on pages that both the kernel and the attacker can access simultaneously. The result is a class of vulnerabilities that cannot be found by checking buffer sizes or validating input at the entry point, because the input changes after validation.
 
-## Attack Surface Overview
+Shared memory vulnerabilities are not limited to double-fetch races. Incorrect MDL (Memory Descriptor List) handling can give the kernel a mapping to arbitrary physical pages, including kernel code and data pages that should never be accessible from user mode. Missing probe calls on MDLs can leave the kernel accessing pages that the memory manager has freed and repurposed. Each of these patterns produces a different primitive, from information disclosure to arbitrary kernel read/write, and each requires a different detection approach.
 
-- **Section objects**: Created via `NtCreateSection` / `ZwCreateSection`, mapped with `NtMapViewOfSection` / `ZwMapViewOfSection` for shared memory between processes or between user mode and kernel
-- **MDL mappings**: Memory Descriptor Lists built with `IoAllocateMdl`, probed with `MmProbeAndLockPages`, and mapped with `MmMapLockedPagesSpecifyCache` to give kernel code direct access to user-mode pages
-- **Shared data pages**: System-wide shared pages like `KUSER_SHARED_DATA` and per-process shared memory regions used by `win32k.sys` for GDI acceleration
-- **Direct I/O**: Drivers using `DO_DIRECT_IO` receive user buffers described by MDLs in `Irp->MdlAddress`, and must correctly probe and map these MDLs before accessing the data
-- **User-mode reach**: Any process can create sections and map views; drivers that accept user MDLs via `METHOD_IN_DIRECT` / `METHOD_OUT_DIRECT` IOCTLs or that build MDLs from user-supplied addresses are exposed
-- **Key risk**: The kernel reads from memory pages that user-mode threads can concurrently modify, creating time-of-check-to-time-of-use (TOCTOU) vulnerabilities, and incorrect MDL access mode parameters bypass page-level protections allowing arbitrary physical memory access
+## Two forms of kernel-user shared memory
 
-## Mechanism Deep-Dive
+``` mermaid
+graph TD
+    subgraph "Section Objects"
+        A["NtCreateSection\n(backed by pagefile)"] --> B["ZwMapViewOfSection\n(kernel mapping)"]
+        A --> C["NtMapViewOfSection\n(user mapping)"]
+        B --> D["Shared Pages\n⚠ Both can read/write"]
+        C --> D
+    end
+    subgraph "MDL Mappings"
+        E["IoAllocateMdl\n(describe pages)"] --> F["MmProbeAndLockPages\n(validate + lock)"]
+        F --> G["MmMapLockedPagesSpecifyCache\n(kernel virtual mapping)"]
+        G --> H["Kernel accesses\nuser's physical pages"]
+    end
+    style D fill:#2d1b1b,stroke:#ef4444,color:#e2e8f0
+    style F fill:#152a4a,stroke:#f59e0b,color:#e2e8f0
+    style H fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+```
 
-Shared memory in Windows takes two primary forms: section objects and MDL-based mappings. Section objects (`SECTION_OBJECT`) are kernel objects backed by the pagefile or a named file, and can be mapped into multiple process address spaces simultaneously. When a driver maps a section into both kernel space and user space, any data the kernel reads from the shared pages can be modified by user-mode threads between reads. This is the fundamental double-fetch problem: the kernel validates a field (e.g., a length value), then reads it again to use it, but the value may have changed between the two reads due to a concurrent user-mode write.
+Shared memory in Windows takes two primary forms, each with distinct vulnerability profiles.
 
-MDL-based mappings provide a different mechanism where the kernel describes a set of physical pages using a Memory Descriptor List, optionally probes and locks those pages into memory, and then maps them into kernel virtual address space. The key function is `MmProbeAndLockPages(mdl, AccessMode, Operation)`, where `AccessMode` determines whether the pages are validated as belonging to user-mode (`UserMode`) or trusted as kernel pages (`KernelMode`). If a driver calls this function with `KernelMode` on an MDL describing user-supplied pages, the probe is skipped -- the function assumes the pages are trusted kernel memory. An MDL pointing to arbitrary physical pages, including kernel code or data pages, then gives arbitrary kernel memory read/write. CVE-2023-29360 in `mskssrv.sys` was exactly this pattern.
+### Section objects: the double-fetch surface
 
-The `MmMapLockedPagesSpecifyCache` function (and its deprecated predecessor `MmMapLockedPages`) maps the locked pages into virtual address space. If a driver calls this without first calling `MmProbeAndLockPages`, the pages described by the MDL are not locked and may be paged out, reallocated, or freed by the memory manager while the kernel mapping persists. This leads to use-after-free conditions when the kernel reads or writes through the stale mapping. CVE-2024-38238 in `ksthunk.sys` was this pattern.
+Section objects (`SECTION_OBJECT`) are kernel objects backed by the pagefile or a named file. They can be mapped into multiple process address spaces simultaneously, and when a driver maps a section into both kernel space and user space, the kernel and user-mode code share the same physical pages. Any data the kernel reads from these shared pages can be modified by user-mode threads between reads.
 
-Copy-on-write (CoW) semantics introduce a less obvious issue. When a section is mapped with copy-on-write protection, a write to a shared page triggers the memory manager to create a private copy for the writing process. However, if the kernel holds a pointer into the original shared page and the user process triggers CoW, the kernel pointer still refers to the original shared page, which may now belong to a different process or context. Section object size calculations using user-supplied values can also overflow integer bounds, leading to undersized mappings that the kernel writes beyond.
+This is the double-fetch problem in its purest form. The kernel validates a length field, then reads it again to use as a copy size. Between the two reads, a user-mode thread racing on another CPU overwrites the length with a much larger value. The kernel validated length 100 but copies length 10,000, overflowing a kernel buffer. The window for this race can be as short as a few CPU cycles, but on a multicore system, a dedicated racing thread can hit it reliably with enough attempts.
 
-## Common Vulnerability Patterns
+The correct pattern is to read the value once into a local variable and use only the local copy for both validation and subsequent operations. But in practice, compiler optimizations can re-read from the shared page even when the source code appears to use a local variable, unless the variable is declared `volatile` or the read is performed through a function that the compiler cannot optimize away. This subtlety makes double-fetch bugs difficult to eliminate even when developers are aware of the pattern.
 
-- **`MmProbeAndLockPages` with `KernelMode` on user MDL**: The driver probes an MDL containing user-supplied page addresses with `KernelMode` access mode, skipping the validation that the pages actually belong to user space, allowing arbitrary physical page mapping
-- **`MmMapLockedPages` without prior `MmProbeAndLockPages`**: The driver maps an MDL directly without locking the pages, meaning the physical pages can be freed or repurposed while the kernel mapping persists
-- **Double-fetch from shared mapped memory**: The kernel reads a value from a user-accessible shared page, validates it, then re-reads it for use -- a user-mode thread modifies the value between the two reads to bypass the validation
-- **Section object size integer overflow**: User-supplied maximum section size or view size undergoes arithmetic that overflows, resulting in an undersized mapping that the kernel writes beyond
-- **Copy-on-write stale pointer**: A driver maps a CoW section and stores a kernel pointer to the shared page; after a user-mode write triggers CoW, the kernel pointer refers to the now-stale original page
-- **Missing MDL null check**: The driver accesses `Irp->MdlAddress` without checking for NULL, which can occur for zero-length transfers or when the I/O Manager could not allocate an MDL
-- **Shared memory access control**: Section objects created with overly permissive security descriptors allow low-privilege processes to map and modify data that higher-privilege kernel components trust
-- **MDL partial mapping**: The driver maps only a portion of an MDL but calculates offsets based on the full MDL length, causing out-of-bounds access relative to the mapped region
+### MDL mappings: the probe-and-lock surface
 
-## Driver Examples
+Memory Descriptor Lists provide a different mechanism where the kernel describes a set of physical pages, optionally probes and locks them into memory, and then maps them into kernel virtual address space. The critical function is `MmProbeAndLockPages(mdl, AccessMode, Operation)`, where the `AccessMode` parameter determines the level of validation performed.
 
-The `win32k.sys` and `win32kbase.sys` subsystem drivers extensively use GDI shared sections for accelerated graphics operations, with shared memory between user-mode GDI clients and kernel-mode GDI processing. The kernel streaming driver `mskssrv.sys` uses MDL-based mappings for media buffer sharing between processes and was the target of CVE-2023-29360. The `ksthunk.sys` driver maps user buffers for 32-bit to 64-bit kernel streaming thunking and was affected by CVE-2024-38238. Display drivers (both Microsoft's WDDM drivers and third-party GPU drivers like NVIDIA's `nvlddmkm.sys`) map frame buffers and command buffers between user mode and kernel. `ntoskrnl.exe` manages the core section object and MDL infrastructure. Virtualization components (`vmbus.sys`, `storvsc.sys`) use shared memory rings for host-guest communication.
+When `AccessMode` is `UserMode`, the function verifies that the pages described by the MDL actually belong to user-mode address space and are accessible at the requested access level. When `AccessMode` is `KernelMode`, the function trusts the pages completely, performing no validation. This is safe when the MDL describes pages allocated by the kernel itself, but catastrophic when the MDL describes pages supplied by a user-mode caller.
 
-## Detection Approach
+CVE-2023-29360 in `mskssrv.sys` was exactly this pattern. The driver called `MmProbeAndLockPages` with `KernelMode` on an MDL containing user-controlled page addresses. Because the probe was skipped, the MDL could describe arbitrary physical pages, including kernel code pages, kernel data pages, or pages belonging to other processes. The resulting mapping gave the attacker a direct read/write primitive on arbitrary physical memory with no additional exploitation needed.
 
-- **MDL API auditing**: Search for all calls to `MmProbeAndLockPages` in a driver binary and verify the `AccessMode` parameter is `UserMode` when the MDL describes user-supplied buffers. Search for `MmMapLockedPagesSpecifyCache` and `MmMapLockedPages` and verify a preceding `MmProbeAndLockPages` call exists on every code path.
-- **Double-fetch detection**: Identify patterns where the same shared memory address is read more than once in a function, with a validation check between the reads. Tools like `Bochspwn` (from Google Project Zero) can detect kernel double-fetches at the hardware level by intercepting physical memory accesses and flagging repeated reads to user-mode pages.
-- **Section object security**: Enumerate section objects using the `!handle` command in WinDbg and check their security descriptors. Shared sections accessible to low-privilege processes that are also mapped into kernel space deserve attention.
-- **Static pattern matching**: Look for `IoAllocateMdl` followed by `MmBuildMdlForNonPagedPool` or `MmProbeAndLockPages` to trace MDL lifecycle. Verify that all error paths properly call `MmUnlockPages` and `IoFreeMdl` to prevent MDL leaks and dangling mappings.
-- **Patch diffing**: MDL security fixes typically change the access mode parameter from `KernelMode` to `UserMode`, add `MmProbeAndLockPages` before mapping calls, or replace double-reads with single-read-and-capture patterns where a value is read once into a local variable.
+The second MDL pitfall is calling `MmMapLockedPagesSpecifyCache` (or its deprecated predecessor `MmMapLockedPages`) without first calling `MmProbeAndLockPages` at all. Without the probe-and-lock step, the pages described by the MDL are not locked in physical memory. The memory manager can page them out, reallocate them, or free them while the kernel mapping persists. When the kernel subsequently reads or writes through this stale mapping, it accesses whatever physical page now occupies that frame, producing a use-after-free condition with unpredictable content. CVE-2024-38238 in `ksthunk.sys` demonstrated this pattern.
+
+## The double-fetch problem in depth
+
+Double-fetch vulnerabilities deserve extended discussion because they are subtle, prevalent, and difficult to detect.
+
+The simplest case involves a length field. A driver maps a shared section containing a header with a `DataLength` field followed by data. The driver reads `DataLength`, verifies it is within bounds, allocates a kernel buffer of that size, and then copies `DataLength` bytes from the shared section into the kernel buffer. If the copy reads `DataLength` again from the shared page (rather than using the value already validated), a race condition exists.
+
+A more subtle case involves structure pointers. A driver reads a pointer or offset from the shared page, validates that it points within the mapped region, and then dereferences it. If the pointer is re-read from the shared page at the dereference point, the user-mode thread can swap it to an out-of-bounds address between validation and use.
+
+Copy-on-write (CoW) semantics introduce a third variant. When a section is mapped with copy-on-write protection, a write to a shared page triggers the memory manager to create a private copy for the writing process. If the kernel holds a pointer into the original shared page and the user process triggers CoW, the kernel pointer still refers to the original shared page, which may now belong to a different process or context. The kernel sees the old data, not the process's modified copy, leading to state inconsistencies.
+
+Google Project Zero's Bochspwn tool detects double-fetches at the hardware level by instrumenting the Bochs x86 emulator to track all physical memory accesses from kernel code. When the kernel reads the same user-mode physical address twice within a short window, with a potential modification between the reads, Bochspwn flags the access as a potential double-fetch. This approach finds bugs that source-level analysis misses because it operates on the actual compiled code, where compiler optimizations may have reintroduced reads that the source code eliminated.
+
+## Section object size and access control issues
+
+Beyond double-fetch races, section objects have two additional vulnerability surfaces.
+
+**Integer overflow in size calculations.** When a driver creates a section object with a user-supplied maximum size, the arithmetic to compute the mapping size can overflow 32-bit or 64-bit integer bounds. An overflow that wraps to a small value produces an undersized mapping. If the kernel then writes to the section assuming the originally requested (pre-overflow) size, it writes beyond the mapped region into adjacent kernel memory.
+
+**Overly permissive security descriptors.** Section objects carry security descriptors that control which processes can map them. A shared section created with a security descriptor granting access to `Everyone` or `Authenticated Users` allows any process on the system to map and modify data that higher-privilege kernel components trust. If a driver creates a section for communication with a specific privileged service but does not restrict the security descriptor, a low-privilege attacker can map the section and manipulate the data that the driver reads from it.
+
+## Drivers that use shared memory
+
+The `win32k.sys` and `win32kbase.sys` subsystem drivers extensively use GDI shared sections for accelerated graphics operations. Shared memory between user-mode GDI clients and kernel-mode GDI processing is the foundation of Windows graphics performance, and it has been a recurring vulnerability source. CVE-2023-29336 was a use-after-free involving shared GDI object memory, and CVE-2022-21882 was a type confusion via shared window object manipulation.
+
+The kernel streaming drivers `mskssrv.sys` and `ksthunk.sys` use MDL-based mappings for media buffer sharing between processes and for 32-bit to 64-bit thunking. Both have had critical MDL handling vulnerabilities (CVE-2023-29360 and CVE-2024-38238 respectively).
+
+Display drivers, both Microsoft's WDDM drivers and third-party GPU drivers like NVIDIA's `nvlddmkm.sys`, map frame buffers and command buffers between user mode and kernel. These mappings handle large data volumes at high frequency, creating both performance pressure (which discourages defensive copying) and security exposure (large shared regions with complex access patterns).
+
+Virtualization components (`vmbus.sys`, `storvsc.sys`) use shared memory rings for host-guest communication. While the trust boundary is different (guest vs. host rather than user vs. kernel), the double-fetch and MDL handling patterns are the same, and the primitives from bugs in this code are guest-to-host escapes rather than privilege escalations.
+
+## Detection approaches
+
+**MDL API auditing** searches for all calls to `MmProbeAndLockPages` in a driver binary and verifies the `AccessMode` parameter is `UserMode` when the MDL describes user-supplied buffers. The audit must also search for `MmMapLockedPagesSpecifyCache` and `MmMapLockedPages` and verify that a preceding `MmProbeAndLockPages` call exists on every code path reaching the mapping call. A mapping without a preceding probe-and-lock is a critical finding.
+
+**Double-fetch detection** identifies patterns where the same shared memory address is read more than once in a function, with a validation check between the reads. Static analysis tools can flag these patterns in source or decompiled code, but dynamic analysis through Bochspwn-style instrumentation is more reliable because it catches reads that the compiler re-introduced during optimization.
+
+**Section object security** enumeration uses the `!handle` command in WinDbg to inspect section object security descriptors. Shared sections accessible to low-privilege processes that are also mapped into kernel space are the highest-priority audit targets.
+
+**Static pattern matching** traces the MDL lifecycle from `IoAllocateMdl` through `MmBuildMdlForNonPagedPool` or `MmProbeAndLockPages` to the eventual mapping and unmapping calls. The analysis must verify that all error paths properly call `MmUnlockPages` and `IoFreeMdl` to prevent MDL leaks and dangling mappings. A dangling MDL mapping after the underlying pages are freed is a use-after-free waiting to happen.
+
+**Patch diffing** reveals shared memory fixes as changes to the `AccessMode` parameter (from `KernelMode` to `UserMode`), additions of `MmProbeAndLockPages` before mapping calls, or replacements of double-reads with single-read-and-capture patterns. These changes are small and surgical, making them ideal targets for [AutoPiff](../tooling/autopiff-integration.md) detection.
 
 ## Related CVEs
 
@@ -61,3 +103,5 @@ The `win32k.sys` and `win32kbase.sys` subsystem drivers extensively use GDI shar
 - `mdl_null_check_added` -- NULL check on `Irp->MdlAddress` added before MDL access to handle zero-length transfer cases
 - `double_fetch_capture_fix` -- Shared memory value captured to local variable instead of being re-read from shared page, eliminating TOCTOU window
 - `section_acl_hardened` -- Section object security descriptor tightened to restrict low-privilege access to shared kernel data
+
+The shared memory attack surface intersects with nearly every other attack surface in the KernelSight knowledge base. [IOCTL handlers](ioctl-handlers.md) that use `METHOD_IN_DIRECT` or `METHOD_OUT_DIRECT` receive user data through MDLs. [Filesystem drivers](filesystem-irps.md) use MDLs for Direct I/O transfers. [WDF drivers](wdf.md) that forward requests to lower drivers pass MDL-described buffers down the stack. Understanding MDL lifecycle and shared memory semantics is not optional for kernel security research; it is prerequisite knowledge that applies across every driver category.

@@ -2,11 +2,13 @@
 
 > What Microsoft's kernel fixes look like for each bug class -- with before/after pseudocode and AutoPiff rule mapping.
 
-## Overview
+## Why Patches Are Predictable
 
-Kernel patches tend to be surgical. A typical Patch Tuesday fix adds 5--20 lines of validation code without restructuring the surrounding function. Recognizing the pattern lets you diff a binary update and classify the vulnerability it fixes -- even before the CVE details are public.
+Kernel patches tend to be surgical. A typical Patch Tuesday fix adds 5-20 lines of validation code without restructuring the surrounding function. This conservatism is intentional: Microsoft needs to fix the vulnerability without introducing regressions or changing driver behavior for legitimate callers. The result is that patches follow a small number of recognizable shapes, each corresponding to a specific vulnerability class.
 
-This page catalogs the 7 most common patch shapes across the KernelSight corpus. Each pattern maps to AutoPiff detection rules for automated patch analysis.
+Recognizing these shapes is a practical skill. When you diff a binary update, the patch pattern tells you what the vulnerability was, often before the CVE details are public. When you audit a driver, knowing the fix shapes tells you what to look for in the original code. And when you build automated analysis (like [AutoPiff](../tooling/autopiff-integration.md)), the patterns become detection rules that can classify patches at scale.
+
+This page catalogs the 7 most common patch shapes across the KernelSight corpus. Each pattern maps to AutoPiff detection rules and references the CVEs where Microsoft applied that specific fix.
 
 ## Patch Categories
 
@@ -14,7 +16,7 @@ This page catalogs the 7 most common patch shapes across the KernelSight corpus.
 
 **Pattern:** A new `if (len > max) return STATUS_...` guard appears before a copy, allocation, or pointer arithmetic operation.
 
-**Where it appears:** Buffer overflow and out-of-bounds access fixes. The most common patch type in the corpus.
+**Where it appears:** Buffer overflow and out-of-bounds access fixes. This is the most common patch type in the corpus, reflecting the dominance of unvalidated input as a root cause (see [Secure Driver Anatomy](secure-driver-anatomy.md), anti-pattern 1).
 
 **Before:**
 ```c
@@ -40,7 +42,7 @@ RtlCopyMemory(dst, src, header->DataSize);
 
 **Pattern:** A spin lock, push lock, or `InterlockedCompareExchange` guard wraps a previously unprotected read-modify-write sequence on shared state.
 
-**Where it appears:** Race condition and some UAF fixes. The second most common patch type.
+**Where it appears:** Race condition and some UAF fixes. The second most common patch type, reflecting the prevalence of synchronization bugs in multi-threaded kernel code.
 
 **Before:**
 ```c
@@ -69,7 +71,7 @@ KeReleaseSpinLock(&Object->Lock, OldIrql);
 
 **Pattern:** `ProbeForRead`/`ProbeForWrite` followed by a single-copy capture replaces direct dereference of a user-mode pointer. The kernel validates and captures user data once instead of reading it multiple times.
 
-**Where it appears:** Double-fetch and TOCTOU fixes.
+**Where it appears:** Double-fetch and TOCTOU fixes. This pattern eliminates the race window by ensuring the kernel only reads from user memory once, then operates on its own copy.
 
 **Before:**
 ```c
@@ -99,9 +101,9 @@ if (CapturedLength <= MAX_LEN) {
 
 ### 4. Added IOCTL Access Control
 
-**Pattern:** The patch adds caller identity checks to an IOCTL dispatcher -- `SeSinglePrivilegeCheck`, `PsGetCurrentProcessSessionId`, or replaces `IoCreateDevice` with `IoCreateDeviceSecure` and a restrictive SDDL string.
+**Pattern:** The patch adds caller identity checks to an IOCTL dispatcher: `SeSinglePrivilegeCheck`, `PsGetCurrentProcessSessionId`, or replaces `IoCreateDevice` with `IoCreateDeviceSecure` and a restrictive SDDL string.
 
-**Where it appears:** Authorization bypass fixes. Common in inbox drivers and dominant in BYOVD driver patches.
+**Where it appears:** Authorization bypass fixes. Common in inbox drivers where the original developer did not anticipate adversarial callers, and dominant in BYOVD driver patches where the fix is restricting who can reach the dangerous functionality.
 
 **Before:**
 ```c
@@ -131,9 +133,9 @@ case IOCTL_DANGEROUS_OPERATION:
 
 ### 5. Added Reference Counting
 
-**Pattern:** `InterlockedIncrement`/`InterlockedDecrement` pairs appear around object acquisition and release paths. The object is only freed when the reference count reaches zero.
+**Pattern:** `InterlockedIncrement`/`InterlockedDecrement` pairs appear around object acquisition and release paths. The object is only freed when the reference count reaches zero, preventing premature deallocation.
 
-**Where it appears:** UAF fixes where the root cause is premature object deallocation while references are still active.
+**Where it appears:** UAF fixes where the root cause is freeing an object while other code paths still hold stale pointers to it.
 
 **Before:**
 ```c
@@ -158,9 +160,9 @@ if (InterlockedDecrement(&Object->RefCount) == 0) {
 
 ### 6. Removed Dangerous Functionality
 
-**Pattern:** An entire IOCTL handler, code path, or exported function is deleted. The patch doesn't fix the vulnerability -- it removes the attack surface.
+**Pattern:** An entire IOCTL handler, code path, or exported function is deleted. The patch does not fix the vulnerability; it removes the attack surface entirely.
 
-**Where it appears:** BYOVD drivers after disclosure. Microsoft's Vulnerable Driver Blocklist entries also fall into this category -- they prevent the driver from loading at all.
+**Where it appears:** BYOVD drivers after disclosure. Microsoft's Vulnerable Driver Blocklist entries also fall into this category, preventing the driver from loading at all. This is the bluntest patch pattern, and the only correct response when the functionality is dangerous by design. There is no safe way to expose physical memory mapping to userland.
 
 **CVE examples:**
 
@@ -168,13 +170,11 @@ if (InterlockedDecrement(&Object->RefCount) == 0) {
 - ThrottleStop.sys -- [CVE-2025-7771](../case-studies/CVE-2025-7771.md), MSR write removed, driver blocklisted
 - BioNTdrv.sys -- [CVE-2025-0289](../case-studies/CVE-2025-0289.md), five CVEs led to driver blocklist entry
 
-This is the bluntest patch pattern -- and the only correct response when the functionality is dangerous by design. There is no safe way to expose physical memory mapping to userland.
-
 ### 7. Added Type / Object Validation
 
-**Pattern:** A type check, object signature validation, or runtime tag comparison appears before a pointer cast or object dereference. The patch rejects objects that don't match the expected type.
+**Pattern:** A type check, object signature validation, or runtime tag comparison appears before a pointer cast or object dereference. The patch rejects objects that do not match the expected type.
 
-**Where it appears:** Type confusion fixes, primarily in win32k and Kernel Streaming drivers.
+**Where it appears:** Type confusion fixes, primarily in win32k and Kernel Streaming drivers where objects from different categories share similar interfaces.
 
 **Before:**
 ```c
@@ -199,7 +199,7 @@ Window->ExtraData = NewValue;
 
 ## AutoPiff Rule Mapping
 
-AutoPiff detects these patch patterns automatically during binary diff analysis. Each pattern maps to one or more detection rules:
+AutoPiff detects these patch patterns automatically during binary diff analysis. Each pattern maps to one or more detection rules that fire when the corresponding code change is identified in a function diff.
 
 | Patch Pattern | AutoPiff Rule(s) | Example CVE |
 |---------------|-------------------|-------------|

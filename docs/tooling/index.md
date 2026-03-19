@@ -4,36 +4,27 @@
   Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &nbsp;|&nbsp; <span class="ks-active">Tooling</span>
 </div>
 
-Tools and frameworks for Windows kernel driver vulnerability research. This section covers the practical side -- how to find, confirm, and analyze the vulnerability classes and primitives described in the pipeline.
+The vulnerability classes and exploitation primitives described in the pipeline are theoretical until you can find them in real binaries. This section covers the practical side: the tools and workflows that turn a driver binary into a vulnerability assessment, a Patch Tuesday advisory into a root cause analysis, and a crash dump into a confirmed exploitable condition.
 
-## Overview
+## From Advisory to Exploit Understanding
 
-Tooling spans the full research pipeline: static analysis of driver binaries, dynamic fuzzing, patch diffing, and kernel debugging. Static analysis narrows the attack surface, fuzzing discovers crashes at scale, debugging confirms exploitability, and patch diffing reveals what Microsoft fixed. This section covers each category and how they fit together.
+A common research workflow begins on the second Tuesday of each month. Microsoft publishes advisories listing affected components and CVE identifiers. Within hours, the researcher can download pre-patch and post-patch binaries from WinBIndex, run BinDiff or AutoPiff to identify changed functions, review the changes in Ghidra or IDA Pro to understand the vulnerability, write a WTF or kAFL harness targeting the patched code path, and debug the triggered crash in WinDbg to confirm the root cause. Each tool in this chain serves a specific purpose, and the sections below explain how to use them together.
 
 ## Tool Landscape
 
-| Category | Tools | Use Case |
-|----------|-------|----------|
-| Static Analysis | `IDA Pro`, `Ghidra`, `CodeQL`, `Joern` | Disassembly, decompilation, semantic queries |
-| Dynamic Analysis | `WinDbg`, `x64dbg`, `Process Monitor` | Runtime debugging, behavior analysis |
-| Fuzzing | `kAFL`, `WTF`, `HEVD` | Automated vulnerability discovery |
-| Patch Diffing | `BinDiff`, `Diaphora`, `ghidriff`, `AutoPiff` | Identifying security-relevant binary changes |
-| Vulnerability Scanning | `IOCTLance` | Automated IOCTL vulnerability detection |
-| Build Acquisition | `WinBIndex` | Downloading specific Windows PE versions |
+| Category | Tools | When to Use |
+|----------|-------|-------------|
+| [Static Analysis](static-analysis.md) | IDA Pro, Ghidra, CodeQL, Joern, IOCTLance | Understanding driver logic, finding vulnerability patterns, batch scanning IOCTL handlers |
+| [Fuzzing](fuzzing.md) | kAFL, WTF, Syzkaller, HEVD | Discovering crashes that manual analysis misses, especially race conditions and deep code paths |
+| [Debugging](debugging.md) | WinDbg, Driver Verifier, VirtualKD-Redux | Confirming exploitability, analyzing crash dumps, tracing runtime behavior |
+| [Patch Diffing](patch-diffing.md) | BinDiff, Diaphora, ghidriff, diffalyze | Identifying security-relevant changes between builds, 1-day root cause analysis |
+| [AutoPiff Integration](autopiff-integration.md) | AutoPiff pipeline (Karton stages 0-8) | End-to-end automated patch analysis at scale, from binary acquisition through risk scoring |
 
-## Categories
+The tools divide into two workflows. **Offensive research** (finding new vulnerabilities) typically starts with static analysis to map the attack surface, moves to fuzzing for automated discovery, and finishes with debugging to confirm exploitability. **Patch analysis** (understanding existing fixes) starts with patch diffing to identify what changed, uses static analysis to understand the semantic meaning of the change, and optionally uses fuzzing to verify the vulnerability in the pre-patch version. AutoPiff bridges both workflows by automating the patch analysis pipeline end-to-end.
 
-| Tool Category | Description |
-|--------------|-------------|
-| [Static Analysis](static-analysis.md) | Binary diffing, decompilation, pattern matching, and automated semantic code analysis |
-| [Fuzzing](fuzzing.md) | Kernel driver fuzzing frameworks and coverage-guided approaches |
-| [Debugging](debugging.md) | Kernel debugging tools, crash analysis, and runtime driver verification |
-| [Patch Diffing](patch-diffing.md) | Binary comparison tools for identifying security-relevant changes between builds |
-| [AutoPiff Integration](autopiff-integration.md) | Using AutoPiff with KernelSight for automated patch analysis |
+## Choosing Your Starting Point
 
-## Typical Research Flow
-
-A common workflow after Patch Tuesday: (1) download pre-patch and post-patch drivers from `WinBIndex`, (2) run `BinDiff` or `AutoPiff` to identify changed functions, (3) review changed functions in `Ghidra` or `IDA Pro`, (4) write a `WTF` or `kAFL` harness targeting the patched code path, (5) debug the triggered crash in `WinDbg` to confirm root cause.
+If you are new to Windows kernel research, start with [Debugging](debugging.md) to set up a kernel debugging environment, then move to [Static Analysis](static-analysis.md) to learn how to navigate a driver binary. If you already have debugging experience and want to find vulnerabilities, [Fuzzing](fuzzing.md) covers the automated discovery tools. If you are focused on Patch Tuesday analysis, go directly to [Patch Diffing](patch-diffing.md) and [AutoPiff Integration](autopiff-integration.md).
 
 <div class="ks-next-pipeline">
   <a href="../index.md">&larr; Pipeline Overview</a>

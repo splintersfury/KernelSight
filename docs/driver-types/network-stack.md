@@ -1,31 +1,65 @@
 # Network Stack Drivers
 
-Network stack drivers implement protocol handling, socket operations, and HTTP processing. They range from the TCP/IP stack to the Windows Sockets kernel helper (AFD) and the HTTP protocol handler.
+<div class="ks-pipeline-pos">
+  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+</div>
+
+In August 2024, Microsoft patched CVE-2024-38063, an integer underflow in tcpip.sys that allowed remote code execution via crafted IPv6 packets. No authentication, no user interaction, no local access required. The attacker sends packets; the kernel parses them; the machine is compromised. Network stack drivers are the only driver category in the KernelSight corpus that includes a genuinely remote, pre-authentication kernel attack surface, and that distinction makes them fundamentally different from every other category on this page.
+
+The Windows network stack spans three major components: the TCP/IP protocol driver (tcpip.sys) that processes packets from the wire, the Ancillary Function Driver (afd.sys) that implements the kernel side of Winsock for local socket operations, and the HTTP protocol stack (http.sys) that parses HTTP requests in kernel mode for IIS and HTTP.sys-based services. Each has a distinct threat model, but they share a common characteristic: they process untrusted data at high speed under tight performance constraints, and the code prioritizes throughput over defensive validation.
 
 ## Architecture
 
-- **Layered model**: NDIS miniport → Protocol drivers (tcpip.sys) → TDI/Winsock (afd.sys) → User-mode Winsock
-- **Key subsystems**: TCP/IP stack, Ancillary Function Driver (AFD), HTTP Protocol Stack
-- **IRP dispatch**: Socket IOCTLs (AFD), network protocol processing (tcpip.sys), HTTP request handling (http.sys)
+The Windows network stack is a layered architecture where each driver handles a specific level of abstraction.
 
-## Attack Surface
+``` mermaid
+graph TD
+    A["Remote Attacker<br/>Crafted Packets"] -->|"Wire"| B["NDIS Miniport<br/>NIC Driver"]
+    B --> C["tcpip.sys<br/>TCP/IP Protocol Stack"]
+    C --> D["afd.sys<br/>Winsock Kernel Helper"]
+    D --> E["User Mode<br/>Winsock Application"]
+    A2["Remote Attacker<br/>HTTP Requests"] -->|"Wire"| B
+    B --> C
+    C --> F["http.sys<br/>HTTP Protocol Stack"]
+    F --> G["User Mode<br/>IIS / HTTP API"]
 
-### tcpip.sys — TCP/IP Stack
-- **Remote attack surface**: IPv4/IPv6 packet processing, reassembly, option parsing
-- **Key risk**: Integer underflow in packet reassembly length calculations
-- **Reach**: Remotely triggerable — no authentication required
+    style A fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+    style A2 fill:#0d1320,stroke:#ef4444,color:#e2e8f0
+    style B fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+    style C fill:#152a4a,stroke:#3b82f6,color:#e2e8f0
+    style D fill:#152a4a,stroke:#3b82f6,color:#e2e8f0
+    style E fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+    style F fill:#152a4a,stroke:#3b82f6,color:#e2e8f0
+    style G fill:#1e293b,stroke:#3b82f6,color:#e2e8f0
+```
 
-### afd.sys — Ancillary Function Driver
-- **Local attack surface**: Winsock kernel helper — processes socket operations from user mode
-- **Key risk**: Missing ProbeForWrite on user buffers, Registered I/O (RIO) buffer races
-- **Reach**: Any user-mode process can create sockets
+At the bottom, NDIS miniport drivers interface with network hardware. Above them, tcpip.sys implements the full TCP/IP protocol stack, including IPv4/IPv6 packet processing, reassembly, option parsing, and routing. The Ancillary Function Driver (afd.sys) sits between tcpip.sys and user-mode Winsock, translating socket API calls into kernel operations. On servers, http.sys provides kernel-mode HTTP request parsing that feeds IIS and other HTTP.sys-based services.
 
-### http.sys — HTTP Protocol Stack
-- **Remote attack surface**: HTTP request parsing, header handling, trailer processing
-- **Key risk**: Uninitialized structures from crafted HTTP headers
-- **Reach**: Remotely triggerable against IIS and HTTP.sys-based services
+## Attack Surfaces by Component
 
-## Common Vulnerability Patterns
+### tcpip.sys: Remote Pre-Auth Kernel Attack Surface
+
+The TCP/IP stack processes every packet that arrives at the network interface. IPv6 packet reassembly, extension header parsing, and option processing all operate on untrusted data from the wire. The code performs arithmetic on header length fields to calculate buffer sizes and offsets, and these calculations are the primary vulnerability surface.
+
+CVE-2024-38063 demonstrates the risk precisely. During IPv6 packet reassembly, tcpip.sys subtracts a header length value from a total length value. When the header length exceeds the total length, the subtraction underflows, producing a large positive value that the driver uses as a buffer size. The result is a massive out-of-bounds operation. This bug is remotely triggerable by any host that can send IPv6 packets to the target, with no authentication and no user interaction. It is about as severe as a kernel vulnerability gets.
+
+### afd.sys: Local Socket Operations
+
+The Ancillary Function Driver is the kernel-side implementation of Winsock. Any user-mode process that creates a socket interacts with afd.sys through a set of IOCTLs that manage socket state, send/receive operations, and buffer management. Three CVEs in the corpus target afd.sys, reflecting its large IOCTL surface and complex asynchronous I/O handling.
+
+CVE-2024-38193 is a use-after-free race condition in Registered I/O (RIO) buffer management. RIO is a high-performance I/O API that allows user-mode code to register memory buffers for direct kernel access. The race occurs when a buffer is freed while an asynchronous operation still holds a reference to it. The Lazarus Group exploited this bug in the wild.
+
+CVE-2023-21768 is a missing `ProbeForWrite` on a user-mode buffer. The IOCTL handler writes to a caller-supplied pointer without first verifying that the pointer is in user-mode address space. This gives the attacker a write-what-where primitive: they pass a kernel address as the output buffer, and the driver writes attacker-controlled data to it. The subsequent exploitation used the I/O Ring primitive to convert this into full kernel read/write.
+
+CVE-2023-28218 is an integer overflow in the control message (CMSG) buffer size calculation. When `AfdCopyCMSGBuffer` computes the total size of ancillary data to copy, the multiplication overflows, producing a small allocation that receives a large copy.
+
+### http.sys: Remote HTTP Parsing
+
+The kernel-mode HTTP protocol stack parses HTTP requests before they reach user-mode server applications. On any machine running IIS or using the HTTP Server API, http.sys processes request lines, headers, and trailers from the network.
+
+CVE-2022-21907 exploits uninitialized memory in HTTP trailer processing. When http.sys parses a crafted HTTP request with specific header combinations, an internal tracker structure is left partially uninitialized. The uninitialized fields contain stale data from previous kernel allocations, which can include kernel pointers or other sensitive values. This is remotely triggerable against any HTTP.sys listener.
+
+## Vulnerability Patterns and Detection
 
 | Pattern | Description | AutoPiff Rules |
 |---------|-------------|----------------|
@@ -34,6 +68,8 @@ Network stack drivers implement protocol handling, socket operations, and HTTP p
 | UAF on async buffers | RIO buffer freed while still referenced | `added_refcount_guard`, `added_use_after_free_guard` |
 | Uninitialized tracker struct | HTTP header parsing leaves fields uninitialized | `safe_string_function_replacement`, `unicode_string_length_validation_added` |
 | Integer overflow in CMSG buffer | Control message buffer size overflows | `safe_size_math_helper_added`, `alloc_size_overflow_check_added` |
+
+The network stack CVEs span four different vulnerability classes (integer overflow, UAF, write-what-where, uninitialized memory), which makes this category more diverse in its bug types than most. The common thread is not a specific memory corruption pattern but rather the general challenge of processing untrusted data under performance pressure.
 
 ## CVEs
 
@@ -45,20 +81,12 @@ Network stack drivers implement protocol handling, socket operations, and HTTP p
 | [CVE-2023-28218](../case-studies/CVE-2023-28218.md) | `afd.sys` | Integer overflow in AfdCopyCMSGBuffer | Integer Overflow | No | No |
 | [CVE-2022-21907](../case-studies/CVE-2022-21907.md) | `http.sys` | Uninitialized tracker via crafted HTTP headers | Uninitialized Memory | No | **Yes** |
 
-## Key Drivers
+## Research Outlook
 
-### tcpip.sys
-- **Role**: Core TCP/IP protocol stack
-- **Attack vector**: Remote — send crafted IPv6 packets
-- **Note**: CVE-2024-38063 is a **remote code execution** with no user interaction
+The network stack presents two distinct research opportunities. For remote kernel exploitation, tcpip.sys and http.sys are the targets. IPv6 processing in tcpip.sys is particularly interesting because IPv6 has more complex extension header handling than IPv4, creating more opportunities for arithmetic errors in length calculations. http.sys exposes a large HTTP parsing surface that is enabled by default on Windows Server installations.
 
-### afd.sys
-- **Role**: Winsock kernel helper for socket operations
-- **Attack vector**: Local — any process can create sockets and invoke AFD IOCTLs
-- **Note**: 3 CVEs in corpus — AFD is a persistent target due to its large IOCTL surface and complex async I/O (Registered I/O)
-- **Exploitation highlight**: CVE-2023-21768 was exploited via the I/O Ring primitive — write-what-where into I/O Ring registration buffer
+For local privilege escalation, afd.sys is the workhorse. Its large IOCTL surface, complex async I/O model (especially Registered I/O), and the fact that any process can create sockets make it a persistent target. The three CVEs in the corpus show three different bug classes in the same driver, suggesting that afd.sys has enough complexity to produce diverse vulnerability types.
 
-### http.sys
-- **Role**: Kernel-mode HTTP protocol handler for IIS and HTTP API
-- **Attack vector**: Remote — send crafted HTTP requests
-- **Note**: Exposed on any machine running IIS or HTTP.sys listeners
+The interaction between network stack drivers and other kernel components creates additional attack surface. For example, afd.sys interacts with the I/O Manager for IRP completion, with the memory manager for MDL operations, and with the pool allocator for buffer management. Bugs at these boundaries, like the missing ProbeForWrite in CVE-2023-21768, often fall through the cracks of component-focused code reviews.
+
+For the broader context of how IOCTL-based attack surfaces work, see [Attack Surfaces](../attack-surfaces/). For the exploitation primitives used after achieving a write-what-where or UAF, see [Primitives](../primitives/).

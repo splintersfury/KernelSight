@@ -1,6 +1,6 @@
 # Capcom.sys
 
-> Capcom anti-cheat driver — intentional ring-0 code execution with SMEP bypass
+> Capcom anti-cheat driver, intentional ring-0 code execution with SMEP bypass
 
 ## Summary
 
@@ -12,6 +12,14 @@
 | **Abused Version** | 1.0.0.4 (shipped with Street Fighter V) |
 | **Status** | Withdrawn — Capcom removed the driver; blocklisted |
 | **Exploited ITW** | Yes |
+
+## The Story
+
+`Capcom.sys` is arguably the most famous BYOVD driver ever created, and its notoriety is well-earned. It shipped as an anti-cheat component with Capcom's Street Fighter V, and its design raised a question that the security community still references: can you really call it a vulnerability when the driver is doing exactly what it was designed to do?
+
+Here is what happens when you send IOCTL `0xAA013044` to `\\.\Htsysm72FB`. The driver reads a function pointer from the user-supplied buffer. It clears the SMEP bit in CR4, disabling Supervisor Mode Execution Prevention. It calls the user-supplied function pointer from ring 0. When the function returns, it re-enables SMEP. That is the entire IOCTL handler. Capcom built this so their anti-cheat verification code could run in kernel mode. The device object has world-accessible ACLs.
+
+tandasat first documented the behavior. FuzzySecurity wrote the most widely-referenced exploitation guide. The exploit is about 50 lines of code. No heap spray. No race condition. No mitigation bypass needed, because the driver disables the mitigation for you.
 
 ## BYOVD Context
 
@@ -25,29 +33,11 @@
 
 - `0xAA013044` — Execute user-supplied function pointer in ring 0 with SMEP disabled
 
-## Root Cause
+## From User-Mode to Ring 0 in Five Steps
 
-`Capcom.sys` is the most well-known BYOVD driver. It shipped as an anti-cheat component with Capcom's Street Fighter V. The driver's IOCTL handler accepts a user-mode function pointer via `DeviceIoControl`, then:
+The exploitation flow is almost trivially simple. The attacker loads `Capcom.sys` and opens `\\.\Htsysm72FB`. They allocate a user-mode buffer containing their shellcode. They send IOCTL `0xAA013044` with the buffer address as the function pointer. The driver disables SMEP and calls the pointer, executing the shellcode in ring 0. The shellcode performs whatever kernel operation the attacker desires: token swap, rootkit installation, callback registration, or anything else achievable from ring 0.
 
-1. Disables SMEP (Supervisor Mode Execution Prevention) by clearing the relevant bit in CR4
-2. Calls the user-supplied function pointer from ring 0
-3. Re-enables SMEP after the call returns
-
-This is not a bug but the driver's intended design. Capcom implemented it to run anti-cheat verification code in kernel mode. Any process that can open the device (world-accessible ACLs) can execute arbitrary code in ring 0 by providing a function pointer. No memory corruption, no exploitation chain, just a direct call.
-
-tandasat first documented the vulnerability. FuzzySecurity wrote the most widely-referenced exploitation guide. Rapid7 published additional analysis.
-
-## Exploitation
-
-1. Load `Capcom.sys` and open `\\.\Htsysm72FB`
-2. Allocate a user-mode buffer containing shellcode
-3. Send IOCTL `0xAA013044` with the buffer address as the function pointer
-4. The driver disables SMEP and calls the pointer, executing shellcode in ring 0
-5. Shellcode performs token swap, installs rootkit, or runs any kernel operation
-
-The exploit is about 50 lines of code. No heap spray, no race condition, no mitigation bypass needed (the driver disables SMEP itself). On systems without HVCI, this gives reliable ring-0 code execution.
-
-On HVCI-enabled systems, the driver cannot disable SMEP (the hypervisor prevents CR4 modification) and cannot execute user-mode code pages (W^X enforcement), so the attack fails.
+On systems without HVCI, this gives reliable, deterministic ring-0 code execution. On HVCI-enabled systems, the story changes completely. The hypervisor prevents CR4 modification (so SMEP cannot be disabled) and enforces W^X on code pages (so user-mode pages cannot execute in ring 0). The attack fails outright, which is one of the strongest practical arguments for HVCI deployment.
 
 ## Detection
 
@@ -85,6 +75,10 @@ rule Capcom_sys {
 - CR4 modification (SMEP bit toggling) detectable via hypervisor instrumentation
 - Immediate ring-0 code execution from user-supplied pointer
 - Any presence of Capcom.sys on a modern system is suspicious
+
+## Broader Significance
+
+`Capcom.sys` is the canonical example of "vulnerable by design." It demonstrates that BYOVD does not require a bug in the traditional sense; a driver that intentionally provides dangerous capabilities with no access control is just as exploitable. The driver also serves as the clearest real-world argument for HVCI: on systems with hypervisor-enforced code integrity, the entire attack class represented by `Capcom.sys` (disable SMEP, execute user-mode shellcode in ring 0) becomes impossible. For defenders, the lesson is that any signed driver that modifies CR4 or executes user-supplied function pointers should be treated as a critical BYOVD risk, regardless of the vendor's stated intent.
 
 ## References
 

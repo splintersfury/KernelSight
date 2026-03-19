@@ -14,6 +14,14 @@
 | **Exploited ITW** | Yes |
 | **Related CVEs** | [CVE-2025-1533](CVE-2025-1533.md) (stack overflow), [CVE-2025-3464](CVE-2025-3464.md) (auth bypass) |
 
+## The Story
+
+Most BYOVD drivers are blunt instruments: they give you physical memory access and you walk page tables. `AsIO3.sys` is more interesting because it offers an unusual primitive alongside the standard ones. Cisco Talos researcher Marcin Noga demonstrated a complete SYSTEM escalation chain using not the physical memory IOCTLs, but a single `ObfDereferenceObject` call that decrements any address by one. The title of the Talos blog post says it all: "Decrement by one to rule them all."
+
+The driver ships with ASRock and some ASUS motherboard utilities. Swapcontext first documented it when adding it as a KDU provider in v1.1. It provides the usual physical memory and MSR access, filtered through allowlists that attempt to restrict the most dangerous operations. But IOCTL `0xa0402450` has no restrictions at all: it calls `ObfDereferenceObject` on a user-supplied address, effectively decrementing the value at `(address - 0x30)` by one.
+
+The driver's authorization model also has a critical flaw. It relies on SHA256 hash verification of the calling process's executable path ([CVE-2025-3464](CVE-2025-3464.md)), which an attacker bypasses trivially with a hardlink. And the `IRP_MJ_CREATE` handler contains a stack buffer overflow in `Win32PathToNtPath` ([CVE-2025-1533](CVE-2025-1533.md)) due to a `MAX_PATH` length assumption.
+
 ## BYOVD Context
 
 - **Driver signing**: Authenticode-signed by ASRock Incorporation with valid certificate
@@ -31,38 +39,34 @@
 | `0xA040A45C` | MSR read/write | Allowlist filtering; excludes IA32_LSTAR and IA32_SYSENTER_EIP |
 | `0xa0402450` | `ObfDereferenceObject` on controlled address | Provides decrement-by-one primitive at `(addr - 0x30)` |
 
-## Root Cause
+## The Decrement-by-One Chain
 
-`AsIO3.sys` is a hardware access driver shipped with ASRock and some ASUS motherboard utilities. The driver provides direct physical memory access, I/O port access, MSR read/write, and an `ObfDereferenceObject` call via IOCTLs. While the physical memory and MSR IOCTLs have some filtering (range checks and allowlists respectively), the `ObfDereferenceObject` IOCTL (`0xa0402450`) has no restrictions — it accepts any address and decrements the value at `(address - 0x30)` by 1.
+The Talos exploitation chain is elegant in its simplicity. The attacker bypasses authorization through a hardlink attack, making their executable's path hash-match the expected utility. Then they leak the current thread's `KTHREAD` address via `NtQuerySystemInformation` with handle enumeration. With the `KTHREAD` address known, a single IOCTL `0xa0402450` call decrements `KTHREAD.PreviousMode` at offset `0x232` from `UserMode (1)` to `KernelMode (0)`.
 
-The driver's authorization relies solely on SHA256 hash verification of the calling process's executable path ([CVE-2025-3464](CVE-2025-3464.md)), which can be bypassed via a hardlink attack. The `IRP_MJ_CREATE` handler also contains a stack buffer overflow in its `Win32PathToNtPath` function ([CVE-2025-1533](CVE-2025-1533.md)) due to a `MAX_PATH` length assumption.
+Once `PreviousMode` equals zero, the game is over. Every subsequent `Nt*` syscall skips `ProbeForRead` and `ProbeForWrite` checks entirely, because the kernel believes the caller is already in kernel mode. The attacker now has full arbitrary read/write over the entire kernel address space using standard `NtReadVirtualMemory` and `NtWriteVirtualMemory`. From there, traversing `ActiveProcessLinks` to find the SYSTEM token and swapping it into the current process is routine. A SYSTEM shell follows.
 
-Swapcontext first documented the driver in the KDU v1.1 release. Cisco Talos researcher Marcin Noga later published a full exploitation analysis, demonstrating a complete SYSTEM escalation chain using the decrement-by-one primitive.
+```mermaid
+sequenceDiagram
+    participant A as Attacker
+    participant D as AsIO3.sys
+    participant K as Kernel
 
-## Exploitation
+    rect rgb(30, 41, 59)
+    A->>A: Hardlink bypass (SHA256 hash match)
+    A->>D: Open device handle
+    A->>K: NtQuerySystemInformation (leak KTHREAD)
+    A->>D: IOCTL 0xa0402450 (target KTHREAD+0x232)
+    D->>K: ObfDereferenceObject(KTHREAD+0x202)
+    Note over K: PreviousMode: 1 → 0
+    A->>K: NtReadVirtualMemory (read SYSTEM token)
+    A->>K: NtWriteVirtualMemory (swap token)
+    Note over A: SYSTEM shell
+    end
+```
 
 ### Via KDU (Physical Memory)
 
-1. Load the signed `AsIO3.sys` driver
-2. Open a device handle
-3. Map physical addresses via the MmMapIoSpace IOCTL
-4. Walk page tables, locate and modify kernel structures
-5. For advanced attacks: map SMRAM to access SMM code and data
-
-The KDU v1.1 release integrated AsIO3.sys as a provider, enabling automated exploitation via the KDU framework.
-
-### Via Decrement-by-One (Talos Chain)
-
-The full exploitation chain from Cisco Talos bypasses authorization and uses the `ObfDereferenceObject` IOCTL:
-
-1. **Auth bypass** — hardlink attack to pass SHA256 hash check ([CVE-2025-3464](CVE-2025-3464.md))
-2. **KTHREAD leak** — `NtQuerySystemInformation` with handle enumeration to find KTHREAD address
-3. **PreviousMode flip** — IOCTL `0xa0402450` decrements `KTHREAD.PreviousMode` (offset `0x232`) from 1 to 0
-4. **Kernel R/W** — with `PreviousMode = 0`, Nt* syscalls bypass all `ProbeForRead`/`ProbeForWrite` checks
-5. **Token theft** — traverse `ActiveProcessLinks` to find SYSTEM token, swap it into current process
-6. **SYSTEM shell** — launch `cmd.exe` as NT AUTHORITY\SYSTEM
-
-See [CVE-2025-3464](CVE-2025-3464.md) for the full technical breakdown.
+The KDU path is the simpler alternative: load the signed driver, open the device, map physical addresses via the `MmMapIoSpace` IOCTL (which has range filtering but can still reach useful regions), walk page tables, and modify kernel structures. For advanced attacks, mapping SMRAM provides access to SMM code and data.
 
 ## Detection
 
@@ -96,7 +100,7 @@ rule AsIO3_sys {
 ### Behavioral Indicators
 
 - Loading of `AsIO3.sys` from outside ASRock utility installation directories
-- Physical memory mapping targeting SMRAM address ranges (typically 0xA0000–0xBFFFF or chipset-defined regions)
+- Physical memory mapping targeting SMRAM address ranges (typically 0xA0000-0xBFFFF or chipset-defined regions)
 - MSR read/write IOCTLs from non-utility processes
 - Privilege escalation following AsIO3 driver interaction
 
@@ -108,6 +112,10 @@ rule AsIO3_sys {
 | PreviousMode Manipulation | [PreviousMode Manipulation](../primitives/exploitation/previous-mode-manipulation.md) |
 | Token Swapping | [Token Swapping](../primitives/exploitation/token-swapping.md) |
 | Physical Memory Mapping | [Direct IOCTL R/W](../primitives/arw/direct-ioctl-rw.md) |
+
+## Broader Significance
+
+`AsIO3.sys` is a textbook example of how a single decrement primitive can be as powerful as full arbitrary read/write. The `PreviousMode` flip technique turns a minimal primitive (subtract one from any address) into unrestricted kernel access, bypassing all user/kernel boundary enforcement. This pattern appears repeatedly in Windows kernel exploitation: when you can write even a single byte at a controlled location, `PreviousMode` at a known `KTHREAD` offset is often the shortest path to SYSTEM.
 
 ## References
 

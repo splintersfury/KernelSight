@@ -2,9 +2,7 @@
 
 > When each Windows kernel defense landed and how it shifted attacker techniques.
 
-## Overview
-
-Windows kernel mitigations have accumulated over a decade. Each new defense raises the cost of exploitation -- but rarely eliminates it. Attackers adapt by finding primitives that work within the new constraints. This page maps each defense to the technique shift it caused.
+Windows kernel mitigations have accumulated over more than a decade. Each new defense raises the cost of exploitation but rarely eliminates it. Attackers adapt by finding primitives that work within the new constraints, and the cycle continues. The result is a co-evolutionary process where each mitigation deployment produces a visible shift in exploitation technique. This page maps those shifts: what each defense blocked, and exactly how attackers responded.
 
 ## Timeline Table
 
@@ -25,7 +23,7 @@ Windows kernel mitigations have accumulated over a decade. Each new defense rais
 | 11 v24H2 | 26100 | 2024 | CLFS isolation, hardened Secure Pool, admin-less by default |
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG — Mitigation Deployment Timeline</span>
+  <span class="ks-figure-label">FIG -- Mitigation Deployment Timeline</span>
   <svg viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal timeline showing when major kernel mitigations were deployed from 2013 to 2024">
     <!-- Timeline axis -->
     <line class="ks-line" x1="40" y1="80" x2="740" y2="80"/>
@@ -86,43 +84,43 @@ Windows kernel mitigations have accumulated over a decade. Each new defense rais
   <p class="ks-figure-caption">Each milestone marks when a major mitigation first shipped. CVE density bands approximate disclosure volume -- 2025 dominates the corpus due to expanded Patch Tuesday coverage.</p>
 </div>
 
-## Impact on Exploitation
+## How Each Mitigation Shifted the Game
 
-### Post-SMEP / SMAP (2013--2017)
+### Post-SMEP / SMAP (2013-2017)
 
-**Blocked:** Running user-space shellcode from kernel context. Before SMEP, a write-what-where could redirect a function pointer to user-mode shellcode. SMAP extended this to reads -- the kernel can no longer fetch user pages either.
+**What it blocked:** Running user-space shellcode from kernel context. Before SMEP, a write-what-where could redirect a function pointer to user-mode shellcode. The attacker's payload sat at a known user-mode address, executed with kernel privileges, and returned. SMAP extended this by preventing the kernel from reading user-mode pages at all, closing the fallback technique of staging fake kernel structures in user memory.
 
-**Attacker adaptation:** Data-only attacks. Attackers now modify kernel data structures (tokens, PreviousMode) instead of executing shellcode. Pool spray + token swap became the standard endgame. See [Token Swapping](../primitives/exploitation/token-swapping.md).
+**How attackers adapted:** Data-only attacks emerged as the dominant strategy. Rather than executing custom code, attackers began modifying kernel data structures directly: copying the SYSTEM token into the current process, flipping `PreviousMode` to gain kernel-mode access checks, or manipulating security descriptors. Pool spray plus token swap became the standard endgame, a pattern that persists to this day. See [Token Swapping](../primitives/exploitation/token-swapping.md).
 
 ### Post-Segment Heap (2020)
 
-**Blocked:** Predictable pool layout. The legacy allocator used fixed-size buckets that made heap spraying reliable. Segment Heap added randomization, guard pages, and metadata checks.
+**What it blocked:** Predictable pool layout. The legacy NT allocator used fixed-size buckets with deterministic allocation ordering that made heap spraying trivially reliable. An attacker could predict exactly where their spray objects would land relative to the target allocation. The Segment Heap added randomized allocation order, guard pages, and metadata checks that disrupted this predictability.
 
-**Attacker adaptation:** Spray objects with known sizes. Named pipe attributes ([Pipe Attributes](../primitives/arw/pipe-attributes.md)), I/O Ring structures ([I/O Ring](../primitives/exploitation/io-ring.md)), and WNF state data ([WNF State Data](../primitives/exploitation/wnf-state-data.md)) still land in predictable pool slots, so reclamation stays reliable despite the new allocator.
+**How attackers adapted:** They found spray objects with known sizes that still land in predictable pool slots. Named pipe attributes ([Pipe Attributes](../primitives/arw/pipe-attributes.md)), I/O Ring structures ([I/O Ring](../primitives/exploitation/io-ring.md)), and WNF state data ([WNF State Data](../primitives/exploitation/wnf-state-data.md)) each provide controlled-size allocations in specific pool buckets. Spraying thousands of these objects achieves reliable reclamation despite the randomized allocator, turning a deterministic technique into a probabilistic one with success rates above 90%.
 
 ### Post-kCET (2022)
 
-**Blocked:** ROP in kernel context. kCET uses hardware shadow stacks to verify return addresses. kCFG separately blocks function pointer overwrites via vtable corruption.
+**What it blocked:** ROP in kernel context. kCET uses hardware shadow stacks to verify that return addresses have not been tampered with. kCFG separately blocks function pointer overwrites by validating indirect call targets against a compiler-generated bitmap of legitimate entry points.
 
-**Attacker adaptation:** kCFG-compliant primitives. [CVE-2026-21241](../case-studies/CVE-2026-21241.md) calls `RtlSetBit`/`RtlClearAllBits` -- legitimate indirect call targets that pass kCFG validation. The [bit-manipulation technique](../primitives/exploitation/bit-manipulation.md) stays inside the existing control flow graph.
+**How attackers adapted:** kCFG-compliant primitives appeared. [CVE-2026-21241](../case-studies/CVE-2026-21241.md) demonstrates the technique by redirecting a controlled callback to `RtlSetBit` and `RtlClearAllBits`, both of which are legitimate indirect call targets that pass kCFG validation. The [bit-manipulation technique](../primitives/exploitation/bit-manipulation.md) operates entirely within the existing control flow graph, achieving arbitrary bit modification without violating any CFI check.
 
 ### Post-CLFS Isolation (2024)
 
-**Blocked:** Unvalidated BLF metadata offsets -- the most exploited single attack surface in the corpus. CLFS Isolation adds bounds checks on structure offsets and verifies integrity during log operations.
+**What it blocked:** Unvalidated BLF metadata offsets, which constituted the most exploited single attack surface in the corpus. CLFS Isolation adds bounds checks on structure offsets and integrity verification during log operations, targeting the exact vulnerability pattern that produced 15 CVEs.
 
-**Attacker adaptation:** Still evolving. Post-isolation CLFS CVEs ([CVE-2025-32713](../case-studies/CVE-2025-32713.md), [CVE-2026-20820](../case-studies/CVE-2026-20820.md)) show the isolation is incomplete -- new offset validation gaps keep appearing each Patch Tuesday.
+**How attackers adapted:** The adaptation is still evolving. Post-isolation CLFS CVEs ([CVE-2025-32713](../case-studies/CVE-2025-32713.md), [CVE-2026-20820](../case-studies/CVE-2026-20820.md)) show that the isolation is incomplete. New offset validation gaps keep appearing each Patch Tuesday, suggesting that the BLF format's complexity continues to outpace the bounds checking. The long-term question is whether Microsoft will continue patching individual offsets or eventually move to a fundamentally different parser architecture.
 
-## What's Still Missing
+## What the Mitigations Have Not Solved
 
-These attack patterns still work despite current mitigations:
+Despite a decade of deployment, four attack patterns remain viable on fully updated Windows 11 24H2 systems.
 
-- **File format parsing in kernel.** NTFS, FAT, and CLFS parse complex on-disk structures in ring 0. VHD mounting triggers this from user context. No sandbox or memory safety boundary protects these parsers.
+**File format parsing in kernel** continues to run complex parsers for NTFS, FAT, and CLFS structures in Ring 0 without any memory safety boundary. VHD mounting triggers these parsers from user context, meaning any user can exercise the full parser attack surface. No sandbox, no memory-safe language runtime, and no hypervisor protection covers these code paths.
 
-- **IOCTL authorization model.** Windows has no mandatory access control for IOCTL codes. Each driver rolls its own checks, and many skip them. See [Anatomy of a Secure Driver](secure-driver-anatomy.md), anti-pattern 5.
+**IOCTL authorization** has no mandatory framework. Windows provides no kernel-level MAC for IOCTL codes. Each driver implements its own access checks (or skips them). The pattern repeats across the corpus: a driver creates a device with a permissive ACL, and the IOCTL handlers trust their callers. See anti-pattern 5 in [Secure Driver Anatomy](secure-driver-anatomy.md).
 
-- **BYOVD.** The Vulnerable Driver Blocklist is opt-in on most configurations and purely reactive -- drivers get blocklisted only after exploitation is observed. The signing model still loads old signed drivers. See [BYOVD](../reference/byovd.md).
+**BYOVD** remains viable because the Vulnerable Driver Blocklist is opt-in on most configurations and purely reactive. Drivers get blocklisted only after exploitation is observed in the wild. The signing model still loads old signed drivers, and some (like NVIDIA's GPU drivers) cannot be blocklisted without breaking core functionality. See [BYOVD](../reference/byovd.md).
 
-- **Pool spray reliability.** Segment Heap added randomization, but practical exploitation still achieves reliable reclamation via I/O Ring, named pipes, and WNF objects. The hardening raises cost without preventing the technique.
+**Pool spray reliability** has not been eliminated by the Segment Heap. The hardening raises the cost (more spray iterations, lower success rate per attempt) without preventing the technique. Practical exploitation still achieves reliable reclamation via I/O Ring, named pipes, and WNF objects. The Segment Heap shifted pool exploitation from deterministic to probabilistic, but probabilistic with a 90%+ success rate is still viable for most threat actors.
 
 ## Cross-References
 
