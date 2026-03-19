@@ -39,6 +39,7 @@ theme:
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/dashboard.css
 
 markdown_extensions:
   - admonition
@@ -55,6 +56,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Overview: overview.md
   - Drivers:
     - driver-types/index.md
     - File System Drivers: driver-types/filesystem.md

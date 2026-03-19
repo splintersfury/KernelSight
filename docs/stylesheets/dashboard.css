@@ -1,0 +1,509 @@
+/* ============================================================
+   KernelSight Dashboard — Styles
+   Technical manual aesthetic: monospace headers, clean lines,
+   no shadows, no rounded corners.
+   ============================================================ */
+
+/* --- Stats Bar --- */
+.ks-stats-bar {
+  display: flex;
+  gap: 0;
+  border-top: 2px solid var(--ks-section);
+  border-bottom: 1px solid var(--ks-border);
+  margin-bottom: 2rem;
+}
+
+.ks-stat-card {
+  flex: 1;
+  padding: 1.2rem 1rem;
+  border-right: 1px solid var(--ks-border);
+  text-align: left;
+}
+
+.ks-stat-card:last-child {
+  border-right: none;
+}
+
+.ks-stat-card .ks-stat-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--ks-section);
+  display: block;
+  line-height: 1.2;
+}
+
+.ks-stat-card .ks-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ks-fg-muted);
+  display: block;
+  margin-top: 0.3rem;
+}
+
+/* --- Search & Filter Controls --- */
+.ks-controls {
+  margin-bottom: 1.5rem;
+}
+
+.ks-search-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  align-items: stretch;
+}
+
+.ks-search-input {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--ks-border);
+  border-radius: 0;
+  background: var(--ks-bg-surface);
+  color: var(--ks-fg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ks-search-input:focus {
+  border-color: var(--ks-section);
+}
+
+.ks-search-input::placeholder {
+  color: var(--ks-fg-light);
+}
+
+.ks-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.ks-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--ks-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ks-fg-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.ks-chip:hover {
+  border-color: var(--ks-section);
+  color: var(--ks-section);
+}
+
+.ks-chip.active {
+  border-color: var(--ks-section);
+  background: var(--ks-cobalt-wash-strong);
+  color: var(--ks-section);
+}
+
+.ks-chip-clear {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ks-fg-light);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.ks-chip-clear:hover {
+  color: var(--ks-badge-itw);
+}
+
+.ks-result-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ks-fg-muted);
+  margin-bottom: 0.8rem;
+}
+
+/* --- CVE Table --- */
+.ks-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.ks-cve-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.ks-cve-table thead {
+  background: transparent;
+}
+
+.ks-cve-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ks-fg-muted);
+  border-bottom: 2px solid var(--ks-section);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.ks-cve-table th:hover {
+  color: var(--ks-section);
+}
+
+.ks-cve-table th .sort-arrow {
+  display: inline-block;
+  margin-left: 0.3rem;
+  font-size: 0.6rem;
+  opacity: 0.4;
+}
+
+.ks-cve-table th.sorted .sort-arrow {
+  opacity: 1;
+  color: var(--ks-section);
+}
+
+.ks-cve-table td {
+  border: none;
+  border-bottom: 1px solid var(--ks-border);
+  padding: 0.5rem 0.6rem;
+  vertical-align: middle;
+}
+
+.ks-cve-table tbody tr {
+  transition: background 0.1s;
+}
+
+.ks-cve-table tbody tr:hover {
+  background: color-mix(in srgb, var(--ks-section) 5%, transparent);
+}
+
+.ks-cve-table tbody tr.hidden {
+  display: none;
+}
+
+.ks-cve-table a {
+  color: var(--ks-cobalt);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 0.76rem;
+}
+
+.ks-cve-table a:hover {
+  border-bottom-color: var(--ks-cobalt);
+}
+
+.ks-cve-table .clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.ks-cve-table .clickable:hover {
+  color: var(--ks-section);
+}
+
+/* --- Table Badges --- */
+.ks-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  padding: 0.08rem 0.35rem;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.ks-badge-itw {
+  color: var(--ks-badge-itw);
+  border: 1px solid var(--ks-badge-itw);
+}
+
+.ks-badge-poc {
+  color: var(--ks-c-primitives);
+  border: 1px solid var(--ks-c-primitives);
+}
+
+.ks-badge-writeup {
+  color: var(--ks-c-surfaces);
+  border: 1px solid var(--ks-c-surfaces);
+}
+
+.ks-badges-cell {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+/* --- Heat Matrix --- */
+.ks-matrix-section {
+  margin: 2.5rem 0;
+}
+
+.ks-matrix-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ks-fg-muted);
+  margin-bottom: 1rem;
+}
+
+.ks-matrix-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.ks-matrix {
+  display: grid;
+  gap: 1px;
+  background: var(--ks-border);
+  border: 1px solid var(--ks-border);
+  width: max-content;
+  min-width: 100%;
+}
+
+.ks-matrix-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 500;
+  padding: 0.4rem 0.5rem;
+  background: var(--ks-bg-surface);
+  color: var(--ks-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ks-matrix-header.row-header {
+  text-align: right;
+  min-width: 120px;
+}
+
+.ks-matrix-header.col-header {
+  text-align: center;
+  writing-mode: horizontal-tb;
+  min-width: 60px;
+}
+
+.ks-matrix-header.corner {
+  background: var(--ks-bg-surface);
+}
+
+.ks-matrix-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: outline 0.1s;
+  min-height: 32px;
+}
+
+.ks-matrix-cell:hover {
+  outline: 2px solid var(--ks-section);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* Heat levels — light mode */
+.ks-heat-0 {
+  background: var(--ks-bg-surface);
+  color: transparent;
+}
+
+.ks-heat-1 {
+  background: color-mix(in srgb, var(--ks-cobalt) 8%, var(--ks-bg-surface));
+  color: var(--ks-cobalt);
+}
+
+.ks-heat-2 {
+  background: color-mix(in srgb, var(--ks-cobalt) 18%, var(--ks-bg-surface));
+  color: var(--ks-cobalt);
+}
+
+.ks-heat-3 {
+  background: color-mix(in srgb, var(--ks-cobalt) 30%, var(--ks-bg-surface));
+  color: #fff;
+}
+
+.ks-heat-4 {
+  background: color-mix(in srgb, var(--ks-cobalt) 50%, var(--ks-bg-surface));
+  color: #fff;
+}
+
+/* ITW red dot */
+.ks-itw-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  background: var(--ks-badge-itw);
+  border-radius: 50%;
+}
+
+/* --- Export Buttons --- */
+.ks-export-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.ks-export-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--ks-border);
+  border-radius: 0;
+  background: var(--ks-bg-surface);
+  color: var(--ks-fg-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ks-export-btn:hover {
+  border-color: var(--ks-section);
+  color: var(--ks-section);
+}
+
+/* --- Dark Mode (Slate) Overrides --- */
+[data-md-color-scheme="slate"] .ks-search-input {
+  background: var(--ks-bg-surface);
+  border-color: var(--ks-border);
+  color: var(--ks-fg);
+}
+
+[data-md-color-scheme="slate"] .ks-search-input:focus {
+  border-color: var(--ks-section);
+}
+
+[data-md-color-scheme="slate"] .ks-heat-0 {
+  background: var(--ks-bg-surface);
+}
+
+[data-md-color-scheme="slate"] .ks-heat-1 {
+  background: color-mix(in srgb, var(--ks-cobalt) 10%, var(--ks-bg-surface));
+  color: var(--ks-cobalt);
+}
+
+[data-md-color-scheme="slate"] .ks-heat-2 {
+  background: color-mix(in srgb, var(--ks-cobalt) 22%, var(--ks-bg-surface));
+  color: var(--ks-cobalt);
+}
+
+[data-md-color-scheme="slate"] .ks-heat-3 {
+  background: color-mix(in srgb, var(--ks-cobalt) 35%, var(--ks-bg-surface));
+  color: #fff;
+}
+
+[data-md-color-scheme="slate"] .ks-heat-4 {
+  background: color-mix(in srgb, var(--ks-cobalt) 55%, var(--ks-bg-surface));
+  color: #fff;
+}
+
+[data-md-color-scheme="slate"] .ks-export-btn {
+  background: var(--ks-bg-surface);
+  border-color: var(--ks-border);
+  color: var(--ks-fg-muted);
+}
+
+[data-md-color-scheme="slate"] .ks-export-btn:hover {
+  border-color: var(--ks-section);
+  color: var(--ks-section);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .ks-stats-bar {
+    flex-direction: column;
+  }
+
+  .ks-stat-card {
+    border-right: none;
+    border-bottom: 1px solid var(--ks-border);
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .ks-stat-card:last-child {
+    border-bottom: none;
+  }
+
+  .ks-stat-card .ks-stat-number {
+    font-size: 1.3rem;
+  }
+
+  .ks-search-row {
+    flex-direction: column;
+  }
+
+  .ks-matrix-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ks-export-row {
+    flex-wrap: wrap;
+  }
+
+  .ks-cve-table {
+    font-size: 0.72rem;
+  }
+
+  .ks-cve-table th,
+  .ks-cve-table td {
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ks-filter-chips {
+    gap: 0.3rem;
+  }
+
+  .ks-chip {
+    font-size: 0.58rem;
+    padding: 0.25rem 0.45rem;
+  }
+}

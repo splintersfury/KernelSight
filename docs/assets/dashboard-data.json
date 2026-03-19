@@ -1,0 +1,2995 @@
+{
+  "cves": [
+    {
+      "id": "CVE-2022-21882",
+      "driver": "win32kbase.sys",
+      "description": "Win32k — ConsoleWindow flag misinterprets WndExtra causing type confusion EoP",
+      "vuln_class": "type-confusion",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-21882/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-21882",
+        "writeup": "https://googleprojectzero.github.io/0days-in-the-wild/0day-RCAs/2022/CVE-2022-21882.html",
+        "poc": "https://github.com/KaLendsi/CVE-2022-21882"
+      }
+    },
+    {
+      "id": "CVE-2022-21907",
+      "driver": "http.sys",
+      "description": "HTTP Protocol Stack — uninitialized tracker struct via crafted HTTP headers allows RCE",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-21907/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-21907",
+        "writeup": "https://www.coresecurity.com/core-labs/articles/proof-concept-cve-2022-21907-http-protocol-stack-remote-code-execution",
+        "poc": "https://github.com/ZZ-SOCMAP/CVE-2022-21907"
+      }
+    },
+    {
+      "id": "CVE-2022-37969",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — SignaturesOffset OOB write via corrupted cbSymbolZone",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-37969/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-37969",
+        "writeup": "https://www.zscaler.com/blogs/security-research/technical-analysis-windows-clfs-zero-day-vulnerability-cve-2022-37969-part2-exploit-analysis",
+        "poc": "https://github.com/fortra/CVE-2022-37969"
+      }
+    },
+    {
+      "id": "CVE-2023-21768",
+      "driver": "afd.sys",
+      "description": "AFD WinSock — missing ProbeForWrite allows kernel write-what-where via IO ring",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-21768/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-21768",
+        "writeup": "https://www.sentinelone.com/blog/cve-2023-21768/",
+        "poc": "https://github.com/chompie1337/Windows_LPE_AFD_CVE-2023-21768"
+      }
+    },
+    {
+      "id": "CVE-2023-28218",
+      "driver": "afd.sys",
+      "description": "AFD WinSock — integer overflow in AfdCopyCMSGBuffer allows EoP",
+      "vuln_class": "integer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-28218/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-28218",
+        "writeup": "https://theori.io/blog/exploiting-windows-kernel-wild-copy-with-user-fault-handling-cve-2023-28218",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-28252",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — OOB write via corrupted base log offset",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-28252/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-28252",
+        "writeup": "https://securelist.com/windows-clfs-exploits-ransomware-cve-2023-28252/111601/",
+        "poc": "https://github.com/fortra/CVE-2023-28252"
+      }
+    },
+    {
+      "id": "CVE-2023-29336",
+      "driver": "win32kfull.sys",
+      "description": "Win32k — use-after-free from unlocked nested menu object allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-29336/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-29336",
+        "writeup": "https://www.numencyber.com/cve-2023-29336-win32k-analysis/",
+        "poc": "https://github.com/numencyber/Vulnerability_PoC/blob/main/CVE-2023-29336/poc.cpp"
+      }
+    },
+    {
+      "id": "CVE-2023-29360",
+      "driver": "mskssrv.sys",
+      "description": "Kernel Streaming Server — MmProbeAndLockPages called with KernelMode on user MDL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-29360/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-29360",
+        "writeup": "https://seg-fault.gitbook.io/researchs/windows-security-research/exploit-development/mskssrv.sys-cve-2023-29360",
+        "poc": "https://github.com/Nero22k/cve-2023-29360"
+      }
+    },
+    {
+      "id": "CVE-2023-32019",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — kernel heap memory leak to user process via thread info query",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2023-32019/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-32019",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-36036",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — heap overflow via crafted reparse data",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2023-36036/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-36036",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-36424",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — pool overflow from unvalidated reparse data",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-36424/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-36424",
+        "writeup": "https://ssd-disclosure.com/ssd-advisory-windows-kernel-pool-clfs-sys-corruption-privilege-escalation/",
+        "poc": "https://github.com/zerozenxlabs/CVE-2023-36424"
+      }
+    },
+    {
+      "id": "CVE-2023-36802",
+      "driver": "mskssrv.sys",
+      "description": "Kernel Streaming Server — FsContextReg/FsStreamReg object type confusion leads to EoP",
+      "vuln_class": "type-confusion",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-36802/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-36802",
+        "writeup": "https://googleprojectzero.github.io/0days-in-the-wild/0day-RCAs/2023/CVE-2023-36802.html",
+        "poc": "https://github.com/chompie1337/Windows_MSKSSRV_LPE_CVE-2023-36802"
+      }
+    },
+    {
+      "id": "CVE-2024-21302",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — secure kernel version downgrade bypass via unvalidated version state",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-21302/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21302",
+        "writeup": "https://www.safebreach.com/blog/update-on-windows-downdate-downgrade-attacks/",
+        "poc": "https://github.com/SafeBreach-Labs/WindowsDowndate"
+      }
+    },
+    {
+      "id": "CVE-2024-21338",
+      "driver": "appid.sys",
+      "description": "AppLocker — IOCTL 0x22A018 missing access control allows kernel code execution",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-21338/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21338",
+        "writeup": "https://www.gendigital.com/blog/insights/research/lazarus-and-the-fudmodule-rootkit-beyond-byovd-with-an-admin-to-kernel-zero-day",
+        "poc": "https://github.com/Crowdfense/CVE-2024-21338"
+      }
+    },
+    {
+      "id": "CVE-2024-26229",
+      "driver": "csc.sys",
+      "description": "Client-Side Caching — missing access check allows EoP",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-26229/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-26229",
+        "writeup": "https://securityonline.info/cve-2024-26229-windows-elevation-of-privilege-flaw-weaponized-poc-exploit-on-github/",
+        "poc": "https://github.com/RalfHacker/CVE-2024-26229-exploit"
+      }
+    },
+    {
+      "id": "CVE-2024-30085",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — missing size check before memcpy leads to heap overflow",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-30085/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30085",
+        "writeup": "https://starlabs.sg/blog/2024/all-i-want-for-christmas-is-a-cve-2024-30085-exploit/",
+        "poc": "https://github.com/Adamkadaban/CVE-2024-30085"
+      }
+    },
+    {
+      "id": "CVE-2024-30088",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — TOCTOU race in AuthzBasepCopyoutInternalSecurityAttributes",
+      "vuln_class": "race-conditions",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-30088/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30088",
+        "writeup": "https://exploits.forsale/pwn2own-2024/",
+        "poc": "https://github.com/tykawaii98/CVE-2024-30088"
+      }
+    },
+    {
+      "id": "CVE-2024-30089",
+      "driver": "mskssrv.sys",
+      "description": "Kernel Streaming Server — ref-count logic error causes use-after-free EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-30089/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30089",
+        "writeup": "https://securityintelligence.com/x-force/little-bug-that-could/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-35250",
+      "driver": "ks.sys",
+      "description": "Kernel Streaming — untrusted pointer dereference in IOCTL dispatch allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-35250/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-35250",
+        "writeup": "https://devco.re/blog/2024/08/23/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part1-en/",
+        "poc": "https://github.com/varwara/CVE-2024-35250"
+      }
+    },
+    {
+      "id": "CVE-2024-38054",
+      "driver": "ksthunk.sys",
+      "description": "Kernel Streaming WOW64 Thunk — integer overflow in KSSTREAM_HEADER thunking allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38054/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38054",
+        "writeup": "https://securityonline.info/exploit-for-cve-2024-38054-released-elevation-of-privilege-flaw-in-windows-kernel-streaming-wow-thunk/",
+        "poc": "https://github.com/Black-Frost/windows-learning/tree/main/CVE-2024-38054/exploit"
+      }
+    },
+    {
+      "id": "CVE-2024-38063",
+      "driver": "tcpip.sys",
+      "description": "TCP/IP stack — integer underflow in IPv6 packet reassembly allows RCE",
+      "vuln_class": "integer-overflow",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38063/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38063",
+        "writeup": "https://malwaretech.com/2024/08/exploiting-CVE-2024-38063.html",
+        "poc": "https://github.com/ynwarcs/CVE-2024-38063"
+      }
+    },
+    {
+      "id": "CVE-2024-38106",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — missing lock around VslpEnterIumSecureMode causes race condition EoP",
+      "vuln_class": "race-conditions",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38106/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38106",
+        "writeup": "https://www.pixiepointsecurity.com/blog/nday-cve-2024-38106/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-38193",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free race on Registered I/O buffers allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38193/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38193",
+        "writeup": "https://www.gendigital.com/blog/insights/research/lazarus-fudmodule-v3",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-21241",
+      "driver": "afd.sys",
+      "description": "AFD — race condition in AfdNotifyPostEvents spinlock release causes use-after-free EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2026-21241/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21241",
+        "writeup": "https://jle-k.com/blog/Exploiting+CVE-2026-21241",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-38238",
+      "driver": "ksthunk.sys",
+      "description": "Kernel Streaming WOW64 Thunk — MmMapLockedPages without MmProbeAndLockPages in frame handling",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38238/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38238",
+        "writeup": "https://ssd-disclosure.com/ssd-advisory-ksthunk-sys-integer-overflow-pe/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-38256",
+      "driver": "win32k.sys",
+      "description": "Win32k — uninitialized resource usage leaks kernel memory to user mode",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-38256/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38256",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-49138",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — heap overflow in LoadContainerQ allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-49138/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-49138",
+        "writeup": "https://hnsecurity.it/blog/cve-2024-49138-windows-clfs-heap-based-buffer-overflow-analysis-part-2/",
+        "poc": "https://github.com/MrAle98/CVE-2024-49138-POC"
+      }
+    },
+    {
+      "id": "CVE-2025-24985",
+      "driver": "fastfat.sys",
+      "description": "FAT File System — cluster count overflow in FAT bitmap allocation allows RCE",
+      "vuln_class": "integer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24985/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24985",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24993",
+      "driver": "ntfs.sys",
+      "description": "NTFS — MFT metadata heap buffer overflow via crafted VHD allows RCE",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24993/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24993",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2021-21551",
+      "driver": "DBUtil_2_3.sys",
+      "description": "Dell BIOS utility — arbitrary kernel R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2021-21551/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://attackerkb.com/topics/zAHZGAFaQX/cve-2021-21551",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Dell"
+    },
+    {
+      "id": "CVE-2019-16098",
+      "driver": "RTCore64.sys",
+      "description": "MSI Afterburner — physical mem R/W, MSR, I/O port via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2019-16098/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://swapcontext.blogspot.com/2020/01/unwinding-rtcore.html",
+        "poc": "https://github.com/Barakat/CVE-2019-16098"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "MSI"
+    },
+    {
+      "id": "CVE-2018-19320",
+      "driver": "gdrv.sys",
+      "description": "Gigabyte — arbitrary kernel R/W and MSR access via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2018-19320/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://seclists.org/fulldisclosure/2018/Dec/39",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Gigabyte"
+    },
+    {
+      "id": "CVE-2015-2291",
+      "driver": "iqvw64e.sys",
+      "description": "Intel Ethernet diagnostics — arbitrary R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2015-2291/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.exploit-db.com/exploits/36392",
+        "poc": "https://www.exploit-db.com/exploits/36392"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Intel"
+    },
+    {
+      "id": "CVE-2020-15368",
+      "driver": "HW.sys",
+      "description": "Marvin Test — physical memory R/W via unrestricted MmMapIoSpace",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2020-15368/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/stong/CVE-2020-15368"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Marvin Test Solutions"
+    },
+    {
+      "id": "CVE-2022-3699",
+      "driver": "LenovoDiagnosticsDriver.sys",
+      "description": "Lenovo Diagnostics — arbitrary kernel R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2022-3699/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/alfarom256/CVE-2022-3699"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Lenovo"
+    },
+    {
+      "id": "CVE-2019-18845",
+      "driver": "Viper RGB driver",
+      "description": "Patriot Viper RGB — physical memory R/W via unrestricted IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2019-18845/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.activecyber.us/activelabs/viper-rgb-driver-local-privilege-escalation-cve-2019-18845",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Patriot Memory"
+    },
+    {
+      "id": "CVE-2019-8372",
+      "driver": "LG LSB driver",
+      "description": "LG Device Manager — arbitrary kernel write via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2019-8372/",
+      "references": {
+        "msrc": "",
+        "writeup": "http://www.jackson-t.ca/lg-driver-lpe.html",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "LG Electronics"
+    },
+    {
+      "id": "CVE-2023-41444",
+      "driver": "iREC.sys",
+      "description": "iREC — arbitrary kernel R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-41444/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://blog.dru1d.ninja/windows-driver-exploit-development-irec-sys-a5eb45093945",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "iREC"
+    },
+    {
+      "id": "CVE-2025-45737",
+      "driver": "NeacController.sys",
+      "description": "NEAC — arbitrary kernel R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-45737/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/smallzhong/NeacController"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "NEAC"
+    },
+    {
+      "id": "ATSZIO64-sys",
+      "driver": "ATSZIO64.sys",
+      "description": "ASUS — physical memory R/W via unrestricted MmMapIoSpace",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/ATSZIO64-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://github.com/LimiQS/AsusDriversPrivEscala",
+        "poc": "https://github.com/DOGSHITD/SciDetectorApp"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ASUS"
+    },
+    {
+      "id": "CVE-2025-1533",
+      "driver": "AsIO3.sys",
+      "description": "ASUS AsIO3 — stack-based buffer overflow in Win32PathToNtPath (MAX_PATH assumption)",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-1533/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ASUS"
+    },
+    {
+      "id": "CVE-2025-3464",
+      "driver": "AsIO3.sys",
+      "description": "ASUS AsIO3 — authorization bypass via hardlink enables ObfDereferenceObject decrement-by-one, PreviousMode flip, token theft",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-3464/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ASUS"
+    },
+    {
+      "id": "AsIO3-sys",
+      "driver": "AsIO3.sys",
+      "description": "ASRock/ASUS — physical mem R/W and potential SMM access",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/AsIO3-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://swapcontext.blogspot.com/2021/04/kdu-v11-release-and-bonus-asio3sys.html",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ASRock/ASUS"
+    },
+    {
+      "id": "CVE-2020-12928",
+      "driver": "AMDRyzenMasterDriver.sys",
+      "description": "AMD Ryzen Master — arbitrary physical memory R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2020-12928/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://h0mbre.github.io/RyzenMaster_CVE/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "AMD"
+    },
+    {
+      "id": "CVE-2023-20598",
+      "driver": "AMD chipset driver",
+      "description": "AMD chipset — information disclosure via MMIO register access",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-20598/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.amd.com/en/resources/product-security/bulletin/amd-sb-6009.html",
+        "poc": ""
+      },
+      "third_party": true,
+      "vendor": "AMD"
+    },
+    {
+      "id": "CVE-2025-7771",
+      "driver": "ThrottleStop.sys",
+      "description": "ThrottleStop — MSR write primitive abused as AV/EDR killer",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-7771/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://securelist.com/av-killer-exploiting-throttlestop-sys/117026/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ThrottleStop"
+    },
+    {
+      "id": "NVDrv",
+      "driver": "nvlddmkm.sys",
+      "description": "NVIDIA — GPU memory mapping exposes kernel R/W primitive",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/NVDrv/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/zer0condition/NVDrv"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "NVIDIA"
+    },
+    {
+      "id": "Capcom-sys",
+      "driver": "Capcom.sys",
+      "description": "Capcom anti-cheat — ring-0 code exec with SMEP bypass",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/Capcom-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.fuzzysecurity.com/tutorials/28.html",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Capcom"
+    },
+    {
+      "id": "echo-driver-sys",
+      "driver": "echo_driver.sys",
+      "description": "Echo anti-cheat — kernel callback manipulation via IOCTL",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/echo-driver-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/kite03/echoac-poc/"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Echo AC"
+    },
+    {
+      "id": "viragt64-sys",
+      "driver": "viragt64.sys",
+      "description": "TG Soft VirIT — process termination IOCTL abused by Kasseika ransomware",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/viragt64-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.trendmicro.com/en_us/research/24/a/kasseika-ransomware-deploys-byovd-attack-abuses-psexec.html",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "TG Soft"
+    },
+    {
+      "id": "Truesight-sys",
+      "driver": "Truesight.sys",
+      "description": "Adlice RogueKiller — EDR bypass via handle duplication and process termination",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/Truesight-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://research.checkpoint.com/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Adlice"
+    },
+    {
+      "id": "amsdk-sys",
+      "driver": "amsdk.sys",
+      "description": "WatchDog — process termination abused by Silver Fox APT",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/amsdk-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://research.checkpoint.com/",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "WatchDog Development"
+    },
+    {
+      "id": "CVE-2023-1048",
+      "driver": "WinRing0x64.sys",
+      "description": "OpenLibSys WinRing0 — MSR write, physical memory R/W, I/O port, PCI config space via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-1048/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1048",
+        "poc": "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1048"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "OpenLibSys"
+    },
+    {
+      "id": "CVE-2023-1676",
+      "driver": "mydrivers64.sys",
+      "description": "DriverGenius — arbitrary MSR write and physical memory R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-1676/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1676",
+        "poc": "https://github.com/zeze-zeze/WindowsKernelVuln/tree/master/CVE-2023-1676"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "DriverGenius"
+    },
+    {
+      "id": "CVE-2025-21334",
+      "driver": "vkrnlintvsp.sys",
+      "description": "Hyper-V VSP Integration — use-after-free allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-21334/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21334",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-21335",
+      "driver": "vkrnlintvsp.sys",
+      "description": "Hyper-V VSP Integration — use-after-free allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-21335/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21335",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-21418",
+      "driver": "afd.sys",
+      "description": "AFD — heap-based buffer overflow allows SYSTEM escalation",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-21418/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21418",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24983",
+      "driver": "win32k.sys",
+      "description": "Win32k — use-after-free / race condition allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24983/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24983",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24990",
+      "driver": "ltmdm64.sys",
+      "description": "LiteManager — untrusted pointer dereference allows SYSTEM escalation",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24990/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24990",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-30400",
+      "driver": "dwmcore.dll",
+      "description": "Desktop Window Manager — use-after-free in composition surface handling allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-30400/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-30400",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-32701",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — use-after-free in log stream object allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-32701/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32701",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-32706",
+      "driver": "clfs.sys",
+      "description": "Common Log File System — heap buffer overflow from missing input validation",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-32706/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32706",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-32709",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free after socket closure allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-32709/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32709",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62215",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — race condition / double-free allows SYSTEM escalation",
+      "vuln_class": "race-conditions",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62215/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62215",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62221",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — use-after-free allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62221/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62221",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-21231",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — race condition allows SYSTEM escalation",
+      "vuln_class": "race-conditions",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-21231/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21231",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-21519",
+      "driver": "dwmcore.dll",
+      "description": "Desktop Window Manager — type confusion allows SYSTEM escalation",
+      "vuln_class": "type-confusion",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-21519/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21519",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24066",
+      "driver": "ks.sys",
+      "description": "Kernel Streaming — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24066/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24066",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24067",
+      "driver": "mskssrv.sys",
+      "description": "Kernel Streaming Server — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24067/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24067",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-53149",
+      "driver": "ksthunk.sys",
+      "description": "Kernel Streaming WOW64 Thunk — heap-based buffer overflow",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-53149/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53149",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24046",
+      "driver": "ks.sys",
+      "description": "Kernel Streaming — double free in filter object handling",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24046/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24046",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-49667",
+      "driver": "win32k.sys",
+      "description": "Win32k — double free allows SYSTEM escalation",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-49667/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49667",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-60719",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free from race between socket unbind and concurrent operations",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-60719/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-60719",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-0289",
+      "driver": "BioNTdrv.sys",
+      "description": "Paragon Partition Manager — arbitrary kernel write via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-0289/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Paragon"
+    },
+    {
+      "id": "CVE-2025-68947",
+      "driver": "NSecKrnl.sys",
+      "description": "NsecSoft — process termination abused for EDR bypass",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-68947/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "NsecSoft"
+    },
+    {
+      "id": "CVE-2025-8061",
+      "driver": "LnvMSRIO.sys",
+      "description": "Lenovo — MSR R/W and physical memory R/W via IOCTL",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-8061/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Lenovo"
+    },
+    {
+      "id": "CVE-2025-52915",
+      "driver": "K7RKScan.sys",
+      "description": "K7 Computing — process termination primitive",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-52915/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "K7 Computing"
+    },
+    {
+      "id": "CVE-2024-51324",
+      "driver": "BdApiUtil.sys",
+      "description": "Baidu — process termination abused for AV/EDR bypass",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-51324/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Baidu"
+    },
+    {
+      "id": "EnPortv-sys",
+      "driver": "EnPortv.sys",
+      "description": "Guidance/OpenText — process termination primitive",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/EnPortv-sys/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Guidance/OpenText"
+    },
+    {
+      "id": "CVE-2025-24984",
+      "driver": "ntfs.sys",
+      "description": "NTFS — information disclosure via sensitive data in log files",
+      "vuln_class": "uninitialized-memory",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24984/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24984",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24991",
+      "driver": "ntfs.sys",
+      "description": "NTFS — out-of-bounds read leaks kernel memory via crafted volume",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24991/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24991",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24992",
+      "driver": "ntfs.sys",
+      "description": "NTFS — buffer over-read leaks kernel memory",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24992/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24992",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-21367",
+      "driver": "win32k.sys",
+      "description": "Win32k — race condition allows EoP",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-21367/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21367",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24044",
+      "driver": "win32k.sys",
+      "description": "Win32k — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24044/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24044",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-27732",
+      "driver": "win32k.sys",
+      "description": "Win32k GRFX — improper memory locking allows EoP",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-27732/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-27732",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24058",
+      "driver": "dwmcore.dll",
+      "description": "DWM — improper input validation allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24058/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24058",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24063",
+      "driver": "ks.sys",
+      "description": "Kernel Streaming — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24063/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24063",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-29829",
+      "driver": "Trusted Runtime Interface",
+      "description": "Trusted Runtime Interface — info disclosure via uninitialized memory",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-29829/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-29829",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-32713",
+      "driver": "clfs.sys",
+      "description": "CLFS — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-32713/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32713",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-32722",
+      "driver": "storport.sys",
+      "description": "Storage Port — buffer over-read leaks kernel memory",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-32722/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32722",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-47982",
+      "driver": "storvsp.sys",
+      "description": "Storage VSP — improper input validation allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-47982/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-47982",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-49661",
+      "driver": "afd.sys",
+      "description": "AFD — untrusted pointer dereference allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-49661/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49661",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-49675",
+      "driver": "ksthunk.sys",
+      "description": "KS WOW Thunk — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-49675/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49675",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-49733",
+      "driver": "win32k.sys",
+      "description": "Win32k ICOMP — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-49733/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49733",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-49762",
+      "driver": "afd.sys",
+      "description": "AFD — race condition allows EoP",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-49762/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-49762",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-53147",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-53147/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53147",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-53718",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-53718/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53718",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-53803",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — information disclosure via kernel memory leak",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-53803/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53803",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-53804",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — information disclosure via kernel-mode driver",
+      "vuln_class": "uninitialized-memory",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-53804/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-53804",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-54110",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — integer overflow allows EoP",
+      "vuln_class": "integer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-54110/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-54110",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-54916",
+      "driver": "ntfs.sys",
+      "description": "NTFS — stack-based buffer overflow allows RCE",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-54916/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-54916",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-55228",
+      "driver": "win32k.sys",
+      "description": "Win32k GRFX — race condition allows RCE",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-55228/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55228",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-55680",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — race condition / TOCTOU allows EoP",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-55680/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55680",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-55681",
+      "driver": "dwmcore.dll",
+      "description": "DWM — out-of-bounds access allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-55681/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-55681",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-58722",
+      "driver": "dwmcore.dll",
+      "description": "DWM — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-58722/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-58722",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-59230",
+      "driver": "rasman.sys",
+      "description": "Remote Access Connection Manager — EoP zero-day",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-59230/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59230",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-59254",
+      "driver": "dwmcore.dll",
+      "description": "DWM — memory handling flaw allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-59254/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59254",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-60709",
+      "driver": "clfs.sys",
+      "description": "CLFS — out-of-bounds read allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-60709/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-60709",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62213",
+      "driver": "afd.sys",
+      "description": "AFD — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62213/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62213",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62217",
+      "driver": "afd.sys",
+      "description": "AFD — elevation of privilege",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62217/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62217",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62454",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62454/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62454",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62457",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — out-of-bounds read allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62457/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62457",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62458",
+      "driver": "win32k.sys",
+      "description": "Win32k — elevation of privilege",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62458/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62458",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-62470",
+      "driver": "clfs.sys",
+      "description": "CLFS — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-62470/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-62470",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-64673",
+      "driver": "storvsp.sys",
+      "description": "Storage VSP — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-64673/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-64673",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-64680",
+      "driver": "dwmcore.dll",
+      "description": "DWM — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-64680/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-64680",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-24052",
+      "driver": "ltmdm64.sys",
+      "description": "Agere Modem — stack buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-24052/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-24052",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20814",
+      "driver": "dxgkrnl.sys",
+      "description": "DirectX Graphics Kernel — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20814/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20814",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20820",
+      "driver": "clfs.sys",
+      "description": "CLFS — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20820/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20820",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20822",
+      "driver": "win32kfull.sys",
+      "description": "Win32k — use-after-free in graphics component allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20822/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20822",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20840",
+      "driver": "ntfs.sys",
+      "description": "NTFS — heap-based buffer overflow allows RCE",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20840/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20840",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20842",
+      "driver": "dwmcore.dll",
+      "description": "DWM — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20842/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20842",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20857",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — elevation of privilege",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20857/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20857",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20876",
+      "driver": "VBS Enclave",
+      "description": "VBS Enclave — heap-based buffer overflow allows EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20876/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20876",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-20922",
+      "driver": "ntfs.sys",
+      "description": "NTFS — heap-based buffer overflow allows RCE",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-20922/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20922",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-21253",
+      "driver": "msfs.sys",
+      "description": "Mailslot File System — use-after-free allows EoP",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-21253/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21253",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-21533",
+      "driver": "Remote Desktop Services",
+      "description": "Remote Desktop Services — EoP zero-day",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-21533/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21533",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2026-2636",
+      "driver": "clfs.sys",
+      "description": "CLFS — improper flag validation causes DoS",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2026-2636/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-2636",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-31096",
+      "driver": "agrsm64.sys",
+      "description": "Agere Soft Modem — stack overflow (driver removed Jan 2026)",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2023-31096/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-31096",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-55414",
+      "driver": "smserl64.sys",
+      "description": "Motorola Soft Modem — physical memory mapping (driver removed Jan 2026)",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-55414/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-0285",
+      "driver": "BioNTdrv.sys",
+      "description": "Paragon — arbitrary kernel memory mapping",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-0285/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.kb.cert.org/vuls/id/726882",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Paragon"
+    },
+    {
+      "id": "CVE-2025-0286",
+      "driver": "BioNTdrv.sys",
+      "description": "Paragon — arbitrary kernel memory write",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-0286/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.kb.cert.org/vuls/id/726882",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Paragon"
+    },
+    {
+      "id": "CVE-2025-0287",
+      "driver": "BioNTdrv.sys",
+      "description": "Paragon — null pointer dereference (DoS)",
+      "vuln_class": "null-deref",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-0287/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.kb.cert.org/vuls/id/726882",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Paragon"
+    },
+    {
+      "id": "CVE-2025-0288",
+      "driver": "BioNTdrv.sys",
+      "description": "Paragon — arbitrary kernel write via memmove",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2025-0288/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://www.kb.cert.org/vuls/id/726882",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Paragon"
+    },
+    {
+      "id": "CVE-2025-61156",
+      "driver": "TfSysMon.sys",
+      "description": "ThreatFire — process termination via insecure IOCTL",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-61156/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": "https://github.com/D7EAD/CVE-2025-61156"
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "ThreatFire"
+    },
+    {
+      "id": "CVE-2025-1055",
+      "driver": "K7RKScan.sys",
+      "description": "K7 Computing — elevation of privilege",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-1055/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "K7 Computing"
+    },
+    {
+      "id": "CVE-2025-70795",
+      "driver": "STProcessMonitor.sys",
+      "description": "Safetica — process termination primitive",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-70795/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "byovd": true,
+      "vendor": "Safetica"
+    },
+    {
+      "id": "CVE-2024-49114",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini-Filter — buffer overflow EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-49114/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-49114",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-21333",
+      "driver": "vsp.sys",
+      "description": "Hyper-V Virtual Service Provider — heap-based buffer overflow EoP",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-21333/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-21333",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-29824",
+      "driver": "clfs.sys",
+      "description": "CLFS — use-after-free / logic bug EoP, exploited by Storm-2460 for RansomEXX",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-29824/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-29824",
+        "writeup": "",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2025-11156",
+      "driver": "epdlpdrv.sys",
+      "description": "Netskope Endpoint DLP — null pointer dereference when driver loaded as generic kernel service",
+      "vuln_class": "null-pointer-deref",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-11156/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "vendor": "Netskope"
+    },
+    {
+      "id": "CVE-2025-5942",
+      "driver": "epdlpdrv.sys",
+      "description": "Netskope Endpoint DLP — heap overflow causes BSOD from unprivileged user",
+      "vuln_class": "buffer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2025-5942/",
+      "references": {
+        "msrc": "",
+        "writeup": "",
+        "poc": ""
+      },
+      "third_party": true,
+      "vendor": "Netskope"
+    },
+    {
+      "id": "CVE-2024-11616",
+      "driver": "epdlpdrv.sys",
+      "description": "Netskope Endpoint DLP — double-fetch TOCTOU heap overflow via communication port",
+      "vuln_class": "toctou",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-11616/",
+      "references": {
+        "msrc": "",
+        "writeup": "https://inbits-sec.com/posts/cve-2024-11616-netskope/",
+        "poc": "https://github.com/inb1ts/CVE-2024-11616"
+      },
+      "third_party": true,
+      "vendor": "Netskope"
+    },
+    {
+      "id": "CVE-2022-24521",
+      "driver": "clfs.sys",
+      "description": "CLFS — rgClients PreviousMode decrement via crafted BLF metadata",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-24521/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-24521",
+        "writeup": "https://securelist.com/windows-clfs-exploits-ransomware-cve-2022-24521/111580/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2022-35803",
+      "driver": "clfs.sys",
+      "description": "CLFS — type confusion via incomplete CVE-2022-24481 patch bypass",
+      "vuln_class": "type-confusion",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-35803/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-35803",
+        "writeup": "https://blog.northseapwn.top/2022/11/11/Windows-Kernel-Exploit-CVE-2022-35803-in-Common-Log-File-System/index.html",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2022-34707",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel (Registry) — reference count overflow in CM_KEY_SECURITY",
+      "vuln_class": "integer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-34707/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-34707",
+        "writeup": "https://googleprojectzero.blogspot.com/2024/04/the-windows-registry-adventure-1.html",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2022-22047",
+      "driver": "csrss.exe",
+      "description": "CSRSS — activation context cache poisoning via impersonated device map",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-22047/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-22047",
+        "writeup": "https://www.thezdi.com/blog/2023/1/23/activation-context-cache-poisoning-exploiting-csrss-for-privilege-escalation",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2022-41073",
+      "driver": "spoolsv.exe",
+      "description": "Print Spooler — drive root remapping during impersonation",
+      "vuln_class": "logic-bugs",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2022-41073/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-41073",
+        "writeup": "https://googleprojectzero.github.io/0days-in-the-wild/0day-RCAs/2022/CVE-2022-41073.html",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-23376",
+      "driver": "clfs.sys",
+      "description": "CLFS — out-of-bounds write via CLFS_CONTROL_RECORD manipulation",
+      "vuln_class": "buffer-overflow",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-23376/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-23376",
+        "writeup": "https://securelist.com/windows-clfs-exploits-ransomware-cve-2023-23376/111593/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-23420",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel (Registry) — use-after-free in transacted key rename",
+      "vuln_class": "use-after-free",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-23420/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-23420",
+        "writeup": "https://googleprojectzero.blogspot.com/2024/04/the-windows-registry-adventure-1.html",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2023-36427",
+      "driver": "ntoskrnl.exe",
+      "description": "Hyper-V / NT Kernel — arbitrary physical memory corruption via Intel HFI MSR abuse",
+      "vuln_class": "arbitrary-rw-primitives",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2023-36427/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-36427",
+        "writeup": "https://github.com/tandasat/CVE-2023-36427",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-30090",
+      "driver": "ksthunk.sys",
+      "description": "Kernel Streaming WOW Thunk — RequestorMode confusion via 32-to-64-bit IRP conversion",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-30090/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30090",
+        "writeup": "https://devco.re/blog/2024/10/05/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part2-en/",
+        "poc": "https://github.com/Dor00tkit/CVE-2024-30090"
+      }
+    },
+    {
+      "id": "CVE-2024-30084",
+      "driver": "cldflt.sys",
+      "description": "Cloud Files Mini Filter — TOCTOU race condition",
+      "vuln_class": "race-conditions",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-30084/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-30084",
+        "writeup": "https://devco.re/blog/2024/08/23/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part1-en/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-38144",
+      "driver": "ksthunk.sys",
+      "description": "Kernel Streaming WOW Thunk — integer overflow in buffer size calculation",
+      "vuln_class": "integer-overflow",
+      "itw": false,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2024-38144/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-38144",
+        "writeup": "https://devco.re/blog/2024/08/23/streaming-vulnerabilities-from-windows-kernel-proxying-to-kernel-part1-en/",
+        "poc": ""
+      }
+    },
+    {
+      "id": "CVE-2024-21345",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — elevation of privilege via improper kernel object handling",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-21345/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21345",
+        "writeup": "",
+        "poc": "https://github.com/exploits-forsale/CVE-2024-21345"
+      }
+    },
+    {
+      "id": "CVE-2024-26218",
+      "driver": "ntoskrnl.exe",
+      "description": "NT Kernel — elevation of privilege via improper kernel call handling",
+      "vuln_class": "logic-bugs",
+      "itw": false,
+      "has_poc": true,
+      "has_writeup": false,
+      "case_study": "case-studies/CVE-2024-26218/",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-26218",
+        "writeup": "",
+        "poc": "https://github.com/exploits-forsale/CVE-2024-26218"
+      }
+    }
+  ],
+  "matrix": {
+    "rows": [
+      "clfs.sys",
+      "ntoskrnl.exe",
+      "afd.sys",
+      "cldflt.sys",
+      "win32k.sys",
+      "dwmcore.dll",
+      "ntfs.sys",
+      "ksthunk.sys",
+      "BioNTdrv.sys",
+      "mskssrv.sys",
+      "ks.sys",
+      "AsIO3.sys",
+      "epdlpdrv.sys",
+      "win32kfull.sys",
+      "vkrnlintvsp.sys",
+      "ltmdm64.sys",
+      "K7RKScan.sys",
+      "storvsp.sys"
+    ],
+    "cols": [
+      "buffer-overflow",
+      "arbitrary-rw-primitives",
+      "use-after-free",
+      "logic-bugs",
+      "race-conditions",
+      "uninitialized-memory",
+      "integer-overflow",
+      "type-confusion",
+      "toctou",
+      "null-deref",
+      "null-pointer-deref"
+    ],
+    "cells": {
+      "clfs.sys|buffer-overflow": {
+        "count": 10,
+        "itw": 5,
+        "cves": [
+          "CVE-2022-37969",
+          "CVE-2023-28252",
+          "CVE-2023-36424",
+          "CVE-2024-49138",
+          "CVE-2025-32706",
+          "CVE-2025-32713",
+          "CVE-2025-60709",
+          "CVE-2025-62470",
+          "CVE-2026-20820",
+          "CVE-2023-23376"
+        ]
+      },
+      "afd.sys|arbitrary-rw-primitives": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-21768"
+        ]
+      },
+      "afd.sys|integer-overflow": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-28218"
+        ]
+      },
+      "win32kfull.sys|use-after-free": {
+        "count": 2,
+        "itw": 1,
+        "cves": [
+          "CVE-2023-29336",
+          "CVE-2026-20822"
+        ]
+      },
+      "mskssrv.sys|arbitrary-rw-primitives": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-29360"
+        ]
+      },
+      "ntoskrnl.exe|uninitialized-memory": {
+        "count": 3,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-32019",
+          "CVE-2025-53803",
+          "CVE-2025-53804"
+        ]
+      },
+      "cldflt.sys|buffer-overflow": {
+        "count": 6,
+        "itw": 1,
+        "cves": [
+          "CVE-2023-36036",
+          "CVE-2024-30085",
+          "CVE-2025-62454",
+          "CVE-2025-62457",
+          "CVE-2026-20857",
+          "CVE-2024-49114"
+        ]
+      },
+      "mskssrv.sys|type-confusion": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2023-36802"
+        ]
+      },
+      "ntoskrnl.exe|logic-bugs": {
+        "count": 3,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-21302",
+          "CVE-2024-21345",
+          "CVE-2024-26218"
+        ]
+      },
+      "ntoskrnl.exe|race-conditions": {
+        "count": 4,
+        "itw": 4,
+        "cves": [
+          "CVE-2024-30088",
+          "CVE-2024-38106",
+          "CVE-2025-62215",
+          "CVE-2026-21231"
+        ]
+      },
+      "mskssrv.sys|use-after-free": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-30089"
+        ]
+      },
+      "ks.sys|buffer-overflow": {
+        "count": 3,
+        "itw": 1,
+        "cves": [
+          "CVE-2024-35250",
+          "CVE-2025-24066",
+          "CVE-2025-24063"
+        ]
+      },
+      "ksthunk.sys|buffer-overflow": {
+        "count": 2,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-38054",
+          "CVE-2025-53149"
+        ]
+      },
+      "afd.sys|use-after-free": {
+        "count": 8,
+        "itw": 2,
+        "cves": [
+          "CVE-2024-38193",
+          "CVE-2026-21241",
+          "CVE-2025-32709",
+          "CVE-2025-60719",
+          "CVE-2025-53147",
+          "CVE-2025-53718",
+          "CVE-2025-62213",
+          "CVE-2025-62217"
+        ]
+      },
+      "ksthunk.sys|arbitrary-rw-primitives": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-38238"
+        ]
+      },
+      "win32k.sys|uninitialized-memory": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-38256"
+        ]
+      },
+      "ntfs.sys|buffer-overflow": {
+        "count": 6,
+        "itw": 2,
+        "cves": [
+          "CVE-2025-24993",
+          "CVE-2025-24991",
+          "CVE-2025-24992",
+          "CVE-2025-54916",
+          "CVE-2026-20840",
+          "CVE-2026-20922"
+        ]
+      },
+      "AsIO3.sys|buffer-overflow": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-1533"
+        ]
+      },
+      "AsIO3.sys|logic-bugs": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-3464"
+        ]
+      },
+      "AsIO3.sys|arbitrary-rw-primitives": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "AsIO3-sys"
+        ]
+      },
+      "vkrnlintvsp.sys|use-after-free": {
+        "count": 2,
+        "itw": 2,
+        "cves": [
+          "CVE-2025-21334",
+          "CVE-2025-21335"
+        ]
+      },
+      "afd.sys|buffer-overflow": {
+        "count": 2,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-21418",
+          "CVE-2025-49661"
+        ]
+      },
+      "win32k.sys|use-after-free": {
+        "count": 5,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-24983",
+          "CVE-2025-49667",
+          "CVE-2025-24044",
+          "CVE-2025-49733",
+          "CVE-2025-62458"
+        ]
+      },
+      "ltmdm64.sys|buffer-overflow": {
+        "count": 2,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-24990",
+          "CVE-2025-24052"
+        ]
+      },
+      "dwmcore.dll|use-after-free": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-30400"
+        ]
+      },
+      "clfs.sys|use-after-free": {
+        "count": 2,
+        "itw": 2,
+        "cves": [
+          "CVE-2025-32701",
+          "CVE-2025-29824"
+        ]
+      },
+      "cldflt.sys|use-after-free": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-62221"
+        ]
+      },
+      "dwmcore.dll|type-confusion": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2026-21519"
+        ]
+      },
+      "mskssrv.sys|buffer-overflow": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-24067"
+        ]
+      },
+      "ks.sys|use-after-free": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-24046"
+        ]
+      },
+      "BioNTdrv.sys|arbitrary-rw-primitives": {
+        "count": 4,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-0289",
+          "CVE-2025-0285",
+          "CVE-2025-0286",
+          "CVE-2025-0288"
+        ]
+      },
+      "K7RKScan.sys|logic-bugs": {
+        "count": 2,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-52915",
+          "CVE-2025-1055"
+        ]
+      },
+      "ntfs.sys|uninitialized-memory": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2025-24984"
+        ]
+      },
+      "win32k.sys|race-conditions": {
+        "count": 3,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-21367",
+          "CVE-2025-27732",
+          "CVE-2025-55228"
+        ]
+      },
+      "dwmcore.dll|buffer-overflow": {
+        "count": 6,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-24058",
+          "CVE-2025-55681",
+          "CVE-2025-58722",
+          "CVE-2025-59254",
+          "CVE-2025-64680",
+          "CVE-2026-20842"
+        ]
+      },
+      "storvsp.sys|buffer-overflow": {
+        "count": 2,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-47982",
+          "CVE-2025-64673"
+        ]
+      },
+      "ksthunk.sys|use-after-free": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-49675"
+        ]
+      },
+      "afd.sys|race-conditions": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-49762"
+        ]
+      },
+      "ntoskrnl.exe|integer-overflow": {
+        "count": 2,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-54110",
+          "CVE-2022-34707"
+        ]
+      },
+      "cldflt.sys|race-conditions": {
+        "count": 2,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-55680",
+          "CVE-2024-30084"
+        ]
+      },
+      "clfs.sys|logic-bugs": {
+        "count": 2,
+        "itw": 1,
+        "cves": [
+          "CVE-2026-2636",
+          "CVE-2022-24521"
+        ]
+      },
+      "BioNTdrv.sys|null-deref": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-0287"
+        ]
+      },
+      "epdlpdrv.sys|null-pointer-deref": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-11156"
+        ]
+      },
+      "epdlpdrv.sys|buffer-overflow": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2025-5942"
+        ]
+      },
+      "epdlpdrv.sys|toctou": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-11616"
+        ]
+      },
+      "clfs.sys|type-confusion": {
+        "count": 1,
+        "itw": 1,
+        "cves": [
+          "CVE-2022-35803"
+        ]
+      },
+      "ntoskrnl.exe|use-after-free": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-23420"
+        ]
+      },
+      "ntoskrnl.exe|arbitrary-rw-primitives": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2023-36427"
+        ]
+      },
+      "ksthunk.sys|race-conditions": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-30090"
+        ]
+      },
+      "ksthunk.sys|integer-overflow": {
+        "count": 1,
+        "itw": 0,
+        "cves": [
+          "CVE-2024-38144"
+        ]
+      }
+    }
+  },
+  "stats": {
+    "total_cves": 156,
+    "total_drivers": 64,
+    "itw_count": 57,
+    "poc_count": 33,
+    "vuln_class_counts": {
+      "buffer-overflow": 51,
+      "arbitrary-rw-primitives": 27,
+      "use-after-free": 26,
+      "logic-bugs": 21,
+      "race-conditions": 11,
+      "uninitialized-memory": 7,
+      "integer-overflow": 6,
+      "type-confusion": 4,
+      "null-deref": 1,
+      "null-pointer-deref": 1,
+      "toctou": 1
+    },
+    "driver_counts": {
+      "clfs.sys": 15,
+      "ntoskrnl.exe": 14,
+      "afd.sys": 13,
+      "cldflt.sys": 9,
+      "win32k.sys": 9,
+      "dwmcore.dll": 8,
+      "ntfs.sys": 7,
+      "ksthunk.sys": 6,
+      "BioNTdrv.sys": 5,
+      "mskssrv.sys": 4,
+      "ks.sys": 4,
+      "AsIO3.sys": 3,
+      "epdlpdrv.sys": 3,
+      "win32kfull.sys": 2,
+      "vkrnlintvsp.sys": 2,
+      "ltmdm64.sys": 2,
+      "K7RKScan.sys": 2,
+      "storvsp.sys": 2,
+      "win32kbase.sys": 1,
+      "http.sys": 1,
+      "appid.sys": 1,
+      "csc.sys": 1,
+      "tcpip.sys": 1,
+      "fastfat.sys": 1,
+      "DBUtil_2_3.sys": 1,
+      "RTCore64.sys": 1,
+      "gdrv.sys": 1,
+      "iqvw64e.sys": 1,
+      "HW.sys": 1,
+      "LenovoDiagnosticsDriver.sys": 1,
+      "Viper RGB driver": 1,
+      "LG LSB driver": 1,
+      "iREC.sys": 1,
+      "NeacController.sys": 1,
+      "ATSZIO64.sys": 1,
+      "AMDRyzenMasterDriver.sys": 1,
+      "AMD chipset driver": 1,
+      "ThrottleStop.sys": 1,
+      "nvlddmkm.sys": 1,
+      "Capcom.sys": 1,
+      "echo_driver.sys": 1,
+      "viragt64.sys": 1,
+      "Truesight.sys": 1,
+      "amsdk.sys": 1,
+      "WinRing0x64.sys": 1,
+      "mydrivers64.sys": 1,
+      "NSecKrnl.sys": 1,
+      "LnvMSRIO.sys": 1,
+      "BdApiUtil.sys": 1,
+      "EnPortv.sys": 1,
+      "Trusted Runtime Interface": 1,
+      "storport.sys": 1,
+      "rasman.sys": 1,
+      "dxgkrnl.sys": 1,
+      "VBS Enclave": 1,
+      "msfs.sys": 1,
+      "Remote Desktop Services": 1,
+      "agrsm64.sys": 1,
+      "smserl64.sys": 1,
+      "TfSysMon.sys": 1,
+      "STProcessMonitor.sys": 1,
+      "vsp.sys": 1,
+      "csrss.exe": 1,
+      "spoolsv.exe": 1
+    }
+  }
+}

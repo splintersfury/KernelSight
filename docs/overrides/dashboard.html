@@ -1,0 +1,1240 @@
+{% extends "base.html" %}
+{% block htmltitle %}<title>KernelSight — Kernel Driver Threat Intelligence</title>{% endblock %}
+{% block extrahead %}
+<meta name="description" content="Interactive threat intelligence dashboard for Windows kernel driver vulnerabilities">
+<meta property="og:title" content="KernelSight — Kernel Driver Threat Intelligence">
+<meta property="og:description" content="Interactive threat intelligence dashboard tracking 156 Windows kernel driver CVEs across 64 drivers">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KernelSight — Threat Intelligence Dashboard">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #06090f;
+  --bg-surface: #0d1320;
+  --bg-elevated: #141c2e;
+  --bg-input: #0a1020;
+  --border: #1a2744;
+  --border-hover: #2a3f6e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #64748b;
+  --text-dim: #334155;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.15);
+  --red: #ef4444;
+  --red-glow: rgba(239,68,68,0.12);
+  --amber: #f59e0b;
+  --amber-glow: rgba(245,158,11,0.12);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.12);
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+}
+
+/* ── Reset MkDocs Material chrome ── */
+.md-header, .md-tabs, .md-sidebar, .md-footer, .md-search,
+.md-header__inner, .md-header-nav, .md-content__inner > .md-content__searchbar {
+  display: none !important;
+}
+.md-main__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-typeset { font-size: inherit; }
+body, html {
+  background: var(--bg-deep) !important;
+  overflow-x: hidden;
+}
+.md-main {
+  background: var(--bg-deep) !important;
+}
+
+/* ── Global ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.ksd-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ksd-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ── Header ── */
+.ksd-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(13,19,32,0.92);
+}
+
+.ksd-header__logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.ksd-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.ksd-header__link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.ksd-header__link:hover {
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.ksd-hero {
+  padding: 128px 24px 40px;
+  text-align: center;
+}
+
+.ksd-hero__title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-shadow: 0 0 40px rgba(59,130,246,0.25), 0 0 80px rgba(59,130,246,0.08);
+}
+
+.ksd-hero__accent-line {
+  width: 60px;
+  height: 2px;
+  background: var(--accent);
+  margin: 20px auto 16px;
+  border-radius: 1px;
+  box-shadow: 0 0 12px rgba(59,130,246,0.4);
+}
+
+.ksd-hero__subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── Stat Cards ── */
+.ksd-stats {
+  display: flex;
+  justify-content: center;
+  margin: 48px auto 0;
+  max-width: 800px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ksd-stat {
+  flex: 1;
+  padding: 24px 32px;
+  background: var(--bg-surface);
+  text-align: center;
+  transition: background 0.2s ease;
+  cursor: default;
+  position: relative;
+}
+
+.ksd-stat:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.ksd-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.ksd-stat--cves::before { background: var(--accent); }
+.ksd-stat--drivers::before { background: var(--cyan); }
+.ksd-stat--itw::before { background: var(--red); }
+.ksd-stat--poc::before { background: var(--amber); }
+
+.ksd-stat:hover {
+  background: var(--bg-elevated);
+}
+
+.ksd-stat__number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.ksd-stat__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* ── Section Labels ── */
+.ksd-section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ksd-section-label__text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.ksd-section-label__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Heat Matrix ── */
+.ksd-matrix-section {
+  padding: 64px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ksd-matrix-wrap {
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ksd-matrix-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.ksd-matrix-wrap::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+.ksd-matrix-wrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.ksd-matrix {
+  display: grid;
+  gap: 1px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: visible;
+  width: max-content;
+}
+
+.ksd-matrix__corner {
+  background: var(--bg-deep);
+  min-width: 140px;
+}
+
+.ksd-matrix__col-header {
+  background: var(--bg-deep);
+  min-width: 40px;
+  padding: 8px 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.ksd-matrix__col-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  line-height: 1;
+  max-height: 180px;
+}
+
+.ksd-matrix__row-header {
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 12px;
+  min-width: 140px;
+  height: 40px;
+}
+
+.ksd-matrix__row-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.ksd-matrix__cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.ksd-matrix__cell--empty {
+  background: var(--bg-deep);
+  cursor: default;
+}
+
+.ksd-matrix__cell--c1 { background: #111d35; }
+.ksd-matrix__cell--c2 { background: #152a4a; }
+.ksd-matrix__cell--c3 { background: #1a3563; }
+.ksd-matrix__cell--c5 { background: #1e4080; }
+
+.ksd-matrix__cell--itw::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+}
+
+.ksd-matrix__cell:not(.ksd-matrix__cell--empty):hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  z-index: 2;
+}
+
+.ksd-matrix__cell--active {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 16px var(--accent-glow) !important;
+}
+
+/* ── CVE Explorer ── */
+.ksd-explorer {
+  padding: 0 24px 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ksd-search {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.ksd-search__icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.ksd-search__input {
+  width: 100%;
+  height: 44px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 16px 0 44px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ksd-search__input::placeholder {
+  color: var(--text-dim);
+}
+
+.ksd-search__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ── Filter Bar ── */
+.ksd-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ksd-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ksd-chip:hover {
+  border-color: var(--border-hover);
+}
+
+.ksd-chip--itw.ksd-chip--active {
+  background: var(--red-glow);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.ksd-chip--poc.ksd-chip--active {
+  background: var(--amber-glow);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.ksd-chip--writeup.ksd-chip--active {
+  background: var(--green-glow);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ksd-filters__count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+/* ── Table ── */
+.ksd-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ksd-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.ksd-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 0 12px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.ksd-table th:hover {
+  color: var(--text-secondary);
+}
+
+.ksd-table th .ksd-sort-arrow {
+  margin-left: 4px;
+  font-size: 0.55rem;
+  opacity: 0.4;
+}
+
+.ksd-table th.ksd-th--active .ksd-sort-arrow {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.ksd-table__col-id { width: 150px; }
+.ksd-table__col-driver { width: 140px; }
+.ksd-table__col-desc { width: auto; }
+.ksd-table__col-vuln { width: 150px; }
+.ksd-table__col-badges { width: 130px; }
+
+.ksd-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.ksd-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.ksd-table tbody tr:hover {
+  background: var(--bg-elevated);
+}
+
+.ksd-table__cve-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.ksd-table__cve-link:hover {
+  color: #60a5fa;
+}
+
+.ksd-table__cve-link--byovd {
+  color: var(--purple);
+  font-size: 0.72rem;
+}
+
+.ksd-table__cve-link--byovd:hover {
+  color: #a78bfa;
+}
+
+.ksd-table__driver {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.ksd-table__driver:hover {
+  color: var(--accent);
+}
+
+.ksd-table__desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0;
+}
+
+.ksd-table__vuln {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.ksd-table__vuln:hover {
+  color: var(--accent);
+}
+
+/* ── Badges ── */
+.ksd-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.ksd-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.ksd-badge--itw {
+  color: var(--red);
+  border: 1px solid var(--red);
+  background: var(--red-glow);
+}
+
+.ksd-badge--poc {
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  background: var(--amber-glow);
+}
+
+.ksd-badge--writeup {
+  color: var(--green);
+  border: 1px solid var(--green);
+  background: var(--green-glow);
+}
+
+/* ── Export ── */
+.ksd-export {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.ksd-export__btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ksd-export__btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Footer ── */
+.ksd-footer {
+  margin-top: 80px;
+  padding: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.ksd-footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.ksd-footer__link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.ksd-footer__link:hover {
+  color: var(--text-secondary);
+}
+
+.ksd-footer__copy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+
+/* ── Animations ── */
+@keyframes ksd-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ksd-count-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ksd-stat__number {
+  animation: ksd-count-fade 0.4s ease;
+}
+
+.ksd-matrix__cell {
+  opacity: 0;
+  animation: ksd-fade-in 0.3s ease forwards;
+}
+
+.ksd-table tbody tr {
+  animation: ksd-fade-in 0.15s ease forwards;
+}
+
+/* ── Empty State ── */
+.ksd-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .ksd-hero { padding: 96px 16px 32px; }
+  .ksd-hero__title { font-size: 2.2rem; }
+  .ksd-hero__subtitle { font-size: 0.95rem; }
+
+  .ksd-stats {
+    flex-wrap: wrap;
+    max-width: 400px;
+  }
+  .ksd-stat {
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+  .ksd-stat:nth-child(1), .ksd-stat:nth-child(2) {
+    border-bottom: 1px solid var(--border);
+  }
+  .ksd-stat:nth-child(2) {
+    border-right: none;
+  }
+  .ksd-stat:nth-child(4) {
+    border-right: none;
+  }
+
+  .ksd-matrix-section, .ksd-explorer { padding-left: 16px; padding-right: 16px; }
+
+  .ksd-table__col-desc { display: none; }
+  .ksd-table td:nth-child(3) { display: none; }
+  .ksd-table th:nth-child(3) { display: none; }
+}
+
+@media (max-width: 480px) {
+  .ksd-stats {
+    flex-direction: column;
+    max-width: 280px;
+  }
+  .ksd-stat {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  .ksd-stat:last-child {
+    border-bottom: none;
+  }
+  .ksd-stat__number { font-size: 2.2rem; }
+
+  .ksd-header__nav { gap: 12px; }
+  .ksd-header__link { font-size: 11px; }
+}
+</style>
+{% endblock %}
+
+{% block tabs %}{% endblock %}
+{% block hero %}{% endblock %}
+
+{% block content %}
+<div class="ksd-page">
+
+  <!-- ── Header ── -->
+  <header class="ksd-header">
+    <a href="./" class="ksd-header__logo">KernelSight</a>
+    <nav class="ksd-header__nav">
+      <a href="overview/" class="ksd-header__link">Knowledge Base</a>
+      <a href="https://github.com/splintersfury/KernelSight" target="_blank" rel="noopener" class="ksd-header__link">GitHub</a>
+    </nav>
+  </header>
+
+  <!-- ── Hero ── -->
+  <section class="ksd-hero">
+    <h1 class="ksd-hero__title">KernelSight</h1>
+    <div class="ksd-hero__accent-line"></div>
+    <p class="ksd-hero__subtitle">
+      The exploitation pipeline for Windows kernel drivers, from
+      attack surface to privilege escalation. <span style="color:var(--text-primary)">156 CVEs</span> across
+      <span style="color:var(--text-primary)">64 drivers</span>,
+      <span style="color:var(--text-primary)">57 exploited in the wild</span>.
+    </p>
+
+    <div class="ksd-stats" id="ksd-stats">
+      <div class="ksd-stat ksd-stat--cves">
+        <div class="ksd-stat__number" data-target="0" id="ksd-stat-cves">0</div>
+        <div class="ksd-stat__label">CVEs Tracked</div>
+      </div>
+      <div class="ksd-stat ksd-stat--drivers">
+        <div class="ksd-stat__number" data-target="0" id="ksd-stat-drivers">0</div>
+        <div class="ksd-stat__label">Drivers</div>
+      </div>
+      <div class="ksd-stat ksd-stat--itw">
+        <div class="ksd-stat__number" data-target="0" id="ksd-stat-itw">0</div>
+        <div class="ksd-stat__label">Exploited ITW</div>
+      </div>
+      <div class="ksd-stat ksd-stat--poc">
+        <div class="ksd-stat__number" data-target="0" id="ksd-stat-poc">0</div>
+        <div class="ksd-stat__label">Public PoC</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Threat Matrix ── -->
+  <section class="ksd-matrix-section">
+    <div class="ksd-section-label">
+      <span class="ksd-section-label__text">Threat Matrix</span>
+      <span class="ksd-section-label__line"></span>
+    </div>
+    <div class="ksd-matrix-wrap">
+      <div class="ksd-matrix" id="ksd-matrix"></div>
+    </div>
+  </section>
+
+  <!-- ── CVE Explorer ── -->
+  <section class="ksd-explorer">
+    <div class="ksd-section-label">
+      <span class="ksd-section-label__text">CVE Explorer</span>
+      <span class="ksd-section-label__line"></span>
+    </div>
+
+    <div class="ksd-search">
+      <svg class="ksd-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="ksd-search__input" id="ksd-search" placeholder="Search CVEs, drivers, descriptions..." autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="ksd-filters">
+      <button class="ksd-chip ksd-chip--itw" data-filter="itw">ITW</button>
+      <button class="ksd-chip ksd-chip--poc" data-filter="poc">PoC</button>
+      <button class="ksd-chip ksd-chip--writeup" data-filter="writeup">Writeup</button>
+      <span class="ksd-filters__count" id="ksd-count"></span>
+    </div>
+
+    <div class="ksd-table-wrap">
+      <table class="ksd-table" id="ksd-table">
+        <thead>
+          <tr>
+            <th class="ksd-table__col-id" data-sort="id">CVE ID <span class="ksd-sort-arrow">&#9650;</span></th>
+            <th class="ksd-table__col-driver" data-sort="driver">Driver <span class="ksd-sort-arrow">&#9650;</span></th>
+            <th class="ksd-table__col-desc" data-sort="description">Description <span class="ksd-sort-arrow">&#9650;</span></th>
+            <th class="ksd-table__col-vuln" data-sort="vuln_class">Vuln Class <span class="ksd-sort-arrow">&#9650;</span></th>
+            <th class="ksd-table__col-badges">Flags</th>
+          </tr>
+        </thead>
+        <tbody id="ksd-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="ksd-empty" class="ksd-empty" style="display:none;">No CVEs match the current filters.</div>
+
+    <div class="ksd-export">
+      <button class="ksd-export__btn" id="ksd-export-csv">Export CSV</button>
+      <button class="ksd-export__btn" id="ksd-export-json">Export JSON</button>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="ksd-footer">
+    <div class="ksd-footer__links">
+      <a href="driver-types/" class="ksd-footer__link">Drivers</a>
+      <a href="attack-surfaces/" class="ksd-footer__link">Surfaces</a>
+      <a href="vuln-classes/" class="ksd-footer__link">Vulns</a>
+      <a href="primitives/" class="ksd-footer__link">Primitives</a>
+      <a href="case-studies/" class="ksd-footer__link">Case Studies</a>
+      <a href="mitigations/" class="ksd-footer__link">Mitigations</a>
+    </div>
+    <div class="ksd-footer__copy">KernelSight &mdash; splintersfury</div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ════════════════════════════════════════
+     State
+     ════════════════════════════════════════ */
+  let DATA = null;
+  let allCves = [];
+  let filteredCves = [];
+  let filters = { itw: false, poc: false, writeup: false, search: '', driver: '', vuln_class: '' };
+  let sortCol = 'id';
+  let sortDir = 'desc';
+  let activeMatrixCell = null;
+
+  /* ════════════════════════════════════════
+     Data Fetch
+     ════════════════════════════════════════ */
+  fetch('assets/dashboard-data.json')
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(function() { return fetch('assets/dashboard-data.json').then(function(r) { return r.json(); }); })
+    .then(function(data) {
+      DATA = data;
+      allCves = data.cves || [];
+      init();
+    })
+    .catch(function(err) {
+      console.error('KernelSight: Failed to load dashboard data', err);
+      document.getElementById('ksd-empty').style.display = 'block';
+      document.getElementById('ksd-empty').textContent = 'Failed to load dashboard data.';
+    });
+
+  /* ════════════════════════════════════════
+     Init
+     ════════════════════════════════════════ */
+  function init() {
+    renderStats();
+    renderMatrix();
+    applyFilters();
+    bindEvents();
+  }
+
+  /* ════════════════════════════════════════
+     Stats — count-up animation
+     ════════════════════════════════════════ */
+  function renderStats() {
+    var stats = DATA.stats || {};
+    animateCount('ksd-stat-cves', stats.total_cves || 0);
+    animateCount('ksd-stat-drivers', stats.total_drivers || 0);
+    animateCount('ksd-stat-itw', stats.itw_count || 0);
+    animateCount('ksd-stat-poc', stats.poc_count || 0);
+  }
+
+  function animateCount(id, target) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('data-target', target);
+    var start = 0;
+    var duration = 1200;
+    var startTime = null;
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  /* ════════════════════════════════════════
+     Heat Matrix
+     ════════════════════════════════════════ */
+  function renderMatrix() {
+    var matrix = DATA.matrix;
+    if (!matrix) return;
+    var rows = matrix.rows || [];
+    var cols = matrix.cols || [];
+    var cells = matrix.cells || {};
+    var grid = document.getElementById('ksd-matrix');
+    var totalCols = cols.length + 1;
+    grid.style.gridTemplateColumns = '140px ' + ('40px '.repeat(cols.length)).trim();
+
+    var html = '';
+    // Corner
+    html += '<div class="ksd-matrix__corner"></div>';
+    // Column headers
+    for (var c = 0; c < cols.length; c++) {
+      html += '<div class="ksd-matrix__col-header"><span class="ksd-matrix__col-label">' + formatVulnClass(cols[c]) + '</span></div>';
+    }
+    // Rows
+    var cellIndex = 0;
+    for (var r = 0; r < rows.length; r++) {
+      html += '<div class="ksd-matrix__row-header"><span class="ksd-matrix__row-label" title="' + escHtml(rows[r]) + '">' + escHtml(rows[r]) + '</span></div>';
+      for (var ci = 0; ci < cols.length; ci++) {
+        var key = rows[r] + '|' + cols[ci];
+        var cell = cells[key];
+        var count = cell ? cell.count : 0;
+        var itw = cell ? cell.itw : 0;
+        var cls = 'ksd-matrix__cell';
+        if (count === 0) cls += ' ksd-matrix__cell--empty';
+        else if (count === 1) cls += ' ksd-matrix__cell--c1';
+        else if (count === 2) cls += ' ksd-matrix__cell--c2';
+        else if (count <= 4) cls += ' ksd-matrix__cell--c3';
+        else cls += ' ksd-matrix__cell--c5';
+        if (itw > 0) cls += ' ksd-matrix__cell--itw';
+        var delay = (r * cols.length + ci) * 5;
+        html += '<div class="' + cls + '" data-driver="' + escHtml(rows[r]) + '" data-vuln="' + escHtml(cols[ci]) + '" style="animation-delay:' + delay + 'ms">';
+        if (count > 0) html += count;
+        html += '</div>';
+        cellIndex++;
+      }
+    }
+    grid.innerHTML = html;
+  }
+
+  /* ════════════════════════════════════════
+     Filters & Render
+     ════════════════════════════════════════ */
+  function applyFilters() {
+    var search = filters.search.toLowerCase();
+    filteredCves = allCves.filter(function(cve) {
+      if (filters.itw && !cve.itw) return false;
+      if (filters.poc && !cve.has_poc) return false;
+      if (filters.writeup && !cve.has_writeup) return false;
+      if (filters.driver && cve.driver !== filters.driver) return false;
+      if (filters.vuln_class && cve.vuln_class !== filters.vuln_class) return false;
+      if (search) {
+        var hay = (cve.id + ' ' + cve.driver + ' ' + cve.description + ' ' + cve.vuln_class).toLowerCase();
+        if (hay.indexOf(search) === -1) return false;
+      }
+      return true;
+    });
+
+    sortCves();
+    renderTable();
+    updateCount();
+  }
+
+  function sortCves() {
+    var col = sortCol;
+    var dir = sortDir === 'asc' ? 1 : -1;
+    filteredCves.sort(function(a, b) {
+      var va = a[col] || '';
+      var vb = b[col] || '';
+      if (col === 'id') {
+        // Sort CVEs by year then number
+        return dir * va.localeCompare(vb);
+      }
+      if (typeof va === 'string') return dir * va.localeCompare(vb);
+      return dir * (va - vb);
+    });
+  }
+
+  function renderTable() {
+    var tbody = document.getElementById('ksd-tbody');
+    var empty = document.getElementById('ksd-empty');
+
+    if (filteredCves.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    var html = '';
+    for (var i = 0; i < filteredCves.length; i++) {
+      var cve = filteredCves[i];
+      var caseLink = cve.case_study ? cve.case_study : '#';
+      html += '<tr style="animation-delay:' + (i * 8) + 'ms">';
+      var isCve = /^CVE-/.test(cve.id);
+      var displayId = isCve ? cve.id : cve.driver;
+      var linkCls = isCve ? 'ksd-table__cve-link' : 'ksd-table__cve-link ksd-table__cve-link--byovd';
+      html += '<td><a href="' + escHtml(caseLink) + '" class="' + linkCls + '">' + escHtml(displayId) + '</a></td>';
+      html += '<td><span class="ksd-table__driver" data-driver="' + escHtml(cve.driver) + '">' + escHtml(cve.driver) + '</span></td>';
+      html += '<td class="ksd-table__desc" title="' + escHtml(cve.description) + '">' + escHtml(cve.description) + '</td>';
+      html += '<td><span class="ksd-table__vuln" data-vuln="' + escHtml(cve.vuln_class) + '">' + formatVulnClass(cve.vuln_class) + '</span></td>';
+      html += '<td><div class="ksd-badges">';
+      if (cve.itw) html += '<span class="ksd-badge ksd-badge--itw">ITW</span>';
+      if (cve.has_poc) html += '<span class="ksd-badge ksd-badge--poc">PoC</span>';
+      if (cve.has_writeup) html += '<span class="ksd-badge ksd-badge--writeup">WU</span>';
+      html += '</div></td>';
+      html += '</tr>';
+    }
+    tbody.innerHTML = html;
+  }
+
+  function updateCount() {
+    var el = document.getElementById('ksd-count');
+    el.textContent = 'Showing ' + filteredCves.length + ' of ' + allCves.length;
+  }
+
+  /* ════════════════════════════════════════
+     Events
+     ════════════════════════════════════════ */
+  function bindEvents() {
+    // Search
+    document.getElementById('ksd-search').addEventListener('input', function(e) {
+      filters.search = e.target.value;
+      applyFilters();
+    });
+
+    // Filter chips
+    document.querySelectorAll('.ksd-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        var f = this.getAttribute('data-filter');
+        filters[f] = !filters[f];
+        this.classList.toggle('ksd-chip--active', filters[f]);
+        applyFilters();
+      });
+    });
+
+    // Matrix cell clicks
+    document.getElementById('ksd-matrix').addEventListener('click', function(e) {
+      var cell = e.target.closest('.ksd-matrix__cell');
+      if (!cell || cell.classList.contains('ksd-matrix__cell--empty')) return;
+
+      var driver = cell.getAttribute('data-driver');
+      var vuln = cell.getAttribute('data-vuln');
+
+      // Toggle off if clicking same cell
+      if (activeMatrixCell === cell) {
+        cell.classList.remove('ksd-matrix__cell--active');
+        activeMatrixCell = null;
+        filters.driver = '';
+        filters.vuln_class = '';
+        applyFilters();
+        return;
+      }
+
+      // Deactivate previous
+      if (activeMatrixCell) activeMatrixCell.classList.remove('ksd-matrix__cell--active');
+
+      cell.classList.add('ksd-matrix__cell--active');
+      activeMatrixCell = cell;
+      filters.driver = driver;
+      filters.vuln_class = vuln;
+      applyFilters();
+
+      // Scroll to explorer
+      document.querySelector('.ksd-explorer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Table header sorting
+    document.querySelectorAll('.ksd-table th[data-sort]').forEach(function(th) {
+      th.addEventListener('click', function() {
+        var col = this.getAttribute('data-sort');
+        if (sortCol === col) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortCol = col;
+          sortDir = 'asc';
+        }
+
+        // Update header styles
+        document.querySelectorAll('.ksd-table th').forEach(function(h) {
+          h.classList.remove('ksd-th--active');
+          var arrow = h.querySelector('.ksd-sort-arrow');
+          if (arrow) arrow.innerHTML = '&#9650;';
+        });
+        this.classList.add('ksd-th--active');
+        var arrow = this.querySelector('.ksd-sort-arrow');
+        if (arrow) arrow.innerHTML = sortDir === 'asc' ? '&#9650;' : '&#9660;';
+
+        applyFilters();
+      });
+    });
+
+    // Clickable driver names in table
+    document.getElementById('ksd-tbody').addEventListener('click', function(e) {
+      var driverEl = e.target.closest('.ksd-table__driver');
+      if (driverEl) {
+        var d = driverEl.getAttribute('data-driver');
+        if (filters.driver === d) {
+          filters.driver = '';
+        } else {
+          filters.driver = d;
+        }
+        // Clear matrix selection
+        if (activeMatrixCell) {
+          activeMatrixCell.classList.remove('ksd-matrix__cell--active');
+          activeMatrixCell = null;
+        }
+        filters.vuln_class = '';
+        applyFilters();
+        return;
+      }
+
+      var vulnEl = e.target.closest('.ksd-table__vuln');
+      if (vulnEl) {
+        var v = vulnEl.getAttribute('data-vuln');
+        if (filters.vuln_class === v) {
+          filters.vuln_class = '';
+        } else {
+          filters.vuln_class = v;
+        }
+        if (activeMatrixCell) {
+          activeMatrixCell.classList.remove('ksd-matrix__cell--active');
+          activeMatrixCell = null;
+        }
+        filters.driver = '';
+        applyFilters();
+      }
+    });
+
+    // Export CSV
+    document.getElementById('ksd-export-csv').addEventListener('click', function() {
+      var lines = ['CVE ID,Driver,Description,Vuln Class,ITW,PoC,Writeup'];
+      filteredCves.forEach(function(c) {
+        lines.push([
+          c.id,
+          '"' + c.driver.replace(/"/g, '""') + '"',
+          '"' + c.description.replace(/"/g, '""') + '"',
+          c.vuln_class,
+          c.itw ? 'Yes' : 'No',
+          c.has_poc ? 'Yes' : 'No',
+          c.has_writeup ? 'Yes' : 'No'
+        ].join(','));
+      });
+      downloadFile('kernelsight-cves.csv', 'text/csv', lines.join('\n'));
+    });
+
+    // Export JSON
+    document.getElementById('ksd-export-json').addEventListener('click', function() {
+      var out = filteredCves.map(function(c) {
+        return {
+          id: c.id,
+          driver: c.driver,
+          description: c.description,
+          vuln_class: c.vuln_class,
+          itw: c.itw,
+          has_poc: c.has_poc,
+          has_writeup: c.has_writeup
+        };
+      });
+      downloadFile('kernelsight-cves.json', 'application/json', JSON.stringify(out, null, 2));
+    });
+  }
+
+  /* ════════════════════════════════════════
+     Utilities
+     ════════════════════════════════════════ */
+  function formatVulnClass(s) {
+    if (!s) return '';
+    return s.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+
+  function downloadFile(name, type, content) {
+    var blob = new Blob([content], { type: type });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+})();
+</script>
+{% endblock %}
+
+{% block footer %}{% endblock %}
