@@ -82,16 +82,70 @@
   border: none !important;
 }
 
-/* Adjust MkDocs header position below super-nav */
+/* Hide Material's own header — super-nav replaces it */
 .md-header {
-  position: sticky !important;
-  top: 0 !important;
+  display: none !important;
 }
 
-/* Hide super-nav on mobile (Material header is sufficient) */
+/* Super-nav hamburger (mobile sidebar toggle) */
+.ks-supernav__hamburger {
+  display: none;
+  color: #9ca3af !important;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.ks-supernav__hamburger svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Super-nav actions (search + github) */
+.ks-supernav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.ks-supernav__action {
+  color: #9ca3af !important;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.ks-supernav__action:hover {
+  color: #adc6ff !important;
+}
+
+.ks-supernav__action svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Adjust sidebar top position (no Material header, just super-nav) */
+.md-sidebar {
+  top: 3rem !important;
+  height: calc(100vh - 3rem) !important;
+}
+
+/* Adjust tabs position */
+.md-tabs {
+  position: sticky;
+  top: 3rem;
+  z-index: 50;
+}
+
+/* Mobile: show hamburger, hide nav links */
 @media (max-width: 768px) {
   .ks-supernav__links {
     display: none;
+  }
+  .ks-supernav__hamburger {
+    display: flex;
   }
   .ks-supernav__inner {
     justify-content: space-between;
