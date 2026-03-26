@@ -18,14 +18,16 @@ plugins:
 theme:
   name: material
   palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
     - scheme: default
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-    - scheme: slate
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
   features:
     - navigation.tabs
     - navigation.sections
@@ -60,6 +62,8 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - CVE Explorer: cve-explorer.md
+  - Threat Matrix: threat-matrix.md
   - Overview: overview.md
   - Drivers:
     - driver-types/index.md
@@ -327,3 +331,4 @@ nav:
     - LOLDrivers Deep Analysis: reference/loldrivers-analysis.md
     - KDU Provider Compatibility: reference/kdu-compatibility.md
     - Resources: reference/resources.md
+  - About: about.md

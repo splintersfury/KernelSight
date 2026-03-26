@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block htmltitle %}<title>Mission Briefing | KernelSight Forensic Intelligence</title>{% endblock %}
+{% block extrahead %}
+<meta name="description" content="The mission behind KernelSight — bridging raw assembly and actionable security intelligence">
+<meta property="og:title" content="About — KernelSight">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.md-header, .md-tabs, .md-sidebar, .md-footer, .md-search,
+.md-header__inner, .md-header-nav { display: none !important; }
+.md-main__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-typeset { font-size: inherit; }
+body, html { background: #10131a !important; overflow-x: hidden; }
+.md-main { background: #10131a !important; }
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(173,198,255,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(173,198,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- TopAppBar -->
+<header style="background:rgba(16,19,26,0.8);backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(69,70,76,0.15)">
+  <div style="display:flex;justify-content:space-between;align-items:center;max-width:1440px;margin:0 auto;padding:1rem 1.5rem">
+    <div style="display:flex;align-items:center;gap:2rem">
+      <a href="{{ config.site_url }}" style="text-decoration:none;font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;letter-spacing:-0.05em;color:#adc6ff">KernelSight</a>
+      <nav style="display:flex;gap:1.5rem">
+        <a href="{{ config.site_url }}" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.875rem;font-weight:500">Dashboard</a>
+        <a href="{{ config.site_url }}threat-matrix/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.875rem;font-weight:500">Threat Matrix</a>
+        <a href="{{ config.site_url }}cve-explorer/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.875rem;font-weight:500">CVE Explorer</a>
+        <a href="{{ config.site_url }}overview/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.875rem;font-weight:500">Knowledge Base</a>
+        <a href="{{ config.site_url }}about/" style="color:#adc6ff;text-decoration:none;font-family:'Space Grotesk';font-size:0.875rem;font-weight:700;border-bottom:2px solid #0566d9;padding-bottom:4px">About</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="blueprint-grid" style="min-height:70vh;display:flex;align-items:center;position:relative;overflow:hidden;border-bottom:1px solid rgba(69,70,76,0.15)">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top, #10131a, transparent);z-index:1"></div>
+  <!-- Technical background SVG -->
+  <div style="position:absolute;right:0;top:0;width:50%;height:100%;opacity:0.15;pointer-events:none">
+    <svg viewBox="0 0 400 400" style="width:100%;height:100%;color:#adc6ff" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="150" fill="none" stroke="currentColor" stroke-dasharray="10 10" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="100" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      <path d="M200 50 L200 350 M50 200 L350 200" stroke="currentColor" stroke-width="0.5"/>
+      <rect x="150" y="150" width="100" height="100" fill="none" stroke="currentColor" stroke-width="0.5" transform="rotate(45 200 200)"/>
+    </svg>
+  </div>
+  <div style="max-width:48rem;margin:0 auto;padding:5rem 2rem;position:relative;z-index:2">
+    <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;margin-bottom:1.5rem;border-radius:4px;border:1px solid rgba(173,198,255,0.3);background:rgba(173,198,255,0.1)">
+      <div style="width:0.5rem;height:0.5rem;border-radius:50%;background:#adc6ff;animation:pulse 2s infinite"></div>
+      <span style="font-family:'JetBrains Mono';font-size:0.7rem;font-weight:700;color:#adc6ff;text-transform:uppercase;letter-spacing:0.2em">Priority Objective: Alpha</span>
+    </div>
+    <h1 style="font-family:'Space Grotesk';font-size:4.5rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 2rem 0;line-height:1.05">
+      The Mission:<br>
+      <span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Unmasking the Kernel</span>
+    </h1>
+    <p style="font-family:'Inter';font-size:1.25rem;color:#c6c6cc;max-width:36rem;line-height:1.7;border-left:2px solid rgba(173,198,255,0.4);padding-left:1.5rem;margin:0">
+      Bridging the architectural gap between raw assembly and actionable security intelligence. KernelSight provides the forensic clarity required to navigate the most complex driver vulnerabilities.
+    </p>
+  </div>
+</section>
+
+<!-- Methodology -->
+<section style="padding:6rem 2rem;max-width:48rem;margin:0 auto">
+  <div style="margin-bottom:4rem">
+    <h2 style="font-family:'Space Grotesk';font-size:1.75rem;font-weight:700;color:#e0e2eb;margin:0 0 1rem 0">The Methodology</h2>
+    <div style="height:4px;width:6rem;background:#adc6ff;border-radius:2px"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem">
+    <div style="padding:2rem;border-radius:0.75rem;background:#181c22;border:1px solid rgba(69,70,76,0.15);transition:border-color 0.3s">
+      <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(173,198,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+        <span class="material-symbols-outlined" style="color:#adc6ff">database</span>
+      </div>
+      <h4 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">1. Telemetry Ingestion</h4>
+      <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;line-height:1.7;margin:0">Continuous monitoring of signed driver submissions to WHQL and public repositories.</p>
+    </div>
+    <div style="padding:2rem;border-radius:0.75rem;background:#181c22;border:1px solid rgba(69,70,76,0.15)">
+      <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(173,198,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+        <span class="material-symbols-outlined" style="color:#adc6ff">memory</span>
+      </div>
+      <h4 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">2. Pattern Recognition</h4>
+      <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;line-height:1.7;margin:0">Automated IOCTL heuristic analysis to identify insecure memory access patterns and privilege escalation vectors.</p>
+    </div>
+    <div style="padding:2rem;border-radius:0.75rem;background:#181c22;border:1px solid rgba(69,70,76,0.15)">
+      <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(173,198,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+        <span class="material-symbols-outlined" style="color:#adc6ff">hub</span>
+      </div>
+      <h4 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">3. Forensic Correlation</h4>
+      <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;line-height:1.7;margin:0">Mapping shared code signatures across manufacturers to identify hidden supply chain risks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Core Principles -->
+<section class="blueprint-grid" style="padding:6rem 2rem;background:#0b0e14;position:relative;overflow:hidden">
+  <div style="max-width:48rem;margin:0 auto;position:relative;z-index:1;text-align:center">
+    <h2 style="font-family:'Space Grotesk';font-size:2.5rem;font-weight:700;color:#e0e2eb;margin:0 0 1rem 0">Core Principles</h2>
+    <p style="color:#c6c6cc;margin:0 0 4rem 0">Why security researchers trust the KernelSight dataset.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3rem">
+      <div>
+        <h3 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#adc6ff;margin:0 0 1rem 0">Precision</h3>
+        <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;margin:0">Bit-accurate analysis of kernel-space transitions and instruction-level profiling.</p>
+      </div>
+      <div>
+        <h3 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#adc6ff;margin:0 0 1rem 0">Integrity</h3>
+        <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;margin:0">Cryptographic validation of every indexed driver to ensure data provenance.</p>
+      </div>
+      <div>
+        <h3 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#adc6ff;margin:0 0 1rem 0">Depth</h3>
+        <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;margin:0">Deep-dive disassembly that goes beyond metadata into the logic of driver implementation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Built for Engineers -->
+<section style="padding:6rem 2rem;max-width:48rem;margin:0 auto">
+  <div style="background:#272a31;border-radius:1rem;border:1px solid rgba(69,70,76,0.2);padding:2.5rem;display:flex;gap:3rem;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <h3 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 1rem 0">Built for Engineers</h3>
+      <p style="font-family:'Inter';color:#c6c6cc;margin:0 0 1.5rem 0;line-height:1.7">
+        KernelSight integrates with your existing forensic workflow. Direct access to the world's most comprehensive driver intelligence database.
+      </p>
+      <div style="display:flex;gap:1rem">
+        <a href="{{ config.site_url }}overview/" style="padding:0.5rem 1.5rem;background:#adc6ff;color:#002e6a;font-weight:700;border-radius:4px;text-decoration:none;font-size:0.875rem">Knowledge Base</a>
+        <a href="https://github.com/splintersfury/KernelSight" style="padding:0.5rem 1.5rem;border:1px solid rgba(69,70,76,0.3);color:#e0e2eb;font-weight:500;border-radius:4px;text-decoration:none;font-size:0.875rem">GitHub</a>
+      </div>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div style="background:#0b0e14;border-radius:0.75rem;border:1px solid rgba(69,70,76,0.15);overflow:hidden;font-family:'JetBrains Mono';font-size:0.75rem">
+        <div style="background:#31353c;padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(69,70,76,0.1)">
+          <div style="display:flex;gap:0.4rem"><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(239,68,68,0.3)"></div><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(245,158,11,0.3)"></div><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(34,197,94,0.3)"></div></div>
+          <span style="color:rgba(156,163,175,0.6);margin-left:0.5rem">Terminal — bash</span>
+        </div>
+        <div style="padding:1.5rem;line-height:2">
+          <div><span style="color:rgba(173,198,255,0.5)">$</span> <span style="color:#b7c8e1">ks-cli scan --target=win32kbase.sys</span></div>
+          <div style="color:rgba(156,163,175,0.4)">Analyzing heuristics...</div>
+          <div style="color:#adc6ff">Found 2 vulnerable IOCTL handlers. Mapping to CVE-2024-XXXX...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top:1px solid rgba(69,70,76,0.15);padding:3rem 1.5rem;background:#10131a">
+  <div style="max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <span style="font-family:'Space Grotesk';font-weight:700;color:#adc6ff;font-size:1.25rem;display:block;margin-bottom:0.5rem">KernelSight</span>
+      <span style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af">© 2024 KernelSight Forensic Intelligence</span>
+    </div>
+    <div style="display:flex;gap:2rem">
+      <a href="https://github.com/splintersfury/KernelSight" style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;text-decoration:none">GitHub</a>
+      <a href="{{ config.site_url }}overview/" style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;text-decoration:none">Documentation</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+</style>
+{% endblock %}

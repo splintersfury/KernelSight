@@ -1,7 +1,102 @@
 /* ============================================================
    KernelSight — Technical Manual Theme
-   Inspired by makingsoftware.com blueprint aesthetic
+   Stitch-aligned design system
    ============================================================ */
+
+/* --- Super-Nav (shared across all MkDocs pages) --- */
+.ks-supernav {
+  background: rgba(16, 19, 26, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(69, 70, 76, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.ks-supernav__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ks-supernav__logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #adc6ff !important;
+  text-decoration: none !important;
+  border: none !important;
+  white-space: nowrap;
+}
+
+.ks-supernav__logo:hover {
+  color: #adc6ff !important;
+  border: none !important;
+}
+
+.ks-supernav__links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.ks-supernav__link {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #9ca3af !important;
+  text-decoration: none !important;
+  border: none !important;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.ks-supernav__link:hover {
+  color: #adc6ff !important;
+  border: none !important;
+}
+
+.ks-supernav__link--active {
+  color: #adc6ff !important;
+  font-weight: 700;
+  border-bottom: 2px solid #0566d9 !important;
+  padding-bottom: 2px;
+}
+
+.ks-supernav__github {
+  margin-left: auto;
+  color: #9ca3af !important;
+  text-decoration: none !important;
+  border: none !important;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.ks-supernav__github:hover {
+  color: #adc6ff !important;
+  border: none !important;
+}
+
+/* Adjust MkDocs header position below super-nav */
+.md-header {
+  position: sticky !important;
+  top: 0 !important;
+}
+
+/* Hide super-nav on mobile (Material header is sufficient) */
+@media (max-width: 768px) {
+  .ks-supernav__links {
+    display: none;
+  }
+  .ks-supernav__inner {
+    justify-content: space-between;
+  }
+}
 
 /* --- Color System --- */
 :root {
@@ -36,21 +131,22 @@
 }
 
 [data-md-color-scheme="slate"] {
-  --ks-cobalt: #7B9EFF;
-  --ks-cobalt-light: #A3BBFF;
-  --ks-cobalt-wash: rgba(123, 158, 255, 0.05);
-  --ks-cobalt-wash-strong: rgba(123, 158, 255, 0.10);
-  --ks-bg: #0D1117;
-  --ks-bg-surface: #161b22;
-  --ks-fg: #e6edf3;
-  --ks-fg-muted: #8b949e;
-  --ks-fg-light: #484f58;
-  --ks-border: #21262d;
-  --ks-border-subtle: #1a1f27;
-  --ks-svg-stroke: #7B9EFF;
-  --ks-svg-fill: rgba(123, 158, 255, 0.05);
-  --ks-svg-text: #e6edf3;
-  --ks-badge-itw: #ef5350;
+  /* Stitch-aligned palette */
+  --ks-cobalt: #adc6ff;
+  --ks-cobalt-light: #adc6ff;
+  --ks-cobalt-wash: rgba(173, 198, 255, 0.05);
+  --ks-cobalt-wash-strong: rgba(173, 198, 255, 0.10);
+  --ks-bg: #10131a;
+  --ks-bg-surface: #1c2026;
+  --ks-fg: #e0e2eb;
+  --ks-fg-muted: #9ca3af;
+  --ks-fg-light: #45464c;
+  --ks-border: #272a31;
+  --ks-border-subtle: #1c2026;
+  --ks-svg-stroke: #adc6ff;
+  --ks-svg-fill: rgba(173, 198, 255, 0.05);
+  --ks-svg-text: #e0e2eb;
+  --ks-badge-itw: #ffb4ab;
   --ks-badge-remote: #ff9800;
 
   --ks-c-drivers: #60A5FA;
@@ -60,6 +156,24 @@
   --ks-c-cases: #F87171;
   --ks-c-mitigations: #34D399;
   --ks-c-tooling: #818CF8;
+
+  /* MkDocs Material overrides */
+  --md-default-bg-color: #10131a;
+  --md-default-fg-color: #e0e2eb;
+  --md-default-fg-color--light: #c6c6cc;
+  --md-default-fg-color--lighter: #9ca3af;
+  --md-default-fg-color--lightest: #45464c;
+  --md-primary-fg-color: #0566d9;
+  --md-primary-fg-color--light: #adc6ff;
+  --md-primary-fg-color--dark: #004395;
+  --md-primary-bg-color: #e0e2eb;
+  --md-accent-fg-color: #adc6ff;
+  --md-accent-bg-color: #0566d9;
+  --md-code-bg-color: #0b0e14;
+  --md-code-fg-color: #b7c8e1;
+  --md-typeset-a-color: #adc6ff;
+  --md-footer-bg-color: #10131a;
+  --md-footer-bg-color--dark: #0b0e14;
 }
 
 /* --- Section Color Overrides --- */
@@ -72,7 +186,7 @@
 [data-ks-section="tooling"]     { --ks-section: var(--ks-c-tooling); }
 
 /* --- Typography --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 body,
 .md-typeset {
@@ -93,8 +207,8 @@ body,
 .md-typeset h2,
 .md-typeset h3,
 .md-typeset h4 {
-  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-  font-weight: 500;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ks-fg);
 }
@@ -595,29 +709,41 @@ body,
 
 /* --- Header and Tabs --- */
 .md-header {
-  background: var(--ks-bg-surface);
+  background: var(--ks-bg);
   color: var(--ks-fg);
   box-shadow: none;
-  border-bottom: 1px solid var(--ks-border);
+  border-bottom: 1px solid rgba(69, 70, 76, 0.15);
+  backdrop-filter: blur(16px);
 }
 
 [data-md-color-scheme="slate"] .md-header {
-  background: var(--ks-bg-surface);
-  border-bottom-color: var(--ks-border);
+  background: rgba(16, 19, 26, 0.8);
+  border-bottom-color: rgba(69, 70, 76, 0.15);
+}
+
+.md-header__topic {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+[data-md-color-scheme="slate"] .md-header__topic {
+  color: #adc6ff;
 }
 
 .md-tabs {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.03em;
-  background: var(--ks-bg-surface);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  background: var(--ks-bg);
   color: var(--ks-fg-muted);
-  border-bottom: 2px solid var(--ks-section);
+  border-bottom: 1px solid rgba(69, 70, 76, 0.15);
 }
 
 [data-md-color-scheme="slate"] .md-tabs {
-  background: var(--ks-bg-surface);
-  border-bottom-color: var(--ks-section);
+  background: #10131a;
+  border-bottom-color: rgba(69, 70, 76, 0.15);
 }
 
 .md-tabs__link {
@@ -626,12 +752,12 @@ body,
 
 .md-tabs__link--active,
 .md-tabs__link:hover {
-  color: var(--ks-section);
+  color: #adc6ff;
   opacity: 1;
 }
 
 .md-header__button.md-logo {
-  color: var(--ks-fg);
+  color: #adc6ff;
 }
 
 /* Hide the auto-generated h1 "Home" on the index page (ks-hero-title replaces it) */
@@ -660,11 +786,25 @@ article:has(.ks-hero-title) > h1:first-child {
 
 .md-nav__link {
   color: var(--ks-fg-muted);
+  transition: color 0.2s, background 0.2s;
 }
 
 .md-nav__link--active,
 .md-nav__link:hover {
-  color: var(--ks-section);
+  color: #adc6ff;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  color: #adc6ff;
+}
+
+/* Sidebar background */
+[data-md-color-scheme="slate"] .md-sidebar {
+  background: #181c22;
+}
+
+[data-md-color-scheme="slate"] .md-sidebar__scrollwrap {
+  background: #181c22;
 }
 
 /* --- Search --- */
@@ -672,11 +812,88 @@ article:has(.ks-hero-title) > h1:first-child {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+[data-md-color-scheme="slate"] .md-search__input {
+  background: #0b0e14;
+  border: 1px solid rgba(69, 70, 76, 0.15);
+}
+
 /* --- Footer --- */
 .md-footer {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.02em;
+}
+
+[data-md-color-scheme="slate"] .md-footer {
+  background: #10131a;
+  border-top: 1px solid rgba(69, 70, 76, 0.15);
+}
+
+/* --- Content Area --- */
+[data-md-color-scheme="slate"] .md-content {
+  background: #10131a;
+}
+
+/* --- Rounded elements (Stitch aesthetic) --- */
+[data-md-color-scheme="slate"] .md-typeset .admonition,
+[data-md-color-scheme="slate"] .md-typeset details {
+  border-radius: 0.75rem;
+  border-left: 3px solid var(--ks-cobalt);
+  background: rgba(28, 32, 38, 0.7);
+  backdrop-filter: blur(12px);
+}
+
+[data-md-color-scheme="slate"] .md-typeset pre > code {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(69, 70, 76, 0.15);
+  background: #0b0e14;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(69, 70, 76, 0.1);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) thead {
+  background: rgba(39, 42, 49, 0.5);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  border-bottom: 1px solid rgba(69, 70, 76, 0.15);
+  color: #9ca3af;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) td {
+  border-bottom: 1px solid rgba(69, 70, 76, 0.05);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover {
+  background: rgba(39, 42, 49, 0.4);
+}
+
+/* --- Driver Cards (rounded for Stitch) --- */
+[data-md-color-scheme="slate"] .driver-grid {
+  border: none;
+  gap: 0.75rem;
+}
+
+[data-md-color-scheme="slate"] .driver-card {
+  border: 1px solid rgba(69, 70, 76, 0.1);
+  border-radius: 1rem;
+  background: #1c2026;
+  transition: all 0.2s;
+}
+
+[data-md-color-scheme="slate"] .driver-card:hover {
+  border-color: rgba(173, 198, 255, 0.2);
+  background: rgba(28, 32, 38, 0.7);
+}
+
+/* --- Badge styling (rounded pills) --- */
+[data-md-color-scheme="slate"] .badge {
+  border-radius: 9999px;
+  padding: 0.1rem 0.5rem;
 }
 
 /* --- Pipeline Diagram: Per-Stage Colors --- */
