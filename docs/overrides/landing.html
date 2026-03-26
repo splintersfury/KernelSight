@@ -134,26 +134,26 @@ body, html { background: #10131a !important; overflow-x: hidden; }
 <!-- Pipeline Overview -->
 <section style="max-width:900px;margin:4rem auto;padding:0 2rem">
   <h2 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 1.5rem 0">The Pipeline</h2>
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem">
-    <a href="{{ config.site_url }}driver-types/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center">
+    <a href="{{ config.site_url }}driver-types/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.05em">Drivers</div>
     </a>
-    <a href="{{ config.site_url }}attack-surfaces/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#22D3EE'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}attack-surfaces/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#22D3EE'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#22D3EE;text-transform:uppercase;letter-spacing:0.05em">Surfaces</div>
     </a>
-    <a href="{{ config.site_url }}vuln-classes/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#FBBF24'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}vuln-classes/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#FBBF24'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#FBBF24;text-transform:uppercase;letter-spacing:0.05em">Vulns</div>
     </a>
-    <a href="{{ config.site_url }}primitives/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#A78BFA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}primitives/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#A78BFA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#A78BFA;text-transform:uppercase;letter-spacing:0.05em">Primitives</div>
     </a>
-    <a href="{{ config.site_url }}case-studies/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#F87171'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}case-studies/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#F87171'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#F87171;text-transform:uppercase;letter-spacing:0.05em">Cases</div>
     </a>
-    <a href="{{ config.site_url }}mitigations/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#34D399'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}mitigations/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#34D399'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#34D399;text-transform:uppercase;letter-spacing:0.05em">Mitigations</div>
     </a>
-    <a href="{{ config.site_url }}tooling/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#818CF8'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+    <a href="{{ config.site_url }}tooling/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#818CF8'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
       <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#818CF8;text-transform:uppercase;letter-spacing:0.05em">Tooling</div>
     </a>
   </div>
