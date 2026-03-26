@@ -1,5 +1,5 @@
 ---
-template: cve-explorer.html
+template: dashboard.html
 hide:
   - navigation
   - toc

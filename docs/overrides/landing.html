@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block htmltitle %}<title>KernelSight — Kernel Driver Forensic Intelligence</title>{% endblock %}
+{% block extrahead %}
+<meta name="description" content="The exploitation pipeline for Windows kernel drivers — 156 CVEs, 64 drivers, 57 exploited in the wild">
+<meta property="og:title" content="KernelSight — Kernel Driver Forensic Intelligence">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.md-header, .md-tabs, .md-sidebar, .md-footer, .md-search,
+.md-header__inner, .md-header-nav { display: none !important; }
+.md-main__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-content__inner { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+.md-typeset { font-size: inherit; }
+body, html { background: #10131a !important; overflow-x: hidden; }
+.md-main { background: #10131a !important; }
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(173,198,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(173,198,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.landing-card { transition: border-color 0.3s, transform 0.2s; }
+.landing-card:hover { border-color: rgba(173,198,255,0.25) !important; transform: translateY(-2px); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header style="background:rgba(16,19,26,0.92);backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(69,70,76,0.15)">
+  <div style="display:flex;align-items:center;max-width:1440px;margin:0 auto;padding:0.75rem 1.5rem;gap:1.5rem">
+    <a href="{{ config.site_url }}" style="text-decoration:none;font-family:'Space Grotesk';font-size:1.35rem;font-weight:700;letter-spacing:-0.05em;color:#adc6ff;margin-right:0.5rem">KernelSight</a>
+    <nav style="display:flex;gap:1.5rem;flex:1">
+      <a href="{{ config.site_url }}explore/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.8rem;font-weight:500">Explore</a>
+      <a href="{{ config.site_url }}overview/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.8rem;font-weight:500">Docs</a>
+      <a href="{{ config.site_url }}about/" style="color:#9ca3af;text-decoration:none;font-family:'Space Grotesk';font-size:0.8rem;font-weight:500">About</a>
+    </nav>
+    <a href="https://github.com/splintersfury/KernelSight" target="_blank" rel="noopener" style="color:#9ca3af;display:flex;align-items:center;transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#adc6ff'" onmouseout="this.style.color='#9ca3af'">
+      <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="blueprint-grid" style="min-height:70vh;display:flex;align-items:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,#10131a 0%,transparent 50%);z-index:1"></div>
+  <div style="position:absolute;right:-5%;top:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(5,102,217,0.08) 0%,transparent 70%);pointer-events:none"></div>
+  <div style="max-width:720px;margin:0 auto;padding:5rem 2rem;position:relative;z-index:2;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;margin-bottom:1.5rem;border-radius:4px;border:1px solid rgba(173,198,255,0.3);background:rgba(173,198,255,0.08)">
+      <div style="width:0.5rem;height:0.5rem;border-radius:50%;background:#adc6ff;animation:pulse 2s infinite"></div>
+      <span style="font-family:'JetBrains Mono';font-size:0.65rem;font-weight:600;color:#adc6ff;text-transform:uppercase;letter-spacing:0.15em">Forensic Intelligence Platform</span>
+    </div>
+    <h1 style="font-family:'Space Grotesk';font-size:3.5rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 1.5rem 0;line-height:1.1">
+      The kernel driver<br><span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">exploitation pipeline</span>
+    </h1>
+    <p style="font-family:'Inter';font-size:1.1rem;color:#9ca3af;max-width:32rem;margin:0 auto 2.5rem auto;line-height:1.7">
+      From attack surface identification to privilege escalation. 156 real CVEs across 64 drivers, 57 exploited in the wild — mapped, analyzed, and documented.
+    </p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="{{ config.site_url }}explore/" style="text-decoration:none;background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);color:#002e6a;padding:0.75rem 2rem;border-radius:0.5rem;font-family:'Space Grotesk';font-weight:700;font-size:0.875rem;display:flex;align-items:center;gap:0.5rem;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        Explore the Data <span class="material-symbols-outlined" style="font-size:1.1rem">arrow_forward</span>
+      </a>
+      <a href="{{ config.site_url }}overview/" style="text-decoration:none;border:1px solid rgba(69,70,76,0.3);color:#e0e2eb;padding:0.75rem 2rem;border-radius:0.5rem;font-family:'Space Grotesk';font-weight:600;font-size:0.875rem;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">
+        Read the Docs
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section style="max-width:900px;margin:-3rem auto 0 auto;padding:0 2rem;position:relative;z-index:3">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(69,70,76,0.15);border-radius:1rem;overflow:hidden;border:1px solid rgba(69,70,76,0.15)">
+    <div style="background:#1c2026;padding:1.5rem;text-align:center">
+      <div style="font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:#e0e2eb">156</div>
+      <div style="font-family:'JetBrains Mono';font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin-top:0.25rem">CVEs Tracked</div>
+    </div>
+    <div style="background:#1c2026;padding:1.5rem;text-align:center">
+      <div style="font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:#e0e2eb">64</div>
+      <div style="font-family:'JetBrains Mono';font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin-top:0.25rem">Drivers</div>
+    </div>
+    <div style="background:#1c2026;padding:1.5rem;text-align:center">
+      <div style="font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:#ffb4ab">57</div>
+      <div style="font-family:'JetBrains Mono';font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin-top:0.25rem">Exploited ITW</div>
+    </div>
+    <div style="background:#1c2026;padding:1.5rem;text-align:center">
+      <div style="font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:#e0e2eb">33</div>
+      <div style="font-family:'JetBrains Mono';font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin-top:0.25rem">Public PoC</div>
+    </div>
+  </div>
+</section>
+
+<!-- How to Navigate -->
+<section style="max-width:900px;margin:5rem auto;padding:0 2rem">
+  <h2 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 0.5rem 0;text-align:center">How to use KernelSight</h2>
+  <p style="font-family:'Inter';color:#9ca3af;text-align:center;margin:0 0 2.5rem 0;font-size:0.875rem">Two ways to work with the dataset — interactive exploration or deep-dive documentation.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <!-- Explore card -->
+    <a href="{{ config.site_url }}explore/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:1rem;padding:2rem;border:1px solid rgba(69,70,76,0.1);display:block">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;background:rgba(5,102,217,0.15);display:flex;align-items:center;justify-content:center">
+          <span class="material-symbols-outlined" style="color:#adc6ff;font-size:1.25rem">explore</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:1.1rem;font-weight:700;color:#e0e2eb;margin:0">Explore</h3>
+      </div>
+      <p style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7;margin:0 0 1rem 0">
+        Interactive dashboard with a searchable CVE table, threat matrix showing vulnerability patterns across driver families, and real-time filtering by severity and exploit status.
+      </p>
+      <div style="font-family:'JetBrains Mono';font-size:0.65rem;color:#adc6ff;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:0.3rem">
+        Browse the data <span class="material-symbols-outlined" style="font-size:0.85rem">arrow_forward</span>
+      </div>
+    </a>
+    <!-- Docs card -->
+    <a href="{{ config.site_url }}overview/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:1rem;padding:2rem;border:1px solid rgba(69,70,76,0.1);display:block">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;background:rgba(5,102,217,0.15);display:flex;align-items:center;justify-content:center">
+          <span class="material-symbols-outlined" style="color:#adc6ff;font-size:1.25rem">menu_book</span>
+        </div>
+        <h3 style="font-family:'Space Grotesk';font-size:1.1rem;font-weight:700;color:#e0e2eb;margin:0">Docs</h3>
+      </div>
+      <p style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7;margin:0 0 1rem 0">
+        241 pages of structured knowledge — driver types, attack surfaces, vulnerability classes, exploitation primitives, case studies with root-cause analysis, and mitigation techniques.
+      </p>
+      <div style="font-family:'JetBrains Mono';font-size:0.65rem;color:#adc6ff;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:0.3rem">
+        Read the knowledge base <span class="material-symbols-outlined" style="font-size:0.85rem">arrow_forward</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Pipeline Overview -->
+<section style="max-width:900px;margin:4rem auto;padding:0 2rem">
+  <h2 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 1.5rem 0">The Pipeline</h2>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem">
+    <a href="{{ config.site_url }}driver-types/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.05em">Drivers</div>
+    </a>
+    <a href="{{ config.site_url }}attack-surfaces/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#22D3EE'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#22D3EE;text-transform:uppercase;letter-spacing:0.05em">Surfaces</div>
+    </a>
+    <a href="{{ config.site_url }}vuln-classes/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#FBBF24'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#FBBF24;text-transform:uppercase;letter-spacing:0.05em">Vulns</div>
+    </a>
+    <a href="{{ config.site_url }}primitives/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#A78BFA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#A78BFA;text-transform:uppercase;letter-spacing:0.05em">Primitives</div>
+    </a>
+    <a href="{{ config.site_url }}case-studies/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#F87171'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#F87171;text-transform:uppercase;letter-spacing:0.05em">Cases</div>
+    </a>
+    <a href="{{ config.site_url }}mitigations/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#34D399'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#34D399;text-transform:uppercase;letter-spacing:0.05em">Mitigations</div>
+    </a>
+    <a href="{{ config.site_url }}tooling/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.75rem;text-align:center;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#818CF8'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
+      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#818CF8;text-transform:uppercase;letter-spacing:0.05em">Tooling</div>
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top:1px solid rgba(69,70,76,0.15);padding:3rem 1.5rem;background:#10131a;margin-top:3rem">
+  <div style="max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <span style="font-family:'Space Grotesk';font-weight:700;color:#adc6ff;font-size:1.25rem;display:block;margin-bottom:0.5rem">KernelSight</span>
+      <span style="font-family:'JetBrains Mono';font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af">© 2024 KernelSight Forensic Intelligence</span>
+    </div>
+    <div style="display:flex;gap:2rem">
+      <a href="https://github.com/splintersfury/KernelSight" style="font-family:'JetBrains Mono';font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;text-decoration:none">GitHub</a>
+      <a href="{{ config.site_url }}about/" style="font-family:'JetBrains Mono';font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;text-decoration:none">About</a>
+    </div>
+  </div>
+</footer>
+{% endblock %}

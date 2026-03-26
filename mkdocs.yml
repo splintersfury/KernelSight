@@ -62,8 +62,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - CVE Explorer: cve-explorer.md
-  - Threat Matrix: threat-matrix.md
+  - Explore: explore.md
   - Overview: overview.md
   - Drivers:
     - driver-types/index.md

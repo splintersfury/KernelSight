@@ -1,5 +1,5 @@
 ---
-template: dashboard.html
+template: landing.html
 hide:
   - navigation
   - toc
