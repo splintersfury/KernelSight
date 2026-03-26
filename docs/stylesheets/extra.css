@@ -5,7 +5,7 @@
 
 /* --- Super-Nav (shared across all MkDocs pages) --- */
 .ks-supernav {
-  background: rgba(16, 19, 26, 0.95);
+  background: rgba(16, 19, 26, 0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(69, 70, 76, 0.15);
   position: sticky;
@@ -19,7 +19,7 @@
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .ks-supernav__logo {

@@ -71,16 +71,13 @@ body, html {
   top: 0;
   left: 0;
   right: 0;
-  height: 48px;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  background: rgba(16,19,26,0.92);
+  border-bottom: 1px solid rgba(69,70,76,0.15);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
+  padding: 0.75rem 1.5rem;
   z-index: 100;
-  backdrop-filter: blur(12px);
-  background: rgba(13,19,32,0.92);
+  backdrop-filter: blur(16px);
 }
 
 .ksd-header__logo {
@@ -90,12 +87,14 @@ body, html {
   color: #adc6ff;
   text-decoration: none;
   letter-spacing: -0.05em;
+  margin-right: 2rem;
 }
 
 .ksd-header__nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem;
+  flex: 1;
 }
 
 .ksd-header__link {
@@ -104,7 +103,8 @@ body, html {
   font-weight: 500;
   color: #9ca3af;
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color 0.2s;
+  white-space: nowrap;
 }
 
 .ksd-header__link--active {
