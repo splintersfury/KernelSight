@@ -8,7 +8,7 @@
 <meta name="twitter:title" content="KernelSight — Threat Intelligence Dashboard">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg-deep: #06090f;
@@ -84,12 +84,12 @@ body, html {
 }
 
 .ksd-header__logo {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #adc6ff;
   text-decoration: none;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.05em;
 }
 
 .ksd-header__nav {
@@ -99,11 +99,19 @@ body, html {
 }
 
 .ksd-header__link {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #9ca3af;
   text-decoration: none;
   transition: color 0.15s ease;
+}
+
+.ksd-header__link--active {
+  color: #adc6ff;
+  font-weight: 700;
+  border-bottom: 2px solid #0566d9;
+  padding-bottom: 2px;
 }
 
 .ksd-header__link:hover {
@@ -757,8 +765,14 @@ body, html {
   <header class="ksd-header">
     <a href="./" class="ksd-header__logo">KernelSight</a>
     <nav class="ksd-header__nav">
+      <a href="./" class="ksd-header__link ksd-header__link--active">Dashboard</a>
+      <a href="threat-matrix/" class="ksd-header__link">Threat Matrix</a>
+      <a href="cve-explorer/" class="ksd-header__link">CVE Explorer</a>
       <a href="overview/" class="ksd-header__link">Knowledge Base</a>
-      <a href="https://github.com/splintersfury/KernelSight" target="_blank" rel="noopener" class="ksd-header__link">GitHub</a>
+      <a href="about/" class="ksd-header__link">About</a>
+      <a href="https://github.com/splintersfury/KernelSight" target="_blank" rel="noopener" style="margin-left:auto;color:#9ca3af;display:flex;align-items:center;transition:color 0.2s" onmouseover="this.style.color='#adc6ff'" onmouseout="this.style.color='#9ca3af'">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
     </nav>
   </header>
 
