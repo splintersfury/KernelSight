@@ -60,7 +60,7 @@ the content that justifies it.
 
 **Phase 1 — content.** Write the missing pages by hand. Ten defense pages, a Bypasses section
 with a hand-authored platform-configuration matrix, prose pages for the significant bypasses,
-three missing case studies, and the corrections to claims that are now wrong. No new YAML, no
+four missing case studies, and the corrections to claims that are now wrong. No new YAML, no
 new scripts, no CI changes. Every page ships in the same narrative voice as the existing 241.
 
 **Phase 2 — machinery.** Once the content exists and its shape has stopped moving, extract it
@@ -568,7 +568,7 @@ bytes from identical input, so sorting its collections is a W2 blocker, not a cl
 - `docs/bypasses/index.md` carries the platform-configuration matrix, hand-authored, with a
   basis marker in every cell.
 - Every alive/dead claim across the site carries an inline `as of <date>` and its basis.
-- The three missing case studies are written and added to `cve_index.yaml` and
+- The four missing case studies are written and added to `cve_index.yaml` and
   `loldrivers-analysis.md`.
 - `mkdocs build` is clean and the new pages are in `mkdocs.yml` nav.
 
