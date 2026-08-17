@@ -48,10 +48,33 @@ resolving citation.
   linked.
 - Verdicts for pre-2016 techniques nobody will retest. Those get `status: historical` and a
   build ceiling.
+- Schema, generators, CI enforcement, and lab verification **as phase-1 work**. They are
+  designed below and deliberately deferred. See Delivery order.
 
-## Architecture
+## Delivery order
 
-### Data model
+The deliverable is what a reader finds on the published site. Content leads; machinery follows
+the content that justifies it.
+
+**Phase 1 — content.** Write the missing pages by hand. Ten defense pages, a Bypasses section
+with a hand-authored platform-configuration matrix, prose pages for the significant bypasses,
+three missing case studies, and the corrections to claims that are now wrong. No new YAML, no
+new scripts, no CI changes. Every page ships in the same narrative voice as the existing 241.
+
+**Phase 2 — machinery.** Once the content exists and its shape has stopped moving, extract it
+into `defenses.yaml` / `bypass_index.yaml` / `refs.yaml`, add the generators and the CI checks,
+and wire the interactive matrix into the dashboard.
+
+The one discipline carried into phase 1, because it costs nothing and is the whole reason the
+schema exists: **every alive/dead claim in prose carries an inline `as of <date>` and its basis**
+— tested, cited, or inferred. That is a sentence-level convention, not tooling, and it is what
+prevents phase 1 from regenerating the `pte-manipulation.md:51` failure while phase 2 is still
+pending.
+
+Phase 2 is designed in full below so the phase-1 prose can be written in a shape that extracts
+cleanly. Writing prose blind to the eventual schema is how migrations get expensive.
+
+## Data model — phase 2 (deferred)
 
 Three new files in `index/`, joining the existing `cve_index.yaml`, `driver_index.yaml`,
 `techniques.yaml`, and `autopiff_rule_map.yaml`.
@@ -175,7 +198,7 @@ One entry per source: `id`, author, title, URL, date, type (`talk` | `post` | `a
 `ms-doc` | `cve`). Bypasses cite by ID, so a dead link is fixed once and every verdict citing
 it stays intact.
 
-### Page architecture
+## Page architecture — phase 1
 
 New `Bypasses` tab in `mkdocs.yml` nav, immediately after `Mitigations` — a reader needs the
 defense before the technique that defeats it. `Mitigations` keeps its name and every existing
@@ -183,13 +206,14 @@ URL, gaining ten pages for the defenses that lack one.
 
 `depth: page | row` prevents page explosion. `row` bypasses appear only in matrix and inventory
 tables. `page` bypasses — alive ones, plus historically load-bearing dead ones — get prose. The
-per-defense inventory renders *onto the defense page*, so `mitigations/dse.md` ends with the
-live table of everything defeating DSE. No structural duplication; the section starts small and
-earns pages.
+per-defense inventory lives *on the defense page*, so `mitigations/dse.md` ends with the table
+of everything defeating DSE — hand-written in phase 1, generated from the registry in phase 2.
+No structural duplication; the section starts small and earns pages.
 
-### The matrix
+## The matrix — phase 1
 
-`docs/bypasses/index.md` is the primary artifact. Rows are bypasses grouped by defense.
+`docs/bypasses/index.md` is the primary artifact. Hand-authored in phase 1; generated in
+phase 2. Rows are bypasses grouped by defense.
 Columns are *platform configurations*, not defenses:
 
 | | Win10, no VBS | 22H2 + HVCI | 24H2 + HVCI, pre-11th-gen | 24H2 + HVCI + HLAT + kCET | 26100/26200, all on |
@@ -208,7 +232,64 @@ The dashboard gains the interactive form — pick build, CPU features, and start
 get what is live on that machine — reusing the existing yaml → json → JS pattern of the CVE
 explorer.
 
-### Generated blocks
+## Bypass inventory to author — phase 1
+
+This is what "comprehensive" resolves to concretely. Each row becomes an entry in its defense
+page's inventory; the significant ones also get a prose page.
+
+**DSE / code integrity** — `g_CiOptions` direct patch (dead, KDP); `g_CiOptions` page swap
+(dead under HLAT, FortiGuard); `CiValidateImageHeader` PTE patch (dead under HVCI, Chester /
+TrustedSec); **`SeCiCallbacks` pointer swap (alive, cryptoplague)**; test-signing via BCD
+(alive, requires admin plus reboot); KDU `DSECorruption` and `MapDriver` providers (hfiref0x,
+already referenced in `kdu-compatibility.md`).
+
+**HVCI** — data-only attacks; I/O Ring; Windows Downdate (CVE-2024-21302); FudModule; **disk
+DMA to Hyper-V memory at runtime (alive, IOMMU is the only defense, LabGuy94)**; VTL0 secure
+call interface abuse (theoretical, no public exploit).
+
+**kCFG / kCET** — kCFG never validates return addresses; ROP through signed kernel code (dead
+under kCET); Connor McGarr's Black Hat 2025 material on kCET and kCFG needs reading before this
+inventory is written.
+
+**KDP** — page-table remap (dead under HLAT); the periodic-check window Microsoft acknowledged;
+unprotected sibling globals adjacent to protected ones.
+
+**KASLR** — the largest inventory, and the freshest. `NtQuerySystemInformation` class 0x0B
+(restricted at low IL); class 0x40 module info (ImageBase zeroed at 26200); class 0x42
+`SystemBigPoolInformation` (address scrubbed at 26200 — the current page says only "tightened"
+at 21H2); thread class 0x39 (`StartAddress`, `StackBase`, `StackLimit`, `Win32StartAddress`
+zeroed at 26200); SIDT (returns decoy base `0xFFFFF80000001000` at 26200); TEB sanitization and
+System `PEB.Ldr` nulled; desktop heap kernel pointers converted to relative offsets;
+`EnumDeviceDrivers` (restricted at 24H2); ETW pointer leaks. Still alive: **`KUSER_SHARED_DATA`
+kernel view at `0xFFFFF78000000000` read through a driver primitive**; **prefetch side-channel
+on Intel**; `SepMediumDaclSd` plus WIL security-descriptor corruption (already covered);
+**physical-memory-mapping BYOVD such as `eneio64.sys` plus an ntoskrnl entry-point RVA scan** —
+absent from the current "four remaining vectors" list despite being the practical unelevated
+route.
+
+**MBEC / GMET** — user-page execution flip (dead).
+
+**Blocklist / WDAC** — unblocklistable drivers that would break functionality (NVDrv); driver
+version rollback to a pre-fix signed build; blocklist update lag.
+
+**Secure Kernel / VTL1** — Windows Downdate; secure call abuse.
+
+**Kernel DMA Protection** — Thunderbolt and PCIe bus-mastering; pre-boot DMA before IOMMU
+initialization; internal devices outside IOMMU coverage.
+
+**Type Isolation** — what it killed in the GDI palette/bitmap era, per the existing
+`primitive-matrix.md` `Blocked By` column.
+
+**Protected Process / PPL** — handle duplication via signed driver (Truesight.sys); process
+termination primitives (viragt64.sys).
+
+**PatchGuard and HyperGuard** — deliberately left unenumerated. These are the two largest
+literature gaps in the corpus (one passing mention and zero mentions respectively), and no
+sources for them were gathered during this design session. They require a dedicated literature
+sweep before anything is written. Inventing a technique list from general knowledge is how a
+reference loses the authority this project is trying to build.
+
+## Generated blocks — phase 2 (deferred)
 
 Every generated table sits between markers:
 
@@ -220,7 +301,7 @@ Every generated table sits between markers:
 `render_bypasses.py` rewrites only between markers, so hand-written narrative is never
 clobbered.
 
-### Tooling
+## Tooling — phase 2 (deferred)
 
 | Script | State | Responsibility |
 |---|---|---|
@@ -239,7 +320,7 @@ No new CI workflow. `.github/workflows/deploy-pages.yml` already runs
 `build_dashboard_data.py` before `mkdocs build`; validate and a render-drift check slot into
 that same job, so a schema violation or an out-of-sync generated block fails the deploy.
 
-### Maintenance
+## Maintenance — phase 2 (deferred)
 
 `collector/sources/security_blogs.py` is already a feedparser-driven source and
 `collector/pr_manager.py` already opens PRs. Extending the feed set to technique-bearing
@@ -247,7 +328,7 @@ sources — afflicted.sh, TrustedSec, Connor McGarr, Satoshi Tanda, Project Zero
 conference circuit — makes collected items land as candidate bypass entries in a PR for
 accept/reject. This is what prevents a repeat of the March-to-August 2026 drift.
 
-## Verification
+## Verification — phase 2 (deferred)
 
 Verdicts are cited by default and lab-verified where feasible. `basis` records which:
 `tested` | `cited` | `inferred`.
@@ -312,20 +393,42 @@ documented as impact; no UEFI section is built.
 
 **W7 — Lab verification**, starting with the 26200 sanitization tranche.
 
-**Order: W0 → W5 → W1 → W2 → W3 and W6 in parallel → W4 and W7.**
+**Order: W0 → W5 → W3 → W4 → W6 → then W1, W2, W7.**
 
-W5 precedes the schema work deliberately: it is small, needs no tooling, and retires a claim
-that is currently wrong on any modern machine. That should not wait behind a data-model
-refactor.
+Content workstreams (W5, W3, W4, W6) run first and ship to the site independently. The
+machinery workstreams (W1 schema, W2 render/CI, W7 lab) follow once the content has stopped
+moving.
 
-## Definition of done — phase 1
+W5 leads because it is small, needs no tooling, and retires a claim that is currently wrong on
+any modern machine.
+
+One prerequisite carried forward for W2 whenever it starts: `build_dashboard_data.py` is
+non-deterministic. Running it against an unchanged tree reorders entries in its output arrays
+(observed: `toctou` moving position in a vuln-class list), because set iteration order leaks
+into the JSON. A render-drift CI check cannot work against a generator that emits different
+bytes from identical input, so sorting its collections is a W2 blocker, not a cleanup task.
+
+## Definition of done — phase 1 (content)
+
+- All 20 defenses have a page. The ten that exist are reviewed for stale claims; the ten
+  missing are written.
+- Every defense page ends with a bypass inventory covering the known techniques against it.
+- `docs/bypasses/index.md` carries the platform-configuration matrix, hand-authored, with a
+  basis marker in every cell.
+- Every alive/dead claim across the site carries an inline `as of <date>` and its basis.
+- The three missing case studies are written and added to `cve_index.yaml` and
+  `loldrivers-analysis.md`.
+- `mkdocs build` is clean and the new pages are in `mkdocs.yml` nav.
+
+## Definition of done — phase 2 (machinery)
 
 - All 20 defenses enumerated in `defenses.yaml`.
 - Every bypass whose derived status is `alive` carries at least one dated verdict with a
   citation resolving in `refs.yaml`.
-- `docs/bypasses/index.md` matrix renders from data.
+- `docs/bypasses/index.md` matrix renders from data rather than by hand.
 - Coverage — defenses with a reviewed bypass inventory over total defenses — is computed and
   displayed.
+- `build_dashboard_data.py` output is deterministic.
 - CI fails on schema violations and on generated-block drift.
 
 ## Risks
