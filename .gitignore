@@ -33,3 +33,7 @@ Thumbs.db
 # Collector state
 collector/state/
 *.cache
+
+# Working artifacts
+.playwright-mcp/
+excalidraw.log
