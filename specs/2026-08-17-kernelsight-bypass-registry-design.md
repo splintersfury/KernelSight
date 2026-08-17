@@ -18,9 +18,11 @@ Three consequences, all observed in the current tree:
    pages, while `kCET` has 13 mentions. There is no slot for it to occupy.
 2. **Claims go stale silently.** `primitives/arw/pte-manipulation.md:51` asserts that
    "physical page frame number remapping may still succeed for data (non-executable) pages."
-   That was true in 2021. On any HLAT-enabled machine it is false: the processor walks
-   hypervisor-owned page tables, so mutating the guest PTE's PFN accomplishes nothing.
-   Nothing in the repository structure was capable of flagging it.
+   That remains true on non-HLAT hardware — IDT hijacking via FWA-backed clones depends on it.
+   On an HLAT-enabled machine it is false: the processor walks hypervisor-owned page tables, so
+   mutating the guest PTE's PFN accomplishes nothing. The sentence states no hardware
+   condition, so it reads as universal and is wrong half the time. Nothing in the repository
+   structure was capable of flagging that.
 3. **Defenses are flattened to one bit.** Pages treat HVCI as a single switch. The
    determining factors are the exact build *and* the exact CPU — HLAT requires 11th-generation
    Intel or newer, so "24H2 with HVCI on" describes two materially different machines with
@@ -244,8 +246,54 @@ TrustedSec); **`SeCiCallbacks` pointer swap (alive, cryptoplague)**; test-signin
 already referenced in `kdu-compatibility.md`).
 
 **HVCI** — data-only attacks; I/O Ring; Windows Downdate (CVE-2024-21302); FudModule; **disk
-DMA to Hyper-V memory at runtime (alive, IOMMU is the only defense, LabGuy94)**; VTL0 secure
+DMA to Hyper-V memory at runtime (alive, IOMMU is the only defense, LabGuy94)**; **kernel table
+hijacking via FWA-backed clones (alive on non-HLAT hardware, Sacco — see below)**; VTL0 secure
 call interface abuse (theoretical, no public exploit).
+
+### Kernel table hijacking — the DOG family
+
+Juan Sacco (Exploit Pack) published a series using the DOG (Data Only Gadgets) tooling in the
+EP3 platform against kernel dispatch tables: SSDT, Shadow SSDT, and — 26 June 2026 — the IDT.
+The IDT entry is the one to write first; the SSDT and Shadow SSDT predecessors need their URLs
+gathered and should be inventoried alongside it.
+
+Mechanism, as described: bind the executing thread to a target processor, since the IDT is
+per-CPU, and resolve that processor's IDTR-derived base, backing physical page, and controlling
+page-table entry. Locate a **Free Writable Area (FWA)** page — a physical page in the gaps
+outside OS-managed RAM ranges, still reachable through a physical memory primitive, validated
+by writing a pattern, reading it back, and restoring. Copy the live IDT into the FWA page,
+modify the gate in the clone, then transiently repoint the processor's IDT page-table entry at
+the FWA-backed clone. Trigger `INT 0x2E` into `nt!KiSystemService`, dispatching through a
+redirected native service slot (`NtSetQuotaInformationFile`) to the payload, then restore both
+the IDT mapping and the service entry. The original IDT page is never written.
+
+Requires a **physical memory read/write primitive**. Payload symbols named:
+`PsGetCurrentProcess`, `PsReferencePrimaryToken`, `ObDereferenceObject`.
+
+Two things this contributes beyond a matrix row. **FWA is a primitive in its own right** —
+using unmanaged physical gaps as attacker-controlled workspace is not covered anywhere in
+`primitives/`, and it generalizes past this technique. And the **kernel-table-hijack category**
+(SSDT / Shadow SSDT / IDT) has no home in the current taxonomy.
+
+Two open questions the article does not address, both recorded rather than resolved:
+
+**HLAT.** The mechanism is guest-PTE remapping, which is precisely what HLAT closes — the
+processor walks hypervisor-owned page tables, so repointing the guest PTE should not change
+translation. The title claims VBS/HVCI/kCET but the body never mentions HLAT, HVPT, or VT-rp.
+Expected verdict: alive pre-11th-gen Intel, dead on HLAT-enabled 24H2. **Untested and
+uncited — this is inference, and must be labelled `basis: inferred` until someone confirms it.**
+
+**PatchGuard.** IDT integrity is classic KPP coverage. The transient remap-and-restore design
+may well evade a periodic check, but the article does not argue it and PatchGuard is not
+mentioned. This is a second reason the PatchGuard literature sweep blocks real work.
+
+Provenance caveat for the entry: Exploit Pack is a commercial offensive-tooling vendor and this
+is product-adjacent marketing content. The technical detail is specific and internally
+coherent, so it belongs in the inventory — but at `basis: cited`, `confidence: medium`, with
+the vendor relationship noted in `refs.yaml`. "kCET" appears only in the title and nowhere in
+the body; the claim is plausible on its face, since a data-only interrupt-dispatch path never
+engages the shadow stack, but the article does not make the argument and the inventory should
+not make it for them.
 
 **kCFG / kCET** — kCFG never validates return addresses; ROP through signed kernel code (dead
 under kCET); Connor McGarr's Black Hat 2025 material on kCET and kCFG needs reading before this
@@ -376,7 +424,11 @@ Protected Process / PPL.
 
 **W4 — Bypass prose pages** for `depth: page` entries.
 
-**W5 — Stale-content fixes.** The false `pte-manipulation.md:51` PFN-remapping claim; the
+**W5 — Stale-content fixes.** The `pte-manipulation.md:51` PFN-remapping claim — **corrected
+scope: this is an under-specification, not a falsehood.** The IDT hijacking technique is
+working proof that data-page PFN remapping still succeeds under HVCI on non-HLAT hardware,
+exactly as the line says. The defect is that the sentence states no hardware condition, so it
+reads as universal. The fix adds the HLAT boundary; it does not delete the claim. Then: the
 `kaslr-bypasses.md` timeline stopping at 24H2 and its "four remaining vectors" list omitting
 the physical-memory-mapping-driver route; `primitive-matrix.md` gaining 26200 rows in its
 existing `Max Build`/`Blocked By` columns; the desktop-heap-offset note on `palette-bitmap.md`;
