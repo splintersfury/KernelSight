@@ -250,12 +250,74 @@ DMA to Hyper-V memory at runtime (alive, IOMMU is the only defense, LabGuy94)**;
 hijacking via FWA-backed clones (alive on non-HLAT hardware, Sacco — see below)**; VTL0 secure
 call interface abuse (theoretical, no public exploit).
 
-### Kernel table hijacking — the DOG family
+### Descriptor and dispatch table hijacking — the DOG family
 
-Juan Sacco (Exploit Pack) published a series using the DOG (Data Only Gadgets) tooling in the
-EP3 platform against kernel dispatch tables: SSDT, Shadow SSDT, and — 26 June 2026 — the IDT.
-The IDT entry is the one to write first; the SSDT and Shadow SSDT predecessors need their URLs
-gathered and should be inventoried alongside it.
+Juan Sacco (Exploit Pack), using the DOG (Data Only Gadgets) tooling in the EP3 platform. Four
+tables, one shared mechanism, all under `/blogs/news/` on exploitpack.com:
+
+| Table | Slug |
+|---|---|
+| SSDT (native dispatch) | `bypassing-kernel-code-execution-a-data-only-ssdt-hijack-under-hvci-but-how` |
+| Shadow SSDT (win32k GUI dispatch) | `shadow-ssdt-hijacking-to-achieve-kernel-code-execution-via-rw-primitives` |
+| IDT (interrupt dispatch) | `idt-table-hijacking-under-vbs-hvci-kcet-in-windows-11` |
+| GDT (segment descriptors) | `gdt-table-hijacking-and-fwa` |
+
+Plus the tool overview at `data-only-gadgets` and the EuskalHack 2026 talk at
+`modern-windows-kernel-exploitation-under-vbs-hvci-juan-sacco-presents-new-research-at-euskalhack-2026`.
+
+**The family shares one mechanism**, which is the important structural observation: pin the
+thread to a target CPU (all four tables are per-processor or per-processor-referenced), clone
+the live table page into an FWA page, modify the descriptor or service entry *in the clone*,
+transiently repoint the controlling page-table entry at the clone, trigger through an existing
+legitimate dispatch path, then restore. The original page is never written.
+
+Per-table specifics worth capturing:
+
+- **Shadow SSDT** — `KeServiceDescriptorTableShadow` is undocumented; `win32u.dll` → shadow
+  SSDT → `win32k*`, versus `ntdll.dll` → native SSDT → `ntoskrnl.exe`. Achieves token swap to
+  SYSTEM on Windows 11 with VBS, HVCI, and kCET enabled. The writeup also documents a
+  WinDBG + **Ret-Sync** workflow, which belongs in `tooling/debugging.md` independent of the
+  bypass itself.
+- **IDT** — `INT 0x2E` into `nt!KiSystemService` through a redirected
+  `NtSetQuotaInformationFile` slot. Author notes the inherent limitation that almost nothing
+  uses `INT 0x2E` anymore, so a handler offset outside the `ntoskrnl.exe` range is historically
+  an obvious tell.
+- **GDT** — installs a user-callable **IA-32e call-gate descriptor**, which is 16 bytes in
+  long mode and therefore needs a two-slot window; staging uses selector `0x0058` with the
+  clone limit expanded to `0x007f` so GDTR covers it. Execution is routed through an existing
+  **WOW64 transition path** via a prepared helper process. Structures named: `Gdtr64`,
+  `SegmentDescriptor8`, `Ia32eCallGateDescriptor16`.
+
+**FWA is confirmed cross-cutting** — it appears in both the IDT and GDT writeups as shared
+infrastructure, not a one-off, which settles the question of whether it earns its own
+`primitives/` page. It does.
+
+**Family-level open question, and the cleanest argument for the matrix.** All four techniques
+depend on repointing a guest PTE. HLAT makes the processor walk hypervisor-owned page tables,
+so one hardware feature should close the entire family at once. If that holds, the matrix's
+HLAT column reads `✗` for four consecutive rows from a single cause — which is exactly the kind
+of relationship the current prose-only structure cannot express. **This is inference, not a
+cited claim, and must ship as `basis: inferred` until confirmed.**
+
+**Internal tension in their own material.** The DOG overview includes a mitigation table whose
+PatchGuard row reads "Gadgets target non-protected data." The IDT and GDT are precisely the kind
+of structures PatchGuard has historically monitored. Either the transient-remap-and-restore
+window evades the periodic check — plausible, and interesting — or the claim is too broad. No
+post in the series argues it. Record the tension; do not resolve it by assertion.
+
+**Two external references** cited in the GDT post, to chase for the PatchGuard and descriptor
+table work: "GDT and LDT in Windows kernel vulnerability exploitation" and "A Way Around UMIP
+and Descriptor-Table Exiting via TSX-based Side-Channel." The second is a UMIP and
+descriptor-table-exiting bypass via TSX side-channel, which is a KASLR-adjacent leak and likely
+belongs in the KASLR inventory on its own merits.
+
+**DOG as a toolkit entry.** The overview post is a capability list, not a bypass, and belongs in
+`reference/` next to `kdu-compatibility.md`. Its features map onto existing and missing pages:
+token swap, PID unlink, callback zeroing, controlled VA/PA read and write, code injection, and
+notably **PPL modification, LSASS `PatchWDigest`, LSASS raw-page dump, LSASS minidump with PPL
+zeroing, and suspend of protected processes** — which is direct inventory for the
+`protected-process` defense page. Supporting machinery: `NTKernelWalkerLib`, runtime `ntoskrnl`
+symbol resolution via `dbghelp`, runtime build detection.
 
 Mechanism, as described: bind the executing thread to a target processor, since the IDT is
 per-CPU, and resolve that processor's IDTR-derived base, backing physical page, and controlling
@@ -336,6 +398,43 @@ literature gaps in the corpus (one passing mention and zero mentions respectivel
 sources for them were gathered during this design session. They require a dedicated literature
 sweep before anything is written. Inventing a technique list from general knowledge is how a
 reference loses the authority this project is trying to build.
+
+### Two Exploit Pack posts that are not bypasses
+
+Both were surfaced by the same sweep and belong elsewhere in the taxonomy. Filing them under
+Bypasses would be a category error.
+
+**`winnotify-building-kernel-read-write-from-cr3-based-ioctls`** — a BYOVD case study on the
+signed WinNotify driver, and a primitive. The public PoC uses `0x22200C` for module base,
+`0x222040` for a 5-QWORD kernel read, and `0x222044` for a `memmove()` virtual-address write,
+then walks `ActiveProcessLinks` for the SYSTEM token. The contribution is the **unused
+`0x222000` / `0x222004` CR3-based path**: the caller supplies a virtual address *plus* a
+DirBase, and the driver performs its own page-table walk. Building a stable physical read/write
+layer on it requires distinguishing **scratch CR3** (where the temporary user mapping lives)
+from **translation CR3** (the address space being walked), and resolving the PTE base at runtime
+by scanning `MiGetPteAddress` for its immediates rather than hardcoding it. Destination: a case
+study, a `driver_index.yaml` entry, and a primitive page for caller-supplied-CR3 translation as
+a physical-memory primitive — which is materially different from the `MmMapIoSpace` and DMA
+paths already covered under `primitives/arw/dma-mmio.md`.
+
+**`kernel-driver-gates-and-handshakes`** — an attack-surface and vulnerability-pattern piece,
+not a technique. Vendor drivers that expose privileged IOCTL interfaces frequently layer a
+private client-recognition protocol above the OS mechanisms: a magic constant in the IOCTL
+packet, an authorization IOCTL, a required buffer-size or arrangement contract, an encrypted
+process identifier, a caller-image hash, or a registry-controlled allowlist. The author's
+distinction is worth adopting verbatim — a **gate** is a single condition; a **handshake** is a
+gate requiring multiple steps, state transfer, or session establishment.
+
+The security point is that these are usually deployed *instead of* a correct device-object
+security descriptor, and they are obfuscation rather than authorization: anything a user-mode
+client can compute, an attacker who reverses the driver can also compute. Destination:
+`attack-surfaces/ioctl-handlers.md`, plus a candidate `vuln-classes/` entry for
+gate-or-handshake-as-sole-authorization.
+
+This pairs directly with the amwrtdrv finding already in W6, where the driver calls
+`IoGetDeviceObjectPointer` from kernel context so that `disk.sys`'s own ACL never applies to the
+caller. Same underlying failure — a vendor substituting its own trust decision for the one the
+OS would have made — reached from opposite directions. The two should cross-reference.
 
 ## Generated blocks — phase 2 (deferred)
 
@@ -435,7 +534,8 @@ existing `Max Build`/`Blocked By` columns; the desktop-heap-offset note on `pale
 the hardware-gating caveat on `vbs-hvci.md`; the Hyper-V-runtime-hijack and IOMMU-only framing
 on `dma-mmio.md`.
 
-**W6 — Three missing case studies.** KKYUM.sys (WHQL-signed, unblocklisted, nine IOCTLs
+**W6 — Four missing case studies.** WinNotify (signed driver; CR3-supplied-translation IOCTL
+path at `0x222000`/`0x222004` beyond the public PoC's `memmove` write), KKYUM.sys (WHQL-signed, unblocklisted, nine IOCTLs
 including `MmCopyVirtualMemory` arbitrary read/write and `win32kbase!ValidateHwnd` DKOM),
 amwrtdrv.sys (AOMEI Backupper 8.4.0, no security descriptor, raw disk access; related
 CVE-2026-12780 filed against 8.3.0), and eneio64.sys/CVE-2020-12446 (physical memory mapping,
