@@ -460,11 +460,62 @@ body, html {
   color: var(--text-dim);
 }
 
+.ksd-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ksd-version__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+.ksd-version__select {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 5px 26px 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.ksd-version__select:hover,
+.ksd-version__select:focus {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  outline: none;
+}
+.ksd-version__select--active {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background-color: var(--accent-glow);
+}
+.ksd-version__select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
 /* ── Table ── */
 .ksd-table-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 72vh;
   -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
+.ksd-table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+.ksd-table-wrap::-webkit-scrollbar-track { background: var(--bg-input); }
+.ksd-table-wrap::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 6px; }
 
 .ksd-table {
   width: 100%;
@@ -477,14 +528,18 @@ body, html {
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-dim);
+  color: var(--text-secondary);
   text-align: left;
-  padding: 0 12px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 12px;
+  border-bottom: 1px solid var(--border-hover);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
   transition: color 0.15s ease;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg-elevated);
 }
 
 .ksd-table th:hover {
@@ -502,11 +557,22 @@ body, html {
   color: var(--accent);
 }
 
-.ksd-table__col-id { width: 150px; }
-.ksd-table__col-driver { width: 140px; }
+.ksd-table__col-id { width: 140px; }
+.ksd-table__col-driver { width: 130px; }
 .ksd-table__col-desc { width: auto; }
-.ksd-table__col-vuln { width: 150px; }
-.ksd-table__col-badges { width: 130px; }
+.ksd-table__col-vuln { width: 140px; }
+.ksd-table__col-version { width: 118px; }
+.ksd-table__col-badges { width: 112px; }
+
+.ksd-table__version {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.ksd-table__version--none {
+  color: var(--text-dim);
+}
 
 .ksd-table td {
   padding: 12px;
@@ -611,6 +677,58 @@ body, html {
   color: var(--green);
   border: 1px solid var(--green);
   background: var(--green-glow);
+}
+
+/* ── Pagination ── */
+.ksd-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.ksd-pager__status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+.ksd-pager__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ksd-pager__btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  min-width: 32px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ksd-pager__btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ksd-pager__btn--active {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}
+.ksd-pager__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ksd-pager__ellipsis {
+  color: var(--text-dim);
+  padding: 0 2px;
+  font-size: 0.7rem;
 }
 
 /* ── Export ── */
@@ -835,6 +953,12 @@ body, html {
       <button class="ksd-chip ksd-chip--itw" data-filter="itw">ITW</button>
       <button class="ksd-chip ksd-chip--poc" data-filter="poc">PoC</button>
       <button class="ksd-chip ksd-chip--writeup" data-filter="writeup">Writeup</button>
+      <label class="ksd-version" for="ksd-version">
+        <span class="ksd-version__label">Windows</span>
+        <select class="ksd-version__select" id="ksd-version">
+          <option value="">All versions</option>
+        </select>
+      </label>
       <span class="ksd-filters__count" id="ksd-count"></span>
     </div>
 
@@ -846,6 +970,7 @@ body, html {
             <th class="ksd-table__col-driver" data-sort="driver">Driver <span class="ksd-sort-arrow">&#9650;</span></th>
             <th class="ksd-table__col-desc" data-sort="description">Description <span class="ksd-sort-arrow">&#9650;</span></th>
             <th class="ksd-table__col-vuln" data-sort="vuln_class">Vuln Class <span class="ksd-sort-arrow">&#9650;</span></th>
+            <th class="ksd-table__col-version" data-sort="win_version">Windows <span class="ksd-sort-arrow">&#9650;</span></th>
             <th class="ksd-table__col-badges">Flags</th>
           </tr>
         </thead>
@@ -854,6 +979,11 @@ body, html {
     </div>
 
     <div id="ksd-empty" class="ksd-empty" style="display:none;">No CVEs match the current filters.</div>
+
+    <div class="ksd-pager" id="ksd-pager" style="display:none;">
+      <span class="ksd-pager__status" id="ksd-pager-status"></span>
+      <div class="ksd-pager__controls" id="ksd-pager-controls"></div>
+    </div>
 
     <div class="ksd-export">
       <button class="ksd-export__btn" id="ksd-export-csv">Export CSV</button>
@@ -886,10 +1016,12 @@ body, html {
   let DATA = null;
   let allCves = [];
   let filteredCves = [];
-  let filters = { itw: false, poc: false, writeup: false, search: '', driver: '', vuln_class: '' };
+  let filters = { itw: false, poc: false, writeup: false, search: '', driver: '', vuln_class: '', win_version: '' };
   let sortCol = 'id';
   let sortDir = 'desc';
   let activeMatrixCell = null;
+  let page = 1;
+  const PAGE_SIZE = 25;
 
   /* ════════════════════════════════════════
      Data Fetch
@@ -914,8 +1046,44 @@ body, html {
   function init() {
     renderStats();
     renderMatrix();
+    populateVersions();
     applyFilters();
     bindEvents();
+  }
+
+  /* Populate the Windows-version dropdown from the data, newest release first. */
+  function populateVersions() {
+    var sel = document.getElementById('ksd-version');
+    if (!sel) return;
+    var counts = {};
+    allCves.forEach(function(c) {
+      var v = c.win_version || '';
+      if (v) counts[v] = (counts[v] || 0) + 1;
+    });
+    // Rank labels so the newest release sorts first (e.g. 24H2 > 23H2 > 22H2).
+    function rank(label) {
+      var m = label.match(/(\d{2})H(\d)/i);       // "24H2" -> 242
+      if (m) return parseInt(m[1], 10) * 10 + parseInt(m[2], 10);
+      m = label.match(/Server\s*(\d{4})/i);        // "Server 2022" -> 220
+      if (m) return (parseInt(m[1], 10) - 2000) * 10;
+      m = label.match(/(\d{5})/);                  // "Build 30000" fallback
+      if (m) return parseInt(m[1], 10);
+      return 0;
+    }
+    var labels = Object.keys(counts).sort(function(a, b) { return rank(b) - rank(a); });
+    var unspec = allCves.length - Object.keys(counts).reduce(function(s, k) { return s + counts[k]; }, 0);
+    labels.forEach(function(label) {
+      var opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = label + ' (' + counts[label] + ')';
+      sel.appendChild(opt);
+    });
+    if (unspec > 0) {
+      var opt = document.createElement('option');
+      opt.value = '__none__';
+      opt.textContent = 'Unspecified (' + unspec + ')';
+      sel.appendChild(opt);
+    }
   }
 
   /* ════════════════════════════════════════
@@ -1006,6 +1174,13 @@ body, html {
       if (filters.writeup && !cve.has_writeup) return false;
       if (filters.driver && cve.driver !== filters.driver) return false;
       if (filters.vuln_class && cve.vuln_class !== filters.vuln_class) return false;
+      if (filters.win_version) {
+        if (filters.win_version === '__none__') {
+          if (cve.win_version) return false;
+        } else if (cve.win_version !== filters.win_version) {
+          return false;
+        }
+      }
       if (search) {
         var hay = (cve.id + ' ' + cve.driver + ' ' + cve.description + ' ' + cve.vuln_class).toLowerCase();
         if (hay.indexOf(search) === -1) return false;
@@ -1014,6 +1189,7 @@ body, html {
     });
 
     sortCves();
+    page = 1;
     renderTable();
     updateCount();
   }
@@ -1040,13 +1216,19 @@ body, html {
     if (filteredCves.length === 0) {
       tbody.innerHTML = '';
       empty.style.display = 'block';
+      renderPager();
       return;
     }
     empty.style.display = 'none';
 
+    var totalPages = Math.max(1, Math.ceil(filteredCves.length / PAGE_SIZE));
+    if (page > totalPages) page = totalPages;
+    var start = (page - 1) * PAGE_SIZE;
+    var pageRows = filteredCves.slice(start, start + PAGE_SIZE);
+
     var html = '';
-    for (var i = 0; i < filteredCves.length; i++) {
-      var cve = filteredCves[i];
+    for (var i = 0; i < pageRows.length; i++) {
+      var cve = pageRows[i];
       var caseLink = cve.case_study ? '../' + cve.case_study : '#';
       html += '<tr style="animation-delay:' + (i * 8) + 'ms">';
       var isCve = /^CVE-/.test(cve.id);
@@ -1056,6 +1238,12 @@ body, html {
       html += '<td><span class="ksd-table__driver" data-driver="' + escHtml(cve.driver) + '">' + escHtml(cve.driver) + '</span></td>';
       html += '<td class="ksd-table__desc" title="' + escHtml(cve.description) + '">' + escHtml(cve.description) + '</td>';
       html += '<td><span class="ksd-table__vuln" data-vuln="' + escHtml(cve.vuln_class) + '">' + formatVulnClass(cve.vuln_class) + '</span></td>';
+      if (cve.win_version) {
+        var buildTip = cve.vuln_build ? ('Vulnerable ' + cve.vuln_build + (cve.fix_build ? ' → fixed ' + cve.fix_build : '')) : cve.win_version;
+        html += '<td><span class="ksd-table__version" title="' + escHtml(buildTip) + '">' + escHtml(cve.win_version) + '</span></td>';
+      } else {
+        html += '<td><span class="ksd-table__version ksd-table__version--none">&mdash;</span></td>';
+      }
       html += '<td><div class="ksd-badges">';
       if (cve.itw) html += '<span class="ksd-badge ksd-badge--itw">ITW</span>';
       if (cve.has_poc) html += '<span class="ksd-badge ksd-badge--poc">PoC</span>';
@@ -1064,6 +1252,56 @@ body, html {
       html += '</tr>';
     }
     tbody.innerHTML = html;
+    renderPager();
+  }
+
+  function renderPager() {
+    var pager = document.getElementById('ksd-pager');
+    var status = document.getElementById('ksd-pager-status');
+    var controls = document.getElementById('ksd-pager-controls');
+    var total = filteredCves.length;
+
+    if (total <= PAGE_SIZE) {
+      pager.style.display = 'none';
+      return;
+    }
+    pager.style.display = 'flex';
+
+    var totalPages = Math.ceil(total / PAGE_SIZE);
+    if (page > totalPages) page = totalPages;
+    var start = (page - 1) * PAGE_SIZE;
+    var end = Math.min(start + PAGE_SIZE, total);
+    status.textContent = 'Rows ' + (start + 1) + '–' + end + ' of ' + total;
+
+    // Build compact page list: 1 … p-1 p p+1 … N
+    var pages = [];
+    var addP = function(n) { pages.push(n); };
+    addP(1);
+    for (var n = page - 1; n <= page + 1; n++) {
+      if (n > 1 && n < totalPages) addP(n);
+    }
+    if (totalPages > 1) addP(totalPages);
+    pages = pages.filter(function(v, i, a) { return a.indexOf(v) === i; }).sort(function(a, b) { return a - b; });
+
+    var html = '';
+    html += '<button class="ksd-pager__btn" data-page="prev"' + (page === 1 ? ' disabled' : '') + '>Prev</button>';
+    var prev = 0;
+    for (var j = 0; j < pages.length; j++) {
+      var pn = pages[j];
+      if (prev && pn - prev > 1) html += '<span class="ksd-pager__ellipsis">…</span>';
+      html += '<button class="ksd-pager__btn' + (pn === page ? ' ksd-pager__btn--active' : '') + '" data-page="' + pn + '">' + pn + '</button>';
+      prev = pn;
+    }
+    html += '<button class="ksd-pager__btn" data-page="next"' + (page === totalPages ? ' disabled' : '') + '>Next</button>';
+    controls.innerHTML = html;
+  }
+
+  function goToPage(p) {
+    var totalPages = Math.max(1, Math.ceil(filteredCves.length / PAGE_SIZE));
+    page = Math.min(Math.max(1, p), totalPages);
+    renderTable();
+    var wrap = document.querySelector('.ksd-table-wrap');
+    if (wrap) wrap.scrollTop = 0;
   }
 
   function updateCount() {
@@ -1090,6 +1328,16 @@ body, html {
         applyFilters();
       });
     });
+
+    // Windows-version dropdown
+    var versionSel = document.getElementById('ksd-version');
+    if (versionSel) {
+      versionSel.addEventListener('change', function() {
+        filters.win_version = this.value;
+        this.classList.toggle('ksd-version__select--active', !!this.value);
+        applyFilters();
+      });
+    }
 
     // Matrix cell clicks
     document.getElementById('ksd-matrix').addEventListener('click', function(e) {
@@ -1184,15 +1432,28 @@ body, html {
       }
     });
 
+    // Pagination
+    document.getElementById('ksd-pager-controls').addEventListener('click', function(e) {
+      var btn = e.target.closest('.ksd-pager__btn');
+      if (!btn || btn.disabled) return;
+      var target = btn.getAttribute('data-page');
+      if (target === 'prev') goToPage(page - 1);
+      else if (target === 'next') goToPage(page + 1);
+      else goToPage(parseInt(target, 10));
+    });
+
     // Export CSV
     document.getElementById('ksd-export-csv').addEventListener('click', function() {
-      var lines = ['CVE ID,Driver,Description,Vuln Class,ITW,PoC,Writeup'];
+      var lines = ['CVE ID,Driver,Description,Vuln Class,Windows,Vulnerable Build,Fixed Build,ITW,PoC,Writeup'];
       filteredCves.forEach(function(c) {
         lines.push([
           c.id,
           '"' + c.driver.replace(/"/g, '""') + '"',
           '"' + c.description.replace(/"/g, '""') + '"',
           c.vuln_class,
+          c.win_version || '',
+          c.vuln_build || '',
+          c.fix_build || '',
           c.itw ? 'Yes' : 'No',
           c.has_poc ? 'Yes' : 'No',
           c.has_writeup ? 'Yes' : 'No'
@@ -1209,6 +1470,9 @@ body, html {
           driver: c.driver,
           description: c.description,
           vuln_class: c.vuln_class,
+          win_version: c.win_version || '',
+          vuln_build: c.vuln_build || '',
+          fix_build: c.fix_build || '',
           itw: c.itw,
           has_poc: c.has_poc,
           has_writeup: c.has_writeup

@@ -30,10 +30,12 @@ theme:
         name: Switch to dark mode
   features:
     - navigation.tabs
-    - navigation.sections
-    - navigation.expand
     - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
     - search.highlight
+    - search.suggest
     - content.code.copy
   icon:
     repo: fontawesome/brands/github

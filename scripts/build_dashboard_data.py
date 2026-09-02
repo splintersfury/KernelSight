@@ -10,6 +10,7 @@ Usage:
 
 import json
 import os
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -28,6 +29,88 @@ OUTPUT = ROOT / "docs" / "assets" / "dashboard-data.json"
 def load_yaml(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+# Maps the product-build number (3rd octet of 10.0.<N>.<rev>) to a Windows
+# release label. Extend as the corpus grows into new branches.
+WIN_VERSION_MAP = {
+    "26200": "Win11 25H2",
+    "26100": "Win11 24H2",
+    "22631": "Win11 23H2",
+    "22621": "Win11 22H2",
+    "22000": "Win11 21H2",
+    "25398": "Server 23H2",
+    "20348": "Server 2022",
+    "19045": "Win10 22H2",
+    "19044": "Win10 21H2",
+    "19043": "Win10 21H1",
+    "19042": "Win10 20H2",
+    "19041": "Win10 2004",
+    "18363": "Win10 1909",
+    "17763": "Win10 1809",
+    "14393": "Server 2016",
+}
+
+# Matches a summary-table row such as:  | **Vulnerable Build** | `10.0.22621.608` (KB..) |
+_BUILD_ROW_RE = re.compile(
+    r"\|\s*\*\*(?P<field>Vulnerable Build|Fixed Build)\*\*\s*\|\s*`?(?P<build>10\.0\.\d+\.\d+)",
+    re.IGNORECASE,
+)
+
+
+def win_version_for(build: str) -> str:
+    """Derive a Windows release label from a full build string, or '' if unknown."""
+    if not build:
+        return ""
+    parts = build.split(".")
+    if len(parts) >= 3:
+        return WIN_VERSION_MAP.get(parts[2], f"Build {parts[2]}")
+    return ""
+
+
+def parse_case_study_builds(case_study_raw: str) -> dict:
+    """Read a case-study markdown file and pull vulnerable/fixed build numbers
+    from its summary table. Returns {'vuln_build': str, 'fix_build': str}."""
+    out = {"vuln_build": "", "fix_build": ""}
+    if not case_study_raw:
+        return out
+    path = case_study_raw
+    if not path.startswith("docs/"):
+        path = "docs/" + path.lstrip("/")
+    md = ROOT / path
+    if not md.exists():
+        return out
+    try:
+        text = md.read_text(encoding="utf-8")
+    except OSError:
+        return out
+    for m in _BUILD_ROW_RE.finditer(text):
+        field = m.group("field").lower()
+        build = m.group("build")
+        if field.startswith("vulnerable") and not out["vuln_build"]:
+            out["vuln_build"] = build
+        elif field.startswith("fixed") and not out["fix_build"]:
+            out["fix_build"] = build
+    return out
+
+
+def resolve_build_info(entry: dict) -> dict:
+    """Best-effort build + Windows-version metadata for one CVE.
+
+    Prefers the case-study markdown table (what the reader sees and the richest
+    source), falling back to the YAML vuln_version/fix_version fields.
+    """
+    info = parse_case_study_builds(entry.get("case_study", ""))
+    if not info["vuln_build"]:
+        vv = entry.get("vuln_version")
+        if isinstance(vv, dict) and vv.get("build"):
+            info["vuln_build"] = str(vv["build"])
+    if not info["fix_build"]:
+        fv = entry.get("fix_version")
+        if isinstance(fv, dict) and fv.get("build"):
+            info["fix_build"] = str(fv["build"])
+    info["win_version"] = win_version_for(info["vuln_build"] or info["fix_build"])
+    return info
 
 
 def normalize_case_study(raw: str) -> str:
@@ -49,6 +132,7 @@ def build_cve_list(cve_data: list) -> list:
     result = []
     for entry in cve_data:
         refs = entry.get("references", {})
+        build = resolve_build_info(entry)
         cve = {
             "id": entry.get("cve_id", ""),
             "driver": entry.get("driver", ""),
@@ -58,6 +142,9 @@ def build_cve_list(cve_data: list) -> list:
             "has_poc": bool(refs.get("poc", "")),
             "has_writeup": bool(refs.get("writeup", "")),
             "case_study": normalize_case_study(entry.get("case_study", "")),
+            "vuln_build": build["vuln_build"],
+            "fix_build": build["fix_build"],
+            "win_version": build["win_version"],
             "references": {
                 "msrc": refs.get("msrc", ""),
                 "writeup": refs.get("writeup", ""),
@@ -139,6 +226,7 @@ def build_stats(cves: list) -> dict:
     drivers = set()
     vuln_class_counts = defaultdict(int)
     driver_counts = defaultdict(int)
+    win_version_counts = defaultdict(int)
     itw_count = 0
     poc_count = 0
 
@@ -148,6 +236,7 @@ def build_stats(cves: list) -> dict:
             driver_counts[cve["driver"]] += 1
         if cve["vuln_class"]:
             vuln_class_counts[cve["vuln_class"]] += 1
+        win_version_counts[cve.get("win_version") or "Unspecified"] += 1
         if cve["itw"]:
             itw_count += 1
         if cve["has_poc"]:
@@ -156,6 +245,7 @@ def build_stats(cves: list) -> dict:
     # Sort dicts by count descending
     sorted_vc = dict(sorted(vuln_class_counts.items(), key=lambda x: x[1], reverse=True))
     sorted_dc = dict(sorted(driver_counts.items(), key=lambda x: x[1], reverse=True))
+    sorted_wv = dict(sorted(win_version_counts.items(), key=lambda x: x[1], reverse=True))
 
     return {
         "total_cves": len(cves),
@@ -164,6 +254,7 @@ def build_stats(cves: list) -> dict:
         "poc_count": poc_count,
         "vuln_class_counts": sorted_vc,
         "driver_counts": sorted_dc,
+        "win_version_counts": sorted_wv,
     }
 
 
