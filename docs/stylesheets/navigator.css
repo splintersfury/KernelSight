@@ -1,0 +1,36 @@
+/* KernelSight mitigation Bypass Navigator — shared component styles.
+   Theme-aware via Material CSS variables (works in light and dark). */
+.ksn{border:1px solid var(--md-default-fg-color--lightest);border-radius:10px;padding:20px 20px 16px;margin:1.2rem 0 2rem;background:var(--md-code-bg-color);}
+.ksn__title{font-size:1.15rem;font-weight:700;letter-spacing:-.01em;}
+.ksn__sub{font-size:.78rem;color:var(--md-default-fg-color--light);margin-top:4px;max-width:70ch;line-height:1.5;}
+.ksn__controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:18px;}
+.ksn__ctl{display:flex;flex-direction:column;gap:6px;}
+.ksn__ctl--wide{grid-column:1/-1;}
+.ksn__label{font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;color:var(--md-default-fg-color--light);font-weight:600;}
+.ksn__select{font:inherit;font-size:.8rem;padding:7px 10px;border:1px solid var(--md-default-fg-color--lighter);border-radius:6px;background:var(--md-default-bg-color);color:var(--md-default-fg-color);cursor:pointer;}
+.ksn__select:focus{outline:2px solid var(--md-accent-fg-color);outline-offset:1px;}
+.ksn__checks{display:flex;flex-wrap:wrap;gap:8px;}
+.ksn__chk{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;padding:6px 12px;border:1px solid var(--md-default-fg-color--lighter);border-radius:20px;cursor:pointer;user-select:none;}
+.ksn__chk input{accent-color:var(--md-accent-fg-color);}
+.ksn__bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px;flex-wrap:wrap;}
+.ksn__chk--only{border-radius:6px;}
+.ksn__count{font-size:.72rem;color:var(--md-default-fg-color--light);font-variant-numeric:tabular-nums;}
+.ksn__list{display:flex;flex-direction:column;gap:8px;}
+.ksn__row{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--md-default-fg-color--lightest);border-radius:8px;background:var(--md-default-bg-color);}
+.ksn__row--closed{opacity:.55;}
+.ksn__rdot{width:9px;height:9px;border-radius:50%;margin-top:6px;}
+.ksn__rmain{min-width:0;}
+.ksn__rname{font-weight:650;font-size:.9rem;line-height:1.3;}
+.ksn__rcat{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--md-default-fg-color--light);margin-top:2px;}
+.ksn__rwhy{font-size:.8rem;color:var(--md-default-fg-color--light);margin-top:6px;line-height:1.5;}
+.ksn__rwhy a{color:var(--md-accent-fg-color);}
+.ksn__rside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;white-space:nowrap;}
+.ksn__pill{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:20px;}
+.ksn__pill--open{background:rgba(46,160,67,.16);color:#3fb950;}
+.ksn__pill--gated{background:rgba(210,153,34,.16);color:#d29922;}
+.ksn__pill--closed{background:var(--md-default-fg-color--lightest);color:var(--md-default-fg-color--light);}
+.ksn__req{font-size:.66rem;color:var(--md-default-fg-color--light);}
+.ksn__dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline;}
+.ksn__dot--open{background:#3fb950;} .ksn__dot--gated{background:#d29922;} .ksn__dot--closed{background:var(--md-default-fg-color--lighter);}
+.ksn__legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:.7rem;color:var(--md-default-fg-color--light);}
+@media (max-width:480px){.ksn__row{grid-template-columns:14px 1fr;}.ksn__rside{grid-column:2;align-items:flex-start;flex-direction:row;}}

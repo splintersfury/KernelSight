@@ -4,6 +4,44 @@ Overwriting a function pointer used to be the most reliable step in a kernel exp
 
 The practical effect on exploitation has been decisive. Before kCFG, a single function pointer overwrite was often enough to hijack kernel execution. After kCFG, exploits must find a useful CFG-valid target or avoid control flow hijacking entirely. With kCET added in Windows 11 24H2, the ROP/JOP fallback is eliminated too. The result is that modern kernel exploits on fully updated systems have abandoned control flow hijacking altogether, converging on data-only techniques like token swapping and `PreviousMode` manipulation.
 
+<div id="ksn-kcfg"></div>
+
+<script>
+(window.__ksnav=window.__ksnav||[]).push({
+  sel:'#ksn-kcfg',
+  title:'Bypass Navigator',
+  sub:'kCFG validates indirect-call targets; kCET protects return addresses. Set what is enforced and what you can corrupt; each row shows whether the control-flow path still works.',
+  controls:[
+    {id:'kcet',label:'kCET shadow stack',type:'select',default:'on',options:[['on','Active (24H2 + CET / Zen 3)'],['off','kCFG only (no shadow-stack CPU)']]},
+    {id:'drv',label:'Target driver',type:'select',default:'ms',options:[['ms','Microsoft kernel (/guard:cf)'],['third','Third-party without /guard:cf']]},
+    {id:'held',label:'What you can corrupt',type:'checks',wide:true,options:[['cf','indirect call / callback pointer'],['stack','stack / return address']]}
+  ],
+  techniques:(function(){var CS='../../case-studies/',PR='../../primitives/exploitation/';return [
+    {name:'CFG-valid gadgets ("CFG-aware")',cat:'Forward-edge',ev:function(s){
+      if(s.cf) return ['open','Have call hijack','kCFG only checks the target is a valid function entry, not the intended one. Redirect an indirect call to NtWriteVirtualMemory, RtlSetBit or RtlClearAllBits — all valid targets. The <a href="'+PR+'bit-manipulation/">bit-manipulation primitive</a> is fully kCFG-compliant. <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a> does exactly this.'];
+      return ['gated','Needs a control-flow hijack','Works even with kCET active — the shadow stack does not constrain forward-edge target choice.'];}},
+    {name:'Data-only attacks',cat:'Data-only',ev:function(s){
+      return ['open','Bypasses both','Token swap, <code>PreviousMode</code> manipulation, and ACL/SD modification hijack no control flow at all — neither kCFG nor kCET applies. Every ITW CVE in the 2024–2026 corpus used this. Needs a kernel write primitive.'];}},
+    {name:'Third-party driver gaps (no /guard:cf)',cat:'Coverage gap',ev:function(s){
+      if(s.drv!=='third') return ['closed','MS kernel is /guard:cf','Microsoft kernel indirect calls are CFG-protected.'];
+      if(s.cf) return ['open','Have call hijack','A driver not compiled with /guard:cf has unprotected indirect call sites. Hijack control flow inside it and no kCFG check applies at those sites.'];
+      return ['gated','Needs a control-flow hijack','Exploitable only where you can corrupt a call target inside the unprotected driver.'];}},
+    {name:'Unprotected callbacks (exception / APC / I/O completion)',cat:'Coverage gap',ev:function(s){
+      return ['gated','Partial coverage','Some callback paths are not fully kCFG-validated. Microsoft is closing these each release, so coverage varies by build.'];}},
+    {name:'ROP chains (classic)',cat:'Code reuse',ev:function(s){
+      if(s.kcet==='on') return ['closed','Shadow stack blocks it','kCET detects return-address tampering at the first RET, long before the chain does anything.'];
+      if(s.stack) return ['open','Have stack control','Without a hardware shadow stack, classic return-address ROP still chains gadgets.'];
+      return ['gated','Needs stack control','Viable only where kCET is not enforced.'];}},
+    {name:'Stack pivot',cat:'Code reuse',ev:function(s){
+      if(s.kcet==='on') return ['closed','Shadow stack blocks it','The SSP is independent of RSP; pivoting RSP mismatches the shadow stack on the next RET.'];
+      if(s.stack) return ['open','Have stack control','Pivot RSP into attacker-controlled memory where kCET is absent.'];
+      return ['gated','Needs stack control','Viable only where kCET is not enforced.'];}},
+    {name:'kCET shadow-stack direct bypass',cat:'Hardware',ev:function(s){
+      return ['closed','No public bypass','As of early 2026 there is no public kCET bypass. Shadow-stack writes need special instructions unreachable via normal memory writes.'];}}
+  ];})()
+});
+</script>
+
 ## How They Work
 
 **kCFG (Kernel Control Flow Guard)** is a software-based forward-edge control flow integrity mechanism introduced in Windows 10 RS1 (build 14393). At compile time, the MSVC compiler generates a bitmap of all valid indirect call targets, which are the addresses of functions whose address is taken somewhere in the program. Before each indirect call, the compiler inserts a call to `_guard_dispatch_icall`, which checks the target address against the bitmap. If the target is not a valid function entry point, the system bugchecks with `KERNEL_SECURITY_CHECK_FAILURE` (code 0x139).

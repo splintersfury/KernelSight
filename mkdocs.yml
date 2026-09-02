@@ -43,6 +43,10 @@ theme:
 extra_css:
   - stylesheets/extra.css
   - stylesheets/dashboard.css
+  - stylesheets/navigator.css
+
+extra_javascript:
+  - javascripts/navigator.js
 
 markdown_extensions:
   - admonition

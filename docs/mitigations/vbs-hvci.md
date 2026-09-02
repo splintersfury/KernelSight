@@ -4,6 +4,59 @@ What happens when the kernel itself cannot be trusted? Virtualization-Based Secu
 
 Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional features and made them enabled by default on new Windows 11 devices meeting hardware requirements. Together with [kCFG/kCET](kcfg-kcet.md) and [SMEP/SMAP](smep-smap.md), HVCI completes a model where no memory in the kernel address space can be both written to and executed, and control flow cannot be arbitrarily redirected.
 
+<div id="ksn-hvci"></div>
+
+<script>
+(window.__ksnav=window.__ksnav||[]).push({
+  sel:'#ksn-hvci',
+  title:'Bypass Navigator',
+  sub:'HVCI enforces code integrity, not data integrity. Set your foothold; each row shows whether HVCI stops that path on this target. Rows link into the detail below.',
+  controls:[
+    {id:'hvci',label:'HVCI status',type:'select',default:'on',options:[['on','Enabled (24H2 default)'],['off','Disabled / unavailable']]},
+    {id:'held',label:'What you hold',type:'checks',wide:true,options:[['rw','kernel read/write primitive'],['admin','admin (can load drivers)'],['drv','unblocklisted signed vuln driver']]}
+  ],
+  techniques:(function(){var CS='../../case-studies/',PR='../../primitives/exploitation/';return [
+    {name:'Data-only attacks (token swap, PreviousMode, ACL/SD)',cat:'Data-only',ev:function(s){
+      if(s.rw) return ['open','Have kernel R/W','HVCI protects code, not data. Modify tokens, <code>PreviousMode</code>, or security descriptors without executing code or touching code pages — HVCI is irrelevant. See <a href="'+PR+'token-swapping/">Token Swapping</a>.'];
+      return ['gated','Needs a kernel write primitive','The primary modern strategy under HVCI: never execute code, only corrupt data structures.'];}},
+    {name:'Living-off-the-land signed code / I/O Ring',cat:'Signed-code reuse',ev:function(s){
+      return ['open','HVCI-irrelevant','All legitimately signed kernel code passes HVCI. Chain existing syscall handlers and signed routines for read/write — the <a href="'+PR+'io-ring/">I/O Ring</a> primitive gives kernel R/W through documented interfaces, so HVCI never applies.'];}},
+    {name:'Data-only BYOVD (token swap via signed driver)',cat:'BYOVD',ev:function(s){
+      if(s.admin&&s.drv) return ['open','Admin + signed driver','HVCI does not stop a signed, non-blocklisted driver doing data-only work. <a href="'+CS+'viragt64-sys/">viragt64.sys</a> (process kill) and <a href="'+CS+'Truesight-sys/">Truesight.sys</a> (handle dup) work regardless of HVCI.'];
+      return ['gated','Needs admin + a non-blocklisted signed driver','Data-only BYOVD survives HVCI as long as the driver is not on the blocklist.'];}},
+    {name:'Unblocklistable driver (e.g. NVDrv)',cat:'BYOVD',ev:function(s){
+      if(s.admin) return ['open','Admin','<a href="'+CS+'NVDrv/">NVDrv</a> (NVIDIA GPU) cannot be blocklisted without breaking display — an architectural gap in the HVCI BYOVD defense.'];
+      return ['gated','Needs admin','A signed driver Microsoft cannot blocklist; usable under HVCI once you can load it.'];}},
+    {name:'VBS "Windows Downdate" (CVE-2024-21302)',cat:'Attack VBS itself',ev:function(s){
+      if(s.hvci==='off') return ['closed','VBS not enabled','No VBS to downgrade on this target.'];
+      if(s.admin) return ['open','Admin','Downgrade VTL 1 / Secure Kernel components to older vulnerable versions, undoing VBS without breaking the hypervisor boundary. Targets the trust model. <a href="'+CS+'CVE-2024-21302/">CVE-2024-21302</a>.'];
+      return ['gated','Needs admin','SafeBreach’s downgrade of Secure-Kernel components; requires admin to reach the update path.'];}},
+    {name:'Kernel shellcode injection',cat:'Code execution',ev:function(s){
+      if(s.hvci==='on') return ['closed','Blocked by W^X','No page in the kernel address space can be both writable and executable — shellcode injection fails.'];
+      if(s.rw) return ['open','Have kernel R/W','Without HVCI, W^X is not hypervisor-enforced; classic shellcode injection is viable.'];
+      return ['gated','Needs a kernel R/W primitive','Viable only with HVCI off.'];}},
+    {name:'PTE manipulation for code execution',cat:'Code execution',ev:function(s){
+      if(s.hvci==='on') return ['closed','EPT overrides VTL 0 PTEs','Even if you flip VTL 0 PTEs to executable, the hypervisor’s EPT entries take precedence and block execution of writable pages.'];
+      if(s.rw) return ['open','Have kernel R/W','With HVCI off, remap a page executable via PTE edits. See <a href="../../primitives/arw/pte-manipulation/">PTE Manipulation</a>.'];
+      return ['gated','Needs a kernel R/W primitive','Viable only with HVCI off.'];}},
+    {name:'Unsigned driver loading',cat:'Code integrity',ev:function(s){
+      if(s.hvci==='on') return ['closed','Blocked by SKCI','The Secure Kernel validates every driver signature in VTL 1 before execution.'];
+      if(s.admin) return ['open','Admin','With HVCI off, an admin can load an unsigned/test-signed driver.'];
+      return ['gated','Needs admin','Viable only with HVCI off.'];}},
+    {name:'Capcom-style CR4 / user-mode shellcode BYOVD',cat:'BYOVD (code)',ev:function(s){
+      if(s.hvci==='on') return ['closed','HVCI neutralizes Capcom','HVCI blocks CR4 modification (SMEP disable) and enforces W^X, killing user-mode code execution from Ring 0. See <a href="'+CS+'Capcom-sys/">Capcom.sys</a>.'];
+      if(s.admin&&s.drv) return ['open','Admin + driver','Without HVCI, a Capcom-class driver can disable SMEP and run user shellcode in Ring 0.'];
+      return ['gated','Needs admin + driver','Viable only with HVCI off.'];}},
+    {name:'Blocklisted MmMapIoSpace drivers (RTCore64, gdrv, ATSZIO64…)',cat:'BYOVD',ev:function(s){
+      if(s.hvci==='on') return ['closed','Hypervisor-enforced blocklist','On HVCI systems the Vulnerable Driver Blocklist (DriverSiPolicy.p7b) is enforced at the hypervisor level, blocking known-vulnerable MmMapIoSpace drivers even for admins.'];
+      if(s.admin&&s.drv) return ['open','Admin + driver','With HVCI off, blocklist enforcement is weaker; classic MmMapIoSpace R/W drivers load.'];
+      return ['gated','Needs admin + driver','Viable only with HVCI off, or with a driver not yet on the blocklist.'];}},
+    {name:'VTL 0 → VTL 1 secure-call interface abuse',cat:'Hypervisor surface',ev:function(s){
+      return ['closed','Theoretical','The VTL boundary must exist for normal operation, but no public exploit has demonstrated full VTL 1 compromise through the secure-call interface.'];}}
+  ];})()
+});
+</script>
+
 ## How It Works
 
 **VBS Architecture.** The Hyper-V hypervisor runs below both the normal kernel and a Secure Kernel, creating two Virtual Trust Levels. VTL 0 (Normal World) contains the standard Windows kernel (`ntoskrnl.exe`), all drivers, and user-mode processes. VTL 1 (Secure World) contains the Secure Kernel (`securekernel.exe`) and Isolated User Mode (IUM) processes called trustlets. Second Level Address Translation (SLAT), implemented via Intel EPT or AMD NPT, enforces memory permissions at the hypervisor level. VTL 0 code cannot modify permissions controlled by VTL 1. Communication between the two levels occurs via secure calls, similar to syscalls but crossing the VTL boundary.

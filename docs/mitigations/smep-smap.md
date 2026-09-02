@@ -4,6 +4,44 @@ Before 2013, the simplest kernel exploit in the world worked like this: find a f
 
 Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Prevention (SMAP) ended that era. These CPU-enforced mitigations prevent the kernel from executing code in or directly accessing user-mode memory pages, turning the trivial ret2user attack into a hardware fault. Their introduction in Windows 8.1 (SMEP) and Windows 10 RS1 (SMAP) is the single most consequential change in the history of Windows kernel exploitation, forcing a permanent shift from code execution to data-only attack strategies.
 
+<div id="ksn-smep"></div>
+
+<script>
+(window.__ksnav=window.__ksnav||[]).push({
+  sel:'#ksn-smep',
+  title:'Bypass Navigator',
+  sub:'SMEP/SMAP block crossing the user/kernel boundary for code or data. Set what else is enforced and what you hold; each row shows whether the boundary bypass still works.',
+  controls:[
+    {id:'era',label:'Control-flow enforcement',type:'select',default:'kcet',options:[['legacy','Legacy — no kCFG/kCET'],['kcfg','kCFG (Win11 21H2–23H2)'],['kcet','kCET shadow stack (24H2)']]},
+    {id:'vbs',label:'VBS / HVCI',type:'select',default:'on',options:[['on','Enabled (CR4 trapped)'],['off','Disabled']]},
+    {id:'held',label:'What you hold',type:'checks',wide:true,options:[['arw','arbitrary read/write'],['stack','stack / return-address control']]}
+  ],
+  techniques:(function(){var PR='../../primitives/';return [
+    {name:'PTE remapping (clear the U/S bit)',cat:'PTE',ev:function(s){
+      if(s.arw) return ['open','Have ARW','Locate the PTE for a user page and clear its U/S bit so the CPU treats it as supervisor — bypasses both SMEP and SMAP. The most durable bypass; works on current systems. Needs the PTE base. See <a href="'+PR+'arw/pte-manipulation/">PTE Manipulation</a>.'];
+      return ['gated','Needs an ARW primitive','Turns an arbitrary read/write into a full SMEP+SMAP bypass by reclassifying a user page as supervisor.'];}},
+    {name:'Data-only attacks',cat:'Data-only',ev:function(s){
+      if(s.arw) return ['open','Have kernel R/W','Never crosses the user/kernel boundary: manipulate token privileges, <code>PreviousMode</code>, or security descriptors entirely within kernel space. SMEP/SMAP are irrelevant. The dominant modern approach.'];
+      return ['gated','Needs a kernel R/W primitive','Sidesteps SMEP and SMAP by operating only on kernel data through an existing primitive.'];}},
+    {name:'KUSER_SHARED_DATA staging',cat:'Data staging',ev:function(s){
+      if(s.arw) return ['open','Have write','The fixed page at 0xFFFFF78000000000 is supervisor-readable/writable — a known writable kernel location for data-only staging. NX blocks code execution from it. See <a href="'+PR+'exploitation/kuser-shared-data/">KUSER_SHARED_DATA</a>.'];
+      return ['gated','Needs a write primitive','A limited, fixed-address writable kernel scratch area for data-only work.'];}},
+    {name:'CR4 bit-flip via ROP (clear SMEP)',cat:'Code reuse',ev:function(s){
+      if(s.era!=='legacy'||s.vbs==='on') return ['closed','kCET / VBS block it','kCET traps the ROP chain and VBS traps CR4 writes at the hypervisor level. Viable only on legacy systems without these protections.'];
+      if(s.stack) return ['open','Have stack control','ROP to a mov cr4, <reg> gadget clears the SMEP bit — the original, simplest bypass.'];
+      return ['gated','Needs stack / ROP control','Legacy only.'];}},
+    {name:'STAC via ROP (defeat SMAP)',cat:'Code reuse',ev:function(s){
+      if(s.era==='kcet') return ['closed','kCET blocks it','On 24H2 kCET detects return-address tampering before the STAC gadget can execute.'];
+      if(s.stack) return ['open','Have stack control','ROP to a STAC gadget sets the AC flag, re-enabling user-mode access from kernel.'];
+      return ['gated','Needs stack control','Requires stack control and no hardware shadow stack.'];}},
+    {name:'MDL remapping (MmMapLockedPagesSpecifyCache)',cat:'Historical',ev:function(s){
+      if(s.era==='legacy'&&s.arw) return ['open','Legacy + ARW','Map a user buffer into kernel space via an MDL to get a supervisor-mode alias with U/S clear.'];
+      if(s.era==='legacy') return ['gated','Needs ARW','Historical alias trick; requires an ARW primitive.'];
+      return ['closed','Restricted on modern Windows','Modern builds have restricted this MDL aliasing technique.'];}}
+  ];})()
+});
+</script>
+
 ## How They Work
 
 Both mitigations are controlled via bits in the CR4 control register and enforced by the CPU's page fault logic in conjunction with page table entry flags.
