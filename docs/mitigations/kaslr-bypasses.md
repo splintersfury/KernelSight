@@ -4,6 +4,198 @@ KASLR gives the kernel 8 bits of entropy. That sounds like a barrier, but in pra
 
 Understanding which bypass vectors remain open on a given build is essential for evaluating any kernel exploit chain. An exploit that requires a KASLR bypass is only as constrained as the cheapest available leak on the target system.
 
+<div class="ksn" markdown="0">
+<div class="ksn__head">
+  <div class="ksn__title">Bypass Navigator</div>
+  <div class="ksn__sub">Set your situation. The matrix marks each KASLR bypass <b>open</b>, <b>gated</b>, or <b>closed</b> for that exact target. Every row links to the detail below.</div>
+</div>
+
+<div class="ksn__controls">
+  <div class="ksn__ctl">
+    <label class="ksn__label" for="ksn-build">Target build</label>
+    <select id="ksn-build" class="ksn__select">
+      <option value="1">&le; 19H2 (legacy)</option>
+      <option value="2">20H1 &ndash; 20H2</option>
+      <option value="3">21H1 &ndash; 21H2</option>
+      <option value="4">22H2</option>
+      <option value="5">23H2</option>
+      <option value="6" selected>24H2 / 25H2</option>
+    </select>
+  </div>
+  <div class="ksn__ctl">
+    <label class="ksn__label" for="ksn-il">Your access</label>
+    <select id="ksn-il" class="ksn__select">
+      <option value="low" selected>Low IL (sandboxed)</option>
+      <option value="medium">Medium IL (standard user)</option>
+    </select>
+  </div>
+  <div class="ksn__ctl">
+    <label class="ksn__label" for="ksn-cpu">CPU</label>
+    <select id="ksn-cpu" class="ksn__select">
+      <option value="any" selected>Any</option>
+      <option value="intel">Intel</option>
+      <option value="amd">AMD</option>
+    </select>
+  </div>
+  <div class="ksn__ctl ksn__ctl--prims">
+    <span class="ksn__label">Primitives you hold</span>
+    <div class="ksn__prims">
+      <label class="ksn__chk"><input type="checkbox" id="ksn-write"> arbitrary write</label>
+      <label class="ksn__chk"><input type="checkbox" id="ksn-bitflip"> bit-flip / partial write</label>
+    </div>
+  </div>
+</div>
+
+<div class="ksn__bar">
+  <label class="ksn__chk ksn__chk--only"><input type="checkbox" id="ksn-only"> Show only what's open</label>
+  <span class="ksn__count" id="ksn-count"></span>
+</div>
+
+<div class="ksn__list" id="ksn-list"></div>
+
+<div class="ksn__legend">
+  <span><i class="ksn__dot ksn__dot--open"></i>Open &mdash; usable as-is</span>
+  <span><i class="ksn__dot ksn__dot--gated"></i>Gated &mdash; needs more access or a primitive</span>
+  <span><i class="ksn__dot ksn__dot--closed"></i>Closed &mdash; patched or restricted on this build</span>
+</div>
+</div>
+
+<style>
+.ksn{border:1px solid var(--md-default-fg-color--lightest);border-radius:10px;padding:20px 20px 16px;margin:1.2rem 0 2rem;background:var(--md-code-bg-color);}
+.ksn__title{font-size:1.15rem;font-weight:700;letter-spacing:-.01em;}
+.ksn__sub{font-size:.78rem;color:var(--md-default-fg-color--light);margin-top:4px;max-width:66ch;line-height:1.5;}
+.ksn__controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:18px;}
+.ksn__ctl{display:flex;flex-direction:column;gap:6px;}
+.ksn__ctl--prims{grid-column:1/-1;}
+.ksn__label{font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;color:var(--md-default-fg-color--light);font-weight:600;}
+.ksn__select{font:inherit;font-size:.8rem;padding:7px 10px;border:1px solid var(--md-default-fg-color--lighter);border-radius:6px;background:var(--md-default-bg-color);color:var(--md-default-fg-color);cursor:pointer;}
+.ksn__select:focus{outline:2px solid var(--md-accent-fg-color);outline-offset:1px;}
+.ksn__prims{display:flex;flex-wrap:wrap;gap:8px;}
+.ksn__chk{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;padding:6px 12px;border:1px solid var(--md-default-fg-color--lighter);border-radius:20px;cursor:pointer;user-select:none;}
+.ksn__chk input{accent-color:var(--md-accent-fg-color);}
+.ksn__bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px;flex-wrap:wrap;}
+.ksn__chk--only{border-radius:6px;}
+.ksn__count{font-size:.72rem;color:var(--md-default-fg-color--light);font-variant-numeric:tabular-nums;}
+.ksn__list{display:flex;flex-direction:column;gap:8px;}
+.ksn__row{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--md-default-fg-color--lightest);border-radius:8px;background:var(--md-default-bg-color);}
+.ksn__row--closed{opacity:.55;}
+.ksn__rdot{width:9px;height:9px;border-radius:50%;margin-top:6px;}
+.ksn__rmain{min-width:0;}
+.ksn__rname{font-weight:650;font-size:.9rem;line-height:1.3;}
+.ksn__rcat{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--md-default-fg-color--light);margin-top:2px;}
+.ksn__rwhy{font-size:.8rem;color:var(--md-default-fg-color--light);margin-top:6px;line-height:1.5;}
+.ksn__rwhy a{color:var(--md-accent-fg-color);}
+.ksn__rside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;white-space:nowrap;}
+.ksn__pill{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:20px;}
+.ksn__pill--open{background:rgba(46,160,67,.16);color:#3fb950;}
+.ksn__pill--gated{background:rgba(210,153,34,.16);color:#d29922;}
+.ksn__pill--closed{background:var(--md-default-fg-color--lightest);color:var(--md-default-fg-color--light);}
+.ksn__req{font-size:.66rem;color:var(--md-default-fg-color--light);}
+.ksn__dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline;}
+.ksn__dot--open{background:#3fb950;} .ksn__dot--gated{background:#d29922;} .ksn__dot--closed{background:var(--md-default-fg-color--lighter);}
+.ksn__legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:.7rem;color:var(--md-default-fg-color--light);}
+@media (max-width:480px){.ksn__row{grid-template-columns:14px 1fr;}.ksn__rside{grid-column:2;align-items:flex-start;flex-direction:row;}}
+</style>
+
+<script>
+(function(){
+  // Fact base transcribed from this page's prose. build ordinals:
+  // 1=<=19H2  2=20H1  3=21H2  4=22H2  5=23H2  6=24H2/25H2
+  var CS='../../case-studies/';
+  var T=[
+    {name:'NtQuerySystemInformation — SystemModuleInformation (class 11)',cat:'API disclosure',
+     eval:function(s){
+       if(s.build<=1) return ['open','Any IL',{t:'Returns ntoskrnl / driver / HAL base addresses to any process on this build.'}];
+       if(s.il==='medium') return ['gated','Medium IL',{t:'Restricted to Medium IL from 20H1; you have it. Returns module bases directly.'}];
+       return ['gated','Needs Medium IL / SD corruption',{t:'Low-IL access closed from 20H1. Unlock it from Low IL with SepMediumDaclSd corruption below if you hold a write primitive.'}];
+     }},
+    {name:'NtQuerySystemInformation — SystemBigPoolInformation (class 66)',cat:'API disclosure',
+     eval:function(s){
+       if(s.build<=1) return ['open','Any IL',{t:'Leaks big-pool allocation addresses and tags — locate specific kernel objects.'}];
+       if(s.il==='medium') return ['gated','Medium IL, partial',{t:'Tightened at 21H1–21H2; some allocation data still returns at Medium IL.'}];
+       return ['closed','Restricted',{t:'Progressively restricted from 20H1; not available at Low IL on this build.'}];
+     }},
+    {name:'NtQuerySystemInformation — SystemExtendedHandleInformation (class 64)',cat:'API disclosure',
+     eval:function(s){
+       if(s.build<=1) return ['open','Any IL',{t:'Handle-table entries expose kernel object pointers (processes, tokens, threads).'}];
+       if(s.il==='medium') return ['gated','Medium IL, partial',{t:'Restricted in later builds; some object pointers still reachable at Medium IL.'}];
+       return ['closed','Restricted',{t:'Not available at Low IL on this build.'}];
+     }},
+    {name:'EnumDeviceDrivers / GetDeviceDriverBaseAddress (PSAPI)',cat:'API disclosure',
+     eval:function(s){
+       if(s.build>=6) return ['closed','Elevated only on 24H2',{t:'PSAPI wrapper over NtQuerySystemInformation; restricted to elevated callers from 24H2.'}];
+       if(s.build<=1||s.il==='medium') return ['open','Non-elevated OK',{t:'Simpler interface to the same module-base data; open to non-elevated callers before 24H2.'}];
+       return ['gated','Needs Medium IL',{t:'Follows the NtQuerySystemInformation IL gate.'}];
+     }},
+    {name:'NtQueryVirtualMemory — MemoryWorkingSetExInformation',cat:'API disclosure (indirect)',
+     eval:function(s){ return ['open','Any IL',{t:'Leaks page-frame numbers and VA metadata; infer kernel layout from working-set analysis. No documented IL restriction.'}]; }},
+    {name:'ETW kernel-logger pointer leaks',cat:'ETW',
+     eval:function(s){
+       if(s.build<=3) return ['open','ETW session',{t:'Kernel-logger event payloads and create-callback data expose raw pointers pre-22H2.'}];
+       return ['closed','Patched 22H2',{t:'Most pointer leaks fixed in 22H2 (backported to 21H2). Surface is broad, so new vectors still surface occasionally.'}];
+     }},
+    {name:'Prefetch timing side-channel',cat:'Timing side-channel',
+     eval:function(s){
+       if(s.cpu==='amd') return ['gated','Intel-reliable',{t:'prefetch + rdtsc over the 256 candidate bases. Inconsistent on AMD; needs KVA shadowing disabled.'}];
+       return ['open','No vuln, no priv',{t:'prefetch + rdtsc latency over 256 bases; works on 24H2 with KVA shadow off. Reliable on Intel'+(s.cpu==='any'?', inconsistent on AMD':'')+'. <a href="https://exploits.forsale/24h2-nt-exploit/" target="_blank" rel="noopener">24H2 NT Exploit</a>.'}];
+     }},
+    {name:'Entropy brute-force (256 bases)',cat:'Timing side-channel',
+     eval:function(s){ return ['gated','Seed leak',{t:'Only 8 bits. Once any partial leak narrows the range, enumerate the rest. An amplifier, not a standalone leak.'}]; }},
+    {name:'Interrupt timing side-channel',cat:'Timing side-channel',
+     eval:function(s){ return ['open','No vuln, no priv',{t:'Interrupt-handling time varies with cache state, correlating with layout. Lower bandwidth and less reliable than prefetch.'}]; }},
+    {name:'SepMediumDaclSd — DACL zeroing',cat:'SD corruption',
+     eval:function(s){
+       if(s.write) return ['open','Have write',{t:'Zero the global DACL (e.g. RtlClearAllBits) to drop the IL gate; Low-IL can then query module addresses. See <a href="../../primitives/exploitation/acl-sd-manipulation/">ACL / SD Manipulation</a>.'}];
+       return ['gated','Needs arbitrary write',{t:'Converts an arbitrary-write primitive into a KASLR bypass — no info-leak vuln needed. Structural, works across modern builds.'}];
+     }},
+    {name:'SepMediumDaclSd — Control bit-flip (SE_SACL_PRESENT)',cat:'SD corruption',
+     eval:function(s){
+       if(s.write||s.bitflip) return ['open','Have bit-flip',{t:'Clear the 0x10 Control bit so SeAccessCheck skips MIC validation — one bit defeats DACL + integrity checks. StarLabs used <a href="'+CS+'CVE-2024-30088/">CVE-2024-30088</a>.'}];
+       return ['gated','Needs bit-flip / partial write',{t:'A single-bit variant of DACL corruption; the cheapest SD-corruption path.'}];
+     }},
+    {name:'WIL feature-flag bypass (Feature_RestrictKernelAddressLeaks)',cat:'SD corruption',
+     eval:function(s){
+       if(s.write||s.bitflip) return ['open','Have bit-set',{t:'Flip the WIL runtime flag with RtlSetBit to stop address scrubbing; pair with DACL zeroing to fully defeat NtQuerySystemInformation restrictions. Chain: <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a>.'}];
+       return ['gated','Needs bit-set primitive',{t:'Defeats the secondary gate Microsoft added after the DACL restrictions. Combine with DACL corruption.'}];
+     }},
+    {name:'Driver-specific info-disclosure vuln',cat:'Driver info leak',
+     eval:function(s){
+       return ['gated','Needs an unpatched driver leak',{t:'The most practical bypass on a fully patched system with no write primitive. Browse candidates by patched build in the <a href="../../explore/">Explore</a> table (filter Vuln Class = Uninitialized Memory / Arbitrary R-W). Known leaks: '+
+         '<a href="'+CS+'CVE-2024-38256/">CVE-2024-38256</a>, <a href="'+CS+'CVE-2024-21338/">CVE-2024-21338</a>, <a href="'+CS+'CVE-2023-32019/">CVE-2023-32019</a>.'}];
+     }}
+  ];
+  var wrap=document.currentScript.closest('article')||document;
+  function $(id){return document.getElementById(id);}
+  function read(){
+    return {build:parseInt($('ksn-build').value,10),il:$('ksn-il').value,cpu:$('ksn-cpu').value,
+            write:$('ksn-write').checked,bitflip:$('ksn-bitflip').checked};
+  }
+  function render(){
+    var s=read(),only=$('ksn-only').checked,list=$('ksn-list'),html='',open=0,shown=0;
+    T.forEach(function(t){
+      var r=t.eval(s),status=r[0],req=r[1],info=r[2];
+      if(status==='open') open++;
+      if(only&&status!=='open') return;
+      shown++;
+      html+='<div class="ksn__row ksn__row--'+status+'">'+
+        '<span class="ksn__rdot ksn__pill--'+status+'" style="background:'+({open:'#3fb950',gated:'#d29922',closed:'var(--md-default-fg-color--lighter)'}[status])+'"></span>'+
+        '<div class="ksn__rmain"><div class="ksn__rname">'+t.name+'</div>'+
+        '<div class="ksn__rcat">'+t.cat+'</div>'+
+        '<div class="ksn__rwhy">'+info.t+'</div></div>'+
+        '<div class="ksn__rside"><span class="ksn__pill ksn__pill--'+status+'">'+status+'</span>'+
+        '<span class="ksn__req">'+req+'</span></div>'+
+        '</div>';
+    });
+    list.innerHTML=html||'<div class="ksn__rwhy" style="padding:8px 2px">No techniques are open for this situation. Widen your access, add a primitive, or drop the &ldquo;only open&rdquo; filter.</div>';
+    $('ksn-count').textContent=open+' of '+T.length+' open for this target'+(only?' · '+shown+' shown':'');
+  }
+  ['ksn-build','ksn-il','ksn-cpu','ksn-write','ksn-bitflip','ksn-only'].forEach(function(id){
+    var el=$(id); if(el) el.addEventListener('change',render);
+  });
+  render();
+})();
+</script>
+
 ## Information Disclosure APIs
 
 The original sin of Windows KASLR was exposing kernel addresses through documented APIs. For years, any process could call `NtQuerySystemInformation` and receive a complete map of the kernel's address space.
