@@ -8,6 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
+/* Reflow for narrow viewports. The flow band stacks, so its side-rounded
+   corners and shared edges have to become a vertical stack instead. */
+@media (max-width: 860px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .flow-panel { border-radius: 0 !important; border: 1px solid rgba(69,70,76,0.3) !important; }
+  .flow-left  { border-radius: 1rem 1rem 0 0 !important; border-bottom: none !important; }
+  .flow-right { border-radius: 0 0 1rem 1rem !important; border-top: none !important;
+                border-color: rgba(173,198,255,0.3) !important; }
+  .flow-mid   { min-width: 0 !important; width: 100% !important; }
+  .flow-mid svg { max-width: 100% !important; }
+}
+@media (max-width: 620px) {
+  .ks-hero-h1 { font-size: 2.15rem !important; }
+}
+
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .md-header, .md-tabs, .md-sidebar, .md-footer, .md-search,
 .md-header__inner, .md-header-nav { display: none !important; }
@@ -54,7 +69,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
       <div style="width:0.5rem;height:0.5rem;border-radius:50%;background:#adc6ff;animation:pulse 2s infinite"></div>
       <span style="font-family:'JetBrains Mono';font-size:0.65rem;font-weight:600;color:#adc6ff;text-transform:uppercase;letter-spacing:0.15em">Windows Kernel Bypass Reference</span>
     </div>
-    <h1 style="font-family:'Space Grotesk';font-size:3.5rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 1.5rem 0;line-height:1.1">
+    <h1 class="ks-hero-h1" style="font-family:'Space Grotesk';font-size:3.5rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 1.5rem 0;line-height:1.1">
       What kernel access<br><span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">actually buys you</span>
     </h1>
     <p style="font-family:'Inter';font-size:1.1rem;color:#9ca3af;max-width:32rem;margin:0 auto 2.5rem auto;line-height:1.7">
@@ -125,80 +140,97 @@ body, html { background: #10131a !important; overflow-x: hidden; }
 })();
 </script>
 
-<!-- Means and Targets -->
-<section style="max-width:900px;margin:5rem auto;padding:0 2rem">
-  <h2 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 0.5rem 0;text-align:center">Two halves of one question</h2>
-  <p style="font-family:'Inter';color:#9ca3af;text-align:center;margin:0 0 2.5rem 0;font-size:0.875rem">How you get kernel access, and what that access is worth once you have it.</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+<!-- Means, the primitive, Targets -->
+<section style="max-width:960px;margin:5rem auto 4.5rem;padding:0 2rem">
 
-    <a href="{{ config.site_url }}driver-types/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:1rem;padding:2rem;border:1px solid rgba(69,70,76,0.22);display:block">
-      <h3 style="font-family:'Space Grotesk';font-size:1.1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">Means</h3>
-      <p style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7;margin:0 0 1.25rem 0">
-        How the access is obtained. Driver families and the surfaces they expose, the vulnerability
-        classes that appear there, and the read, write and execute primitives those bugs yield.
-      </p>
-      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(69,70,76,0.2);border-radius:0.625rem;overflow:hidden">
-        <div style="display:flex;justify-content:space-between;font-family:'Inter';font-size:0.78rem;padding:0.6rem 0.8rem;background:#1c2026"><span style="color:#c3c8d2">Driver types</span><span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">12</span></div>
-        <div style="display:flex;justify-content:space-between;font-family:'Inter';font-size:0.78rem;padding:0.6rem 0.8rem;background:#1c2026"><span style="color:#c3c8d2">Attack surfaces</span><span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">9</span></div>
-        <div style="display:flex;justify-content:space-between;font-family:'Inter';font-size:0.78rem;padding:0.6rem 0.8rem;background:#1c2026"><span style="color:#c3c8d2">Vulnerability classes</span><span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">10</span></div>
-        <div style="display:flex;justify-content:space-between;font-family:'Inter';font-size:0.78rem;padding:0.6rem 0.8rem;background:#1c2026"><span style="color:#c3c8d2">Primitives</span><span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">21</span></div>
-        <div style="display:flex;justify-content:space-between;font-family:'Inter';font-size:0.78rem;padding:0.6rem 0.8rem;background:#1c2026"><span style="color:#c3c8d2">Case studies</span><span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">161</span></div>
-      </div>
-    </a>
+  <h2 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0;text-align:center;letter-spacing:-0.01em">Getting in, and what it buys</h2>
+  <p style="font-family:'Inter';color:#9ca3af;text-align:center;margin:0 auto 2.75rem;font-size:0.9rem;line-height:1.65;max-width:52ch">
+    Every page here is one of two things. Either it explains how kernel access is obtained, or it
+    records what that access defeats. The primitive in the middle is what connects them.
+  </p>
 
-    <a href="{{ config.site_url }}bypasses/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:1rem;padding:2rem;border:1px solid rgba(173,198,255,0.22);display:block">
-      <h3 style="font-family:'Space Grotesk';font-size:1.1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">Targets</h3>
-      <p style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7;margin:0 0 1.25rem 0">
-        What the access defeats, and what it does not. Each defense carries a maintained inventory,
-        sorted by the layer of the asset it protects.
-      </p>
-      <div style="display:flex;flex-direction:column;gap:0.6rem">
-        <div style="padding:0.8rem;background:rgba(255,255,255,0.02);border-radius:0.625rem;border:1px solid rgba(69,70,76,0.18)">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.35rem">
-            <span style="font-family:'Space Grotesk';font-size:0.85rem;font-weight:600;color:#adc6ff">Kernel layer</span>
-            <span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">19</span>
-          </div>
-          <div style="font-family:'Inter';font-size:0.73rem;color:#8b919b;line-height:1.6">DSE, HVCI, kCFG, kCET, KDP, HLAT, KASLR, PatchGuard, HyperGuard, SMEP, SMAP, MBEC, pool hardening, type isolation</div>
-        </div>
-        <div style="padding:0.8rem;background:rgba(255,255,255,0.02);border-radius:0.625rem;border:1px solid rgba(69,70,76,0.18)">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.35rem">
-            <span style="font-family:'Space Grotesk';font-size:0.85rem;font-weight:600;color:#adc6ff">User layer</span>
-            <span style="font-family:'JetBrains Mono';color:#6b7280;font-size:0.7rem">10</span>
-          </div>
-          <div style="font-family:'Inter';font-size:0.73rem;color:#8b919b;line-height:1.6">Process protection, LSA protection, Credential Guard, ETW-Ti, EDR kernel callbacks, user-mode hooks, WDAC, AppLocker, UAC and integrity levels, AMSI</div>
-        </div>
+  <!-- the model, in one line -->
+  <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center;margin-bottom:3rem">
+
+    <div class="flow-panel flow-left" style="flex:1 1 280px;min-width:260px;background:#1c2026;border:1px solid rgba(69,70,76,0.3);border-radius:1rem 0 0 1rem;padding:1.4rem 1.5rem">
+      <div style="font-family:'Space Grotesk';font-size:0.95rem;font-weight:700;color:#e0e2eb;margin-bottom:0.2rem">Means</div>
+      <div style="font-family:'Inter';font-size:0.75rem;color:#8b919b;margin-bottom:1rem;line-height:1.5">Where the bugs are, and what they yield</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem">
+        <a href="{{ config.site_url }}driver-types/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Driver types</a>
+        <a href="{{ config.site_url }}attack-surfaces/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Attack surfaces</a>
+        <a href="{{ config.site_url }}vuln-classes/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Vulnerability classes</a>
+        <a href="{{ config.site_url }}case-studies/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">161 case studies</a>
       </div>
-    </a>
+    </div>
+
+    <div class="flow-panel flow-mid" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#151922;border-top:1px solid rgba(69,70,76,0.3);border-bottom:1px solid rgba(69,70,76,0.3);padding:1.4rem 1.1rem;min-width:190px">
+      <div style="text-align:center">
+        <svg viewBox="0 0 120 12" width="100%" height="12" style="max-width:120px;display:block;margin:0 auto 0.7rem" aria-hidden="true">
+          <line x1="0" y1="6" x2="106" y2="6" stroke="#3a4150" stroke-width="1.5"></line>
+          <path d="M106 2 L114 6 L106 10 Z" fill="#3a4150"></path>
+        </svg>
+        <a href="{{ config.site_url }}primitives/" style="text-decoration:none;display:block">
+          <div style="font-family:'JetBrains Mono';font-size:0.7rem;color:#adc6ff;line-height:1.5">kernel read<br>write, execute</div>
+          <div style="font-family:'Inter';font-size:0.68rem;color:#6b7280;margin-top:0.45rem">21 primitives</div>
+        </a>
+        <svg viewBox="0 0 120 12" width="100%" height="12" style="max-width:120px;display:block;margin:0.7rem auto 0" aria-hidden="true">
+          <line x1="0" y1="6" x2="106" y2="6" stroke="#3a4150" stroke-width="1.5"></line>
+          <path d="M106 2 L114 6 L106 10 Z" fill="#3a4150"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div class="flow-panel flow-right" style="flex:1 1 280px;min-width:260px;background:#1c2026;border:1px solid rgba(173,198,255,0.3);border-radius:0 1rem 1rem 0;padding:1.4rem 1.5rem">
+      <div style="font-family:'Space Grotesk';font-size:0.95rem;font-weight:700;color:#e0e2eb;margin-bottom:0.2rem">Targets</div>
+      <div style="font-family:'Inter';font-size:0.75rem;color:#8b919b;margin-bottom:1rem;line-height:1.5">What the primitive is spent on, and what resists it</div>
+      <div style="display:flex;flex-direction:column;gap:0.45rem">
+        <a href="{{ config.site_url }}mitigations/" style="display:flex;justify-content:space-between;align-items:baseline;text-decoration:none;padding:0.45rem 0.7rem;border-radius:0.625rem;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">
+          <span style="font-family:'Inter';font-size:0.78rem;color:#c3c8d2">Kernel-layer defenses</span>
+          <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:#6b7280">19</span>
+        </a>
+        <a href="{{ config.site_url }}mitigations/protected-process/" style="display:flex;justify-content:space-between;align-items:baseline;text-decoration:none;padding:0.45rem 0.7rem;border-radius:0.625rem;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">
+          <span style="font-family:'Inter';font-size:0.78rem;color:#c3c8d2">User-layer defenses</span>
+          <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:#6b7280">10</span>
+        </a>
+      </div>
+    </div>
 
   </div>
-</section>
 
-<!-- Pipeline Overview -->
-<section style="max-width:900px;margin:4rem auto;padding:0 2rem">
-  <h2 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 1.5rem 0">The Pipeline</h2>
-  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center">
-    <a href="{{ config.site_url }}driver-types/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.05em">Drivers</div>
-    </a>
-    <a href="{{ config.site_url }}attack-surfaces/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#22D3EE'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#22D3EE;text-transform:uppercase;letter-spacing:0.05em">Surfaces</div>
-    </a>
-    <a href="{{ config.site_url }}vuln-classes/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#FBBF24'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#FBBF24;text-transform:uppercase;letter-spacing:0.05em">Vulns</div>
-    </a>
-    <a href="{{ config.site_url }}primitives/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#A78BFA'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#A78BFA;text-transform:uppercase;letter-spacing:0.05em">Primitives</div>
-    </a>
-    <a href="{{ config.site_url }}case-studies/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#F87171'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#F87171;text-transform:uppercase;letter-spacing:0.05em">Cases</div>
-    </a>
-    <a href="{{ config.site_url }}mitigations/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#34D399'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#34D399;text-transform:uppercase;letter-spacing:0.05em">Mitigations</div>
-    </a>
-    <a href="{{ config.site_url }}tooling/" style="text-decoration:none;background:#1c2026;border-radius:0.5rem;padding:0.6rem 1.2rem;text-align:center;white-space:nowrap;border:1px solid rgba(69,70,76,0.1);transition:border-color 0.2s" onmouseover="this.style.borderColor='#818CF8'" onmouseout="this.style.borderColor='rgba(69,70,76,0.1)'">
-      <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#818CF8;text-transform:uppercase;letter-spacing:0.05em">Tooling</div>
-    </a>
+  <!-- what each half answers -->
+  <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+    <div style="background:#1c2026;border-radius:1rem;padding:1.6rem 1.75rem;border:1px solid rgba(69,70,76,0.22)">
+      <div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0">Start in Means if you are asking</div>
+      <p style="font-family:'Inter';font-size:0.82rem;color:#9ca3af;line-height:1.75;margin:0 0 1rem 0">
+        Which drivers expose this surface. What the bug class looks like in the wild. Whether
+        anyone has published a working chain. What read or write primitive this yields.
+      </p>
+      <p style="font-family:'Inter';font-size:0.78rem;color:#8b919b;line-height:1.7;margin:0">
+        This is the older half of the site and the larger one. It ends at a primitive, which is
+        where the other half begins.
+      </p>
+    </div>
+
+    <div style="background:#1c2026;border-radius:1rem;padding:1.6rem 1.75rem;border:1px solid rgba(173,198,255,0.22)">
+      <div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0">Start in Targets if you are asking</div>
+      <p style="font-family:'Inter';font-size:0.82rem;color:#9ca3af;line-height:1.75;margin:0 0 1rem 0">
+        I have kernel write on this build. Does it reach LSASS. Does it silence the sensor. Will
+        it survive HVCI, or newer silicon, or the next cumulative update.
+      </p>
+      <p style="font-family:'Inter';font-size:0.78rem;color:#8b919b;line-height:1.7;margin:0">
+        Defenses are filed by the layer of the asset they protect, not by what enforces them.
+        Credential Guard sits here as a case where the answer is no.
+      </p>
+    </div>
+
   </div>
+
+  <p style="font-family:'Inter';font-size:0.8rem;color:#8b919b;text-align:center;margin:2.25rem auto 0;max-width:56ch;line-height:1.7">
+    Not sure which half you want? The <a href="{{ config.site_url }}bypasses/" style="color:#adc6ff;text-decoration:none;border-bottom:1px solid rgba(173,198,255,0.35)">bypass matrix</a>
+    takes a build and a CPU and tells you what is still open on it.
+  </p>
+
 </section>
 
 <!-- Footer -->
