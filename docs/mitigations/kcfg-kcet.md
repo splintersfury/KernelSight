@@ -11,6 +11,9 @@ The practical effect on exploitation has been decisive. Before kCFG, a single fu
   sel:'#ksn-kcfg',
   title:'Bypass Navigator',
   sub:'kCFG validates indirect-call targets; kCET protects return addresses. Set what is enforced and what you can corrupt; each row shows whether the control-flow path still works.',
+  fromPlatform:function(p){
+    return {kcet:(p.kcet?'on':'off'), drv:'ms', cf:p.prims, stack:p.prims};
+  },
   controls:[
     {id:'kcet',label:'kCET shadow stack',type:'select',default:'on',options:[['on','Active (24H2 + CET / Zen 3)'],['off','kCFG only (no shadow-stack CPU)']]},
     {id:'drv',label:'Target driver',type:'select',default:'ms',options:[['ms','Microsoft kernel (/guard:cf)'],['third','Third-party without /guard:cf']]},

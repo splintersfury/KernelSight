@@ -25,6 +25,9 @@ runs, and it is why the two defenses sit beside each other in this section.
   sel:'#ppl-nav',
   title:'Protected Process Light',
   sub:'Three techniques. Each assumes an existing kernel write primitive; PPL is what that primitive is spent on, not an obstacle to obtaining it.',
+  fromPlatform:function(p){
+    return {build:String(p.build), kwrite:p.prims, blocklist:true};
+  },
   controls:[
     {id:'build',label:'Build',type:'select',default:'26100',options:[['19041','Windows 10 2004'],['22621','Windows 11 22H2'],['26100','Windows 11 24H2'],['26200','Windows 11 25H2']]},
     {id:'ppl_held',label:'What you hold',type:'checks',wide:true,options:[['kwrite','kernel write primitive',true],['blocklist','driver blocklist is current',true]]}

@@ -11,6 +11,11 @@ Understanding which bypass vectors remain open on a given build is essential for
   sel:'#ksn-kaslr',
   title:'Bypass Navigator',
   sub:'Set your situation. Each KASLR bypass is marked <b>open</b>, <b>gated</b>, or <b>closed</b> for that exact target. Every row links into the sourced detail below.',
+  fromPlatform:function(p){
+    var b = p.build>=26100 ? '6' : (p.build>=22621 ? '4' : '2');
+    return {build:b, il:(p.admin?'medium':'low'), cpu:(p.hlat?'intel':'any'),
+            write:p.prims, bitflip:false};
+  },
   controls:[
     {id:'build',label:'Target build',type:'select',default:'6',options:[['1','&le; 19H2 (legacy)'],['2','20H1 &ndash; 20H2'],['3','21H1 &ndash; 21H2'],['4','22H2'],['5','23H2'],['6','24H2 / 25H2']]},
     {id:'il',label:'Your access',type:'select',default:'low',options:[['low','Low IL (sandboxed)'],['medium','Medium IL (standard user)']]},

@@ -11,6 +11,10 @@ Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Preventio
   sel:'#ksn-smep',
   title:'Bypass Navigator',
   sub:'SMEP/SMAP block crossing the user/kernel boundary for code or data. Set what else is enforced and what you hold; each row shows whether the boundary bypass still works.',
+  fromPlatform:function(p){
+    var era = p.kcet ? 'kcet' : (p.build>=22621 ? 'kcfg' : 'legacy');
+    return {era:era, vbs:(p.hvci?'on':'off'), arw:p.prims, stack:p.prims};
+  },
   controls:[
     {id:'era',label:'Control-flow enforcement',type:'select',default:'kcet',options:[['legacy','Legacy — no kCFG/kCET'],['kcfg','kCFG (Win11 21H2–23H2)'],['kcet','kCET shadow stack (24H2)']]},
     {id:'vbs',label:'VBS / HVCI',type:'select',default:'on',options:[['on','Enabled (CR4 trapped)'],['off','Disabled']]},

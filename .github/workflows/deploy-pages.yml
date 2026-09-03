@@ -24,12 +24,26 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install mkdocs-material pyyaml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-      - name: Generate dashboard data
-        run: python scripts/build_dashboard_data.py
+      - run: pip install mkdocs-material pyyaml pytest
 
-      - run: mkdocs build
+      - name: Validate roster and verdicts
+        run: |
+          python scripts/check_roster.py
+          python scripts/check_verdicts.py
+
+      - name: Generate dashboard data and hero curve
+        run: |
+          python scripts/build_dashboard_data.py
+          python scripts/build_hero_curve.py
+
+      - name: Tests
+        run: python -m pytest tests/ -q
+
+      - run: mkdocs build --strict
 
       - uses: actions/upload-pages-artifact@v3
         with:

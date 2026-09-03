@@ -15,49 +15,50 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    /* Every navigator config declares its own controls, so the union of their
-     * control ids is the state this page must supply. Defaults come from each
-     * config, letting an ev() written for one page evaluate correctly here. */
-    var state = { build: '26100' };
-    (window.__ksnav || []).forEach(function (cfg) {
-      (cfg.controls || []).forEach(function (c) {
-        if (c.type === 'select' && state[c.id] === undefined) state[c.id] = c.default;
-        if (c.type === 'checks') {
-          (c.options || []).forEach(function (o) {
-            if (state[o[0]] === undefined) state[o[0]] = !!o[2];
-          });
-        }
-      });
-    });
-    state.layer = 'all';
-    state.showClosed = true;
+    /* Configs were authored independently, so their control ids share no
+     * namespace: 'build' is an ordinal '1'..'6' on the KASLR page and a real
+     * build number elsewhere, and 'drv' is a string enum on one page and a
+     * boolean on another. Merging them silently mistypes values, so instead
+     * each config projects a canonical platform onto its own control names
+     * via fromPlatform(). A config without one is skipped rather than
+     * evaluated against a state it never expected. */
+    var platform = { build: 26100, hlat: true, kcet: true, hvci: true, admin: true, prims: true };
+    var view = { layer: 'all', showClosed: true };
 
     function collect() {
       var out = [];
       (window.__ksnav || []).forEach(function (cfg) {
+        if (typeof cfg.fromPlatform !== 'function') return;
         (cfg.techniques || []).forEach(function (t) {
-          out.push({ t: t, defense: cfg.title || 'Unknown defense' });
+          out.push({ t: t, cfg: cfg, defense: cfg.title || 'Unknown defense' });
         });
       });
       return out;
     }
 
     function controls() {
-      var builds = BUILDS.map(function (b) {
-        return '<option value="' + b[0] + '"' + (b[0] === state.build ? ' selected' : '') + '>' + b[1] + '</option>';
+      var builds = [[19041, 'Windows 10 2004'], [22621, 'Windows 11 22H2'],
+                    [26100, 'Windows 11 24H2'], [26200, 'Windows 11 25H2']].map(function (b) {
+        return '<option value="' + b[0] + '"' + (b[0] === platform.build ? ' selected' : '') + '>' + b[1] + '</option>';
       }).join('');
       var layers = [['all', 'All layers'], ['kernel', 'Kernel layer'], ['user', 'User layer']].map(function (v) {
-        return '<option value="' + v[0] + '"' + (v[0] === state.layer ? ' selected' : '') + '>' + v[1] + '</option>';
+        return '<option value="' + v[0] + '"' + (v[0] === view.layer ? ' selected' : '') + '>' + v[1] + '</option>';
       }).join('');
       return '<div class="ksn__controls">' +
         '<div class="ksn__ctl"><span class="ksn__label">Build</span>' +
-        '<select class="ksn__select" data-ctl="build">' + builds + '</select></div>' +
+        '<select class="ksn__select" data-plat="build">' + builds + '</select></div>' +
         '<div class="ksn__ctl"><span class="ksn__label">Target layer</span>' +
-        '<select class="ksn__select" data-ctl="layer">' + layers + '</select></div>' +
-        '<div class="ksn__ctl ksn__ctl--wide"><span class="ksn__label">Display</span>' +
+        '<select class="ksn__select" data-view="layer">' + layers + '</select></div>' +
+        '<div class="ksn__ctl ksn__ctl--wide"><span class="ksn__label">Platform and access</span>' +
         '<div class="ksn__checks">' +
-        '<label class="ksn__chk"><input type="checkbox" data-chk="showClosed"' +
-        (state.showClosed ? ' checked' : '') + '> Show closed</label></div></div></div>';
+        [['hlat', 'HLAT capable CPU'], ['kcet', 'kCET'], ['hvci', 'HVCI'],
+         ['admin', 'admin'], ['prims', 'kernel read/write']].map(function (c) {
+          return '<label class="ksn__chk"><input type="checkbox" data-plat="' + c[0] + '"' +
+                 (platform[c[0]] ? ' checked' : '') + '> ' + c[1] + '</label>';
+        }).join('') +
+        '<label class="ksn__chk"><input type="checkbox" data-view="showClosed"' +
+        (view.showClosed ? ' checked' : '') + '> show closed</label>' +
+        '</div></div></div>';
     }
 
     function render() {
@@ -66,12 +67,13 @@
       collect().forEach(function (entry) {
         var t = entry.t;
         var res;
-        try { res = t.ev(state) || ['closed', '', '']; } catch (e) { res = ['closed', '', '']; }
+        try { res = t.ev(entry.cfg.fromPlatform(platform)) || ['closed', '', '']; }
+        catch (e) { res = ['closed', '', '']; }
         var status = res[0];
         if (counts[status] === undefined) counts[status] = 0;
         counts[status]++;
-        if (state.layer !== 'all' && t.layer !== state.layer) return;
-        if (!state.showClosed && status === 'closed') return;
+        if (view.layer !== 'all' && t.layer !== view.layer) return;
+        if (!view.showClosed && status === 'closed') return;
         rows += '<div class="ksn__row' + (status === 'closed' ? ' ksn__row--closed' : '') + '">' +
           '<div class="ksn__rdot" style="background:' + DOT[status] + '"></div>' +
           '<div class="ksn__rmain"><div class="ksn__rname">' + esc(t.name) + '</div>' +
@@ -88,11 +90,19 @@
         counts.open + ' open, ' + counts.gated + ' gated, ' + counts.closed + ' closed' +
         '</span></div><div class="ksn__list">' + rows + '</div></div>';
 
-      el.querySelectorAll('[data-ctl]').forEach(function (n) {
-        n.addEventListener('change', function () { state[n.getAttribute('data-ctl')] = n.value; render(); });
+      el.querySelectorAll('[data-plat]').forEach(function (n) {
+        n.addEventListener('change', function () {
+          var k = n.getAttribute('data-plat');
+          platform[k] = (n.type === 'checkbox') ? n.checked : parseInt(n.value, 10);
+          render();
+        });
       });
-      el.querySelectorAll('[data-chk]').forEach(function (n) {
-        n.addEventListener('change', function () { state[n.getAttribute('data-chk')] = n.checked; render(); });
+      el.querySelectorAll('[data-view]').forEach(function (n) {
+        n.addEventListener('change', function () {
+          var k = n.getAttribute('data-view');
+          view[k] = (n.type === 'checkbox') ? n.checked : n.value;
+          render();
+        });
       });
     }
 

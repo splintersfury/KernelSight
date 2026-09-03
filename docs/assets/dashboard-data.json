@@ -2637,7 +2637,7 @@
       "id": "CVE-2025-11156",
       "driver": "epdlpdrv.sys",
       "description": "Netskope Endpoint DLP — null pointer dereference when driver loaded as generic kernel service",
-      "vuln_class": "null-pointer-deref",
+      "vuln_class": "null-deref",
       "itw": false,
       "has_poc": false,
       "has_writeup": false,
@@ -2677,7 +2677,7 @@
       "id": "CVE-2024-11616",
       "driver": "epdlpdrv.sys",
       "description": "Netskope Endpoint DLP — double-fetch TOCTOU heap overflow via communication port",
-      "vuln_class": "toctou",
+      "vuln_class": "toctou-double-fetch",
       "itw": false,
       "has_poc": true,
       "has_writeup": true,
@@ -2958,9 +2958,8 @@
       "uninitialized-memory",
       "integer-overflow",
       "type-confusion",
-      "null-pointer-deref",
       "null-deref",
-      "toctou"
+      "toctou-double-fetch"
     ],
     "cells": {
       "clfs.sys|buffer-overflow": {
@@ -3317,7 +3316,7 @@
           "CVE-2025-0287"
         ]
       },
-      "epdlpdrv.sys|null-pointer-deref": {
+      "epdlpdrv.sys|null-deref": {
         "count": 1,
         "itw": 0,
         "cves": [
@@ -3331,7 +3330,7 @@
           "CVE-2025-5942"
         ]
       },
-      "epdlpdrv.sys|toctou": {
+      "epdlpdrv.sys|toctou-double-fetch": {
         "count": 1,
         "itw": 0,
         "cves": [
@@ -3389,9 +3388,8 @@
       "uninitialized-memory": 7,
       "integer-overflow": 6,
       "type-confusion": 4,
-      "null-deref": 1,
-      "null-pointer-deref": 1,
-      "toctou": 1
+      "null-deref": 2,
+      "toctou-double-fetch": 1
     },
     "driver_counts": {
       "clfs.sys": 15,
