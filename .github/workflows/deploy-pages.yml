@@ -21,6 +21,10 @@ jobs:
       SOCIAL_CARDS: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          # build_page_dates.py walks the full history to find when each page
+          # last changed. A shallow clone silently yields wrong dates.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -41,6 +45,7 @@ jobs:
         run: |
           python scripts/build_dashboard_data.py
           python scripts/build_hero_curve.py
+          python scripts/build_page_dates.py
 
       - name: Tests
         run: python -m pytest tests/ -q
