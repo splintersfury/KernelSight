@@ -1822,7 +1822,7 @@ cves:
     driver: "epdlpdrv.sys"
     vendor: "Netskope"
     description: "Netskope Endpoint DLP — null pointer dereference when driver loaded as generic kernel service"
-    vuln_class: "null-pointer-deref"
+    vuln_class: "null-deref"
     third_party: true
     byovd: false
     itw: false
@@ -1850,7 +1850,7 @@ cves:
     driver: "epdlpdrv.sys"
     vendor: "Netskope"
     description: "Netskope Endpoint DLP — double-fetch TOCTOU heap overflow via communication port"
-    vuln_class: "toctou"
+    vuln_class: "toctou-double-fetch"
     third_party: true
     byovd: false
     itw: false
