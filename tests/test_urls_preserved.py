@@ -27,7 +27,7 @@ def built_pages():
             raise AssertionError(
                 "mkdocs build --strict failed:\n"
                 + "\n".join(l for l in (result.stdout + result.stderr).splitlines()
-                             if "WARNING" in l or "ERROR" in l or "Aborted" in l)
+                             if any(k in l.lower() for k in ("warning", "error", "aborted")))
             )
         site = ROOT / "site"
         _cache["pages"] = {str(p.relative_to(site)) for p in site.rglob("*.html")}
