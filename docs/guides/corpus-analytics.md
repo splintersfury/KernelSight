@@ -9,7 +9,7 @@ The KernelSight corpus is not a random sample. It is a curated collection of Win
 The top 10 driver families account for roughly 68% of the corpus. The concentration is striking: clfs.sys leads at 15, followed by ntoskrnl.exe and the Kernel Streaming stack at 14 each, then afd.sys at 13. The remaining 47 CVEs spread across 54 additional drivers, meaning most drivers contribute one or two entries each while a small number generate bugs repeatedly.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- CVEs by Driver Family (Top 10)</span>
+  <span class="ks-figure-label">FIG_010: CVEs by Driver Family (Top 10)</span>
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing CVE counts by driver family">
     <!-- clfs.sys -->
     <text class="ks-label" x="175" y="35" text-anchor="end">clfs.sys</text>
@@ -62,7 +62,7 @@ The dominance of clfs.sys is notable because CLFS (Common Log File System) is a 
 Windows kernel-mode components average 90-140 CVEs per year. The chart counts every CVE in the NVD whose description mentions a kernel-mode component: ntoskrnl, win32k, CLFS, AFD, NTFS, TCP/IP, DWM, cloud files mini-filter, or kernel-mode driver.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- Windows Kernel-Mode CVEs by Year (NVD)</span>
+  <span class="ks-figure-label">FIG_011: Windows Kernel-Mode CVEs by Year (NVD)</span>
   <svg viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart showing Windows kernel-mode CVE counts from NVD by year, 2015 to 2026">
     <!-- Y-axis -->
     <text class="ks-annotation" x="55" y="213" text-anchor="end">0</text>
@@ -147,7 +147,7 @@ Coverage concentrates on 2025-2026 because those years have the most public expl
 Buffer overflows are the most common class, followed closely by use-after-free, which dominates the exploited-in-the-wild cases. The "Arbitrary R/W" category is dominated by BYOVD drivers that provide kernel read/write as an intentional design feature rather than a bug.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- Vulnerability Class Distribution</span>
+  <span class="ks-figure-label">FIG_012: Vulnerability Class Distribution</span>
   <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing vulnerability class distribution">
     <!-- Buffer Overflow -->
     <text class="ks-label" x="175" y="35" text-anchor="end">Buffer Overflow</text>

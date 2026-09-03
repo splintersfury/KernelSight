@@ -22,12 +22,12 @@ user-layer defense. That distinction is the whole reason a single primitive give
 different answers across the roster.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_007 : Reach of a kernel read/write primitive</span>
+  <span class="ks-figure-label">FIG_007: Reach of a kernel read/write primitive</span>
   <svg viewBox="0 0 820 396" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three privilege bands. A kernel read or write primitive reaches the kernel-layer and user-layer bands but not the VTL1 band above it.">
 
     <!-- VTL1: above the primitive -->
     <rect class="ks-box" x="40" y="30" width="620" height="74" stroke-dasharray="4 3"/>
-    <text class="ks-label" x="56" y="52">VTL1 &mdash; SECURE KERNEL</text>
+    <text class="ks-label" x="56" y="52">VTL1: SECURE KERNEL</text>
     <text class="ks-annotation" x="56" y="70">Credential Guard, HyperGuard, the HVCI verifier itself</text>
     <text class="ks-annotation" x="56" y="86">A VTL0 primitive does not read or write here, however complete it is</text>
 
@@ -37,14 +37,14 @@ different answers across the roster.
 
     <!-- VTL0 kernel -->
     <rect class="ks-box" x="40" y="140" width="620" height="98"/>
-    <text class="ks-label" x="56" y="162">VTL0 KERNEL &mdash; 19 DEFENSES</text>
+    <text class="ks-label" x="56" y="162">VTL0 KERNEL: 19 DEFENSES</text>
     <text class="ks-annotation" x="56" y="182">Protects kernel-resident assets: code integrity, page tables, pool metadata,</text>
     <text class="ks-annotation" x="56" y="196">address layout, dispatch tables</text>
     <text class="ks-annotation" x="56" y="220">DSE &middot; HVCI &middot; kCFG &middot; kCET &middot; KDP &middot; HLAT &middot; KASLR &middot; PatchGuard &middot; SMEP &middot; SMAP</text>
 
     <!-- VTL0 user -->
     <rect class="ks-box" x="40" y="272" width="620" height="98"/>
-    <text class="ks-label" x="56" y="294">VTL0 USER &mdash; 10 DEFENSES</text>
+    <text class="ks-label" x="56" y="294">VTL0 USER: 10 DEFENSES</text>
     <text class="ks-annotation" x="56" y="314">Protects user-mode assets, but the decision is stored and enforced in the</text>
     <text class="ks-annotation" x="56" y="328">kernel, which is why a kernel write reaches all of it</text>
     <text class="ks-annotation" x="56" y="352">PP/PPL &middot; LSA Protection &middot; ETW-Ti &middot; EDR callbacks &middot; WDAC &middot; AppLocker &middot; UAC &middot; AMSI</text>

@@ -9,7 +9,7 @@ This page distills those root causes into six anti-patterns. Each one describes 
 ## Root Cause Distribution
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- Root Cause Distribution (156 CVEs)</span>
+  <span class="ks-figure-label">FIG_015: Root Cause Distribution (156 CVEs)</span>
   <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing root cause distribution across 156 CVEs">
     <!-- Unvalidated Input -->
     <text class="ks-label" x="215" y="35" text-anchor="end">Unvalidated Input</text>

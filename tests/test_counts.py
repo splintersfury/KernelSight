@@ -68,3 +68,30 @@ def test_the_guard_would_actually_catch_drift():
     # and it must NOT fire on a legitimate per-driver tally
     assert not ACROSS.search("With 13 CVEs in the KernelSight corpus")
     assert not ALL_OF.search("With 13 CVEs in the KernelSight corpus")
+
+
+def test_figure_labels_use_one_consistent_format():
+    """Three separators were in use at once: ':', '--' and an em-dash."""
+    bad = []
+    for md in sorted(DOCS.rglob("*.md")):
+        for n, line in enumerate(md.read_text(encoding="utf-8").splitlines(), 1):
+            if "ks-figure-label" not in line:
+                continue
+            if not re.search(r">FIG(?:_\d+)?: \S", line):
+                bad.append(f"{md.relative_to(ROOT)}:{n}: {line.strip()[:80]}")
+    assert not bad, "figure labels must read 'FIG_00N: Title':\n  " + "\n  ".join(bad)
+
+
+def test_no_em_dashes_anywhere_in_the_docs():
+    """House rule. They had crept into 27 files.
+
+    Checks the HTML entity too: an SVG label written as &mdash; renders as an
+    em-dash and passes a naive character scan. That is exactly how three of
+    them survived the first sweep.
+    """
+    bad = []
+    for f in sorted(list(DOCS.rglob("*.md")) + list(DOCS.rglob("*.html"))):
+        text = f.read_text(encoding="utf-8")
+        if "\u2014" in text or "&mdash;" in text:
+            bad.append(str(f.relative_to(ROOT)))
+    assert not bad, "em-dashes found in: " + ", ".join(bad)

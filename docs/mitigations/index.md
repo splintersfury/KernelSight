@@ -15,7 +15,7 @@ This philosophy is visible in the corpus. CVE-2024-21338 (appid.sys) gave Lazaru
 The stack is ordered by bypass difficulty. Hardware mitigations at the bottom are relatively straightforward to work around if the attacker already holds a write primitive. VBS-backed protections at the top require defeating the hypervisor, something no public exploit has accomplished through direct assault.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_006 -- Defense-in-Depth Stack</span>
+  <span class="ks-figure-label">FIG_006: Defense-in-Depth Stack</span>
   <svg viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Defense-in-depth stack from hardware at bottom to VBS at top">
     <!-- Stack bars - bottom to top -->
     <!-- HW Layer -->

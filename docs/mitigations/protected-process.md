@@ -16,6 +16,55 @@ runs, and it is why the two defenses sit beside each other in this section.
 | Mechanism | `EPROCESS.Protection`, a byte holding signer and level. |
 | Introduced | Windows 8.1, extended for antimalware signers in Windows 10. |
 
+## The signer ladder
+
+`EPROCESS.Protection` packs two fields into one byte: a protection type and a signer. A process
+may open another only when its own signer sits at or above the target's. Everything in the
+inventory below is a way of editing that byte, or of borrowing a driver that never checks it.
+
+<div class="ks-figure" markdown>
+  <span class="ks-figure-label">FIG_009: Protection byte and signer precedence</span>
+  <svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The protection byte splits into a type nibble and a signer nibble. Signers rank from WinTcb at the top down to Authenticode, and a process may only open one at or below its own rank.">
+
+    <!-- the byte -->
+    <text class="ks-label" x="30" y="28">EPROCESS.Protection, one byte</text>
+    <rect class="ks-box" x="30" y="40" width="150" height="42"/>
+    <text class="ks-annotation" x="105" y="58" text-anchor="middle">bits 7:4</text>
+    <text class="ks-annotation" x="105" y="74" text-anchor="middle">SIGNER</text>
+    <rect class="ks-box" x="180" y="40" width="150" height="42"/>
+    <text class="ks-annotation" x="255" y="58" text-anchor="middle">bits 3:0</text>
+    <text class="ks-annotation" x="255" y="74" text-anchor="middle">TYPE, PP or PPL</text>
+    <text class="ks-annotation" x="30" y="104">A kernel write clears both. Nothing recomputes them from the signature.</text>
+
+    <!-- ladder -->
+    <text class="ks-label" x="440" y="28">Signer precedence</text>
+    <rect class="ks-box" x="440" y="40" width="230" height="30"/>
+    <text class="ks-annotation" x="452" y="59">WinTcb, highest</text>
+    <rect class="ks-box" x="440" y="76" width="230" height="30"/>
+    <text class="ks-annotation" x="452" y="95">Windows</text>
+    <rect class="ks-box" x="440" y="112" width="230" height="30"/>
+    <text class="ks-annotation" x="452" y="131">Lsa</text>
+    <rect class="ks-box" x="440" y="148" width="230" height="30"/>
+    <text class="ks-annotation" x="452" y="167">Antimalware, where EDR sits</text>
+    <rect class="ks-box" x="440" y="184" width="230" height="30"/>
+    <text class="ks-annotation" x="452" y="203">Authenticode, lowest</text>
+
+    <path class="ks-arrow" d="M690 55 L690 199"/>
+    <path class="ks-arrow" d="M685 193 L690 203 L695 193 Z" fill="currentColor"/>
+    <text class="ks-annotation" x="700" y="120">may open</text>
+    <text class="ks-annotation" x="700" y="134">downward</text>
+
+    <!-- where the primitive lands -->
+    <line class="ks-line" x1="30" y1="150" x2="410" y2="150" stroke-dasharray="4 3"/>
+    <text class="ks-annotation" x="30" y="170">A kernel write primitive does not climb this ladder.</text>
+    <text class="ks-annotation" x="30" y="186">It rewrites the rung, which is why every entry below is</text>
+    <text class="ks-annotation" x="30" y="202">the same category of work.</text>
+
+    <text class="ks-annotation" x="30" y="248">Contrast Credential Guard: the secret is not guarded by a byte in this</text>
+    <text class="ks-annotation" x="30" y="264">structure, it lives in VTL1, so there is no rung to rewrite.</text>
+  </svg>
+</div>
+
 ## Bypass inventory
 
 <div id="ppl-nav"></div>

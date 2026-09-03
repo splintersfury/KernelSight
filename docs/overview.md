@@ -27,7 +27,7 @@ What kernel access buys you on Windows. One half of this site covers how the acc
 | **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md). Expanded: [ACL / SD Manipulation](primitives/exploitation/acl-sd-manipulation.md), [KASLR Bypasses](mitigations/kaslr-bypasses.md). |
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_001 : The two halves, and the hinge</span>
+  <span class="ks-figure-label">FIG_001: The two halves, and the hinge</span>
   <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Means feeds a kernel read, write or execute primitive, which then feeds Targets. Means covers driver types, attack surfaces, vulnerability classes and case studies. Targets covers kernel-layer and user-layer defenses.">
 
     <!-- MEANS -->

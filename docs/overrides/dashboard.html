@@ -1001,7 +1001,7 @@ body, html {
       <a href="../case-studies/" class="ksd-footer__link">Case Studies</a>
       <a href="../mitigations/" class="ksd-footer__link">Mitigations</a>
     </div>
-    <div class="ksd-footer__copy">KernelSight &mdash; splintersfury</div>
+    <div class="ksd-footer__copy">KernelSight: splintersfury</div>
   </footer>
 
 </div>
@@ -1242,7 +1242,7 @@ body, html {
         var buildTip = cve.vuln_build ? ('Vulnerable ' + cve.vuln_build + (cve.fix_build ? ' → fixed ' + cve.fix_build : '')) : cve.win_version;
         html += '<td><span class="ksd-table__version" title="' + escHtml(buildTip) + '">' + escHtml(cve.win_version) + '</span></td>';
       } else {
-        html += '<td><span class="ksd-table__version ksd-table__version--none">&mdash;</span></td>';
+        html += '<td><span class="ksd-table__version ksd-table__version--none">,</span></td>';
       }
       html += '<td><div class="ksd-badges">';
       if (cve.itw) html += '<span class="ksd-badge ksd-badge--itw">ITW</span>';

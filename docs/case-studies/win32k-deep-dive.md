@@ -71,6 +71,58 @@ Three ITW exploited. Twelve total. Four distinct vulnerability classes. Four yea
 
 ### Callback Reentrancy UAF
 
+<div class="ks-figure" markdown>
+  <span class="ks-figure-label">FIG_008: User-mode callback reentrancy</span>
+  <svg viewBox="0 0 860 268" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A kernel operation calls out to a user-mode window procedure. That callback re-enters the kernel and frees the object the first call path still holds. When the first path resumes it dereferences freed memory.">
+
+    <line class="ks-line" x1="20" y1="128" x2="840" y2="128" stroke-dasharray="6 4"/>
+    <text class="ks-annotation" x="24" y="120">KERNEL</text>
+    <text class="ks-annotation" x="24" y="144">USER</text>
+
+    <!-- step 1, kernel takes a reference -->
+    <rect class="ks-box" x="60" y="52" width="150" height="58"/>
+    <text class="ks-annotation" x="70" y="74">1. Kernel operation</text>
+    <text class="ks-annotation" x="70" y="90">takes a reference to</text>
+    <text class="ks-annotation" x="70" y="104">a window object</text>
+
+    <!-- down to user -->
+    <path class="ks-arrow" d="M135 110 L135 158"/>
+    <path class="ks-arrow" d="M130 152 L135 162 L140 152 Z" fill="currentColor"/>
+    <text class="ks-annotation" x="144" y="140">2. calls out</text>
+
+    <!-- user callback -->
+    <rect class="ks-box" x="60" y="162" width="150" height="58"/>
+    <text class="ks-annotation" x="70" y="184">Window procedure</text>
+    <text class="ks-annotation" x="70" y="200">runs attacker code</text>
+
+    <!-- back up, re-entrant -->
+    <path class="ks-arrow" d="M210 190 L330 190 L330 110"/>
+    <path class="ks-arrow" d="M325 116 L330 106 L335 116 Z" fill="currentColor"/>
+    <text class="ks-annotation" x="222" y="182">3. re-enters the kernel</text>
+
+    <!-- the free -->
+    <rect class="ks-box" x="336" y="52" width="176" height="58"/>
+    <text class="ks-annotation" x="346" y="74">4. Second kernel call</text>
+    <text class="ks-annotation" x="346" y="90">destroys the object the</text>
+    <text class="ks-annotation" x="346" y="104">first path still holds</text>
+
+    <!-- return to first path -->
+    <path class="ks-arrow" d="M512 81 L588 81"/>
+    <path class="ks-arrow" d="M582 76 L592 81 L582 86 Z" fill="currentColor"/>
+    <text class="ks-annotation" x="518" y="72">5. callback returns</text>
+
+    <!-- the dereference -->
+    <rect class="ks-box" x="592" y="52" width="200" height="58" stroke-width="2"/>
+    <text class="ks-annotation" x="602" y="74">6. First path resumes and</text>
+    <text class="ks-annotation" x="602" y="90">dereferences freed memory</text>
+    <text class="ks-annotation" x="602" y="104">use after free</text>
+
+    <!-- the invariant that breaks -->
+    <text class="ks-annotation" x="60" y="246">The reference taken at step 1 is never revalidated after step 5. That gap is the bug class,</text>
+    <text class="ks-annotation" x="60" y="260">and it is why locking one object at a time has never closed it.</text>
+  </svg>
+</div>
+
 The most dangerous Win32k pattern, and the most architecturally difficult to fix. During a kernel operation (menu display, window creation, message dispatch), Win32k calls back to user mode via a window procedure or hook. The user-mode callback triggers a second kernel call that frees or modifies an object the first call path still references. When execution returns to the first path, it accesses freed memory.
 
 [CVE-2023-29336](CVE-2023-29336.md) exploits this through nested menu objects. During menu display, the menu's window procedure callback receives a message. The attacker's callback handler destroys a child menu item. The parent's teardown path, which had been suspended during the callback, resumes and dereferences a pointer to the now-freed child. The stale pointer hits attacker-controlled memory sprayed into the freed slot.

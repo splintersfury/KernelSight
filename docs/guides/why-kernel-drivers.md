@@ -34,7 +34,7 @@ Two additional hardware features extend this boundary:
 Below Ring 0, VBS-enabled systems add a hypervisor layer (sometimes called Ring -1) that enforces [HVCI](../mitigations/vbs-hvci.md) -- code integrity at page granularity, even against a compromised kernel.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- x86-64 Privilege Rings on Windows</span>
+  <span class="ks-figure-label">FIG_016: x86-64 Privilege Rings on Windows</span>
   <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing privilege rings: Ring 3 user mode, Ring 0 kernel mode, Ring -1 hypervisor, with SYSCALL boundary">
     <!-- Ring -1 (Hypervisor) -->
     <rect class="ks-box" x="50" y="180" width="600" height="55" rx="0"/>
@@ -120,7 +120,7 @@ Every kernel driver is a liability. A bug in Ring 0 code grants the attacker ful
 The KernelSight corpus quantifies this cost: 156 CVEs across 64 drivers, with 57 exploited in the wild. The consequences cluster around elevation of privilege.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- CVE Distribution by Consequence (156 CVEs)</span>
+  <span class="ks-figure-label">FIG_017: CVE Distribution by Consequence (156 CVEs)</span>
   <svg viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing CVE distribution by consequence type">
     <!-- EoP -->
     <text class="ks-label" x="155" y="35" text-anchor="end">EoP</text>

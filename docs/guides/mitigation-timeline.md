@@ -23,7 +23,7 @@ Windows kernel mitigations have accumulated over more than a decade. Each new de
 | 11 v24H2 | 26100 | 2024 | CLFS isolation, hardened Secure Pool, admin-less by default |
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- Mitigation Deployment Timeline</span>
+  <span class="ks-figure-label">FIG_014: Mitigation Deployment Timeline</span>
   <svg viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal timeline showing when major kernel mitigations were deployed from 2013 to 2024">
     <!-- Timeline axis -->
     <line class="ks-line" x1="40" y1="80" x2="740" y2="80"/>
