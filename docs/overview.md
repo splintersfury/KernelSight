@@ -1,19 +1,21 @@
 ---
 hide:
   - toc
-description: "Windows kernel driver exploitation knowledge base — 156 CVEs across 64 drivers, exploit chain patterns, BYOVD analysis, mitigations, and exploitation primitives."
+description: "What kernel access buys you on Windows: how it is obtained across 156 CVEs and 64 drivers, and which kernel-layer and user-layer defenses it does and does not defeat."
 ---
 
 <div class="ks-hero-title" markdown>KernelSight</div>
 
 <p class="ks-hero-subtitle">
-A structured knowledge base for Windows kernel driver exploitation, organized as a pipeline from driver identification through privilege escalation. Covers 156 real CVEs across Microsoft inbox and third-party BYOVD drivers.
+What kernel access buys you on Windows. One half of this site covers how the access is obtained, across 156 real CVEs and 64 drivers. The other covers what that access defeats, at both kernel and user level. A read or write primitive is the hinge between them.
 </p>
 
 ## Recent Updates
 
 | Date | What's New |
 |------|------------|
+| **2026-09-04** | Every page now shows when it last changed, measured from git rather than asserted. Corpus totals are generated from the data and guarded by a test, after three different figures were live at once. |
+| **2026-09-03** | Repositioned around what kernel access buys you. Navigation regrouped into [Means](driver-types/index.md) and [Targets](mitigations/index.md); new [bypass matrix](bypasses/index.md) evaluating every inventory against one platform selection; first user-layer defense page, [Protected Process Light](mitigations/protected-process.md). Every technique now carries a dated verdict and a basis tier. |
 | **2026-03-12** | [KDU Provider Compatibility](reference/kdu-compatibility.md) and [LOLDrivers Deep Analysis](reference/loldrivers-analysis.md) updated with full 1,775-driver Tier 2 Ghidra results. 1,404 KDU-compatible (79%), 354 Tier 2 confirmed, 122 confirmed MapDriver candidates with physical + virtual memory primitives reachable from IOCTL handlers. All mitigations, ROP gadgets, and I/O methods scored. |
 | **2026-03-01** | Backfill: 13 case studies added for 2022--2024 CVEs with published exploit research. CLFS ransomware chain (CVE-2022-24521, CVE-2022-35803, CVE-2023-23376), Project Zero registry audit (CVE-2022-34707, CVE-2023-23420), DEVCORE kernel streaming (CVE-2024-30090, CVE-2024-30084, CVE-2024-38144), activation context bugs (CVE-2022-22047, CVE-2022-41073). Corpus now at 156 CVEs, 57 exploited ITW. |
 | **2026-03-01** | New guide: [Why Kernel Drivers?](guides/why-kernel-drivers.md) -- what hardware enforces, what only Ring 0 can do, user-mode alternatives, the security cost, and Microsoft's trajectory toward constraining kernel code. |
@@ -25,92 +27,83 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 | **2026-02-25** | New technique: [Bit-Manipulation Primitives](primitives/exploitation/bit-manipulation.md). Expanded: [ACL / SD Manipulation](primitives/exploitation/acl-sd-manipulation.md), [KASLR Bypasses](mitigations/kaslr-bypasses.md). |
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_001 — The Exploitation Pipeline</span>
-  <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Exploitation pipeline: Driver Type to Attack Surface to Vulnerability Class to Primitive to Case Study, with Mitigations below">
-    <!-- Row 1: Five pipeline stages -->
-    <a href="driver-types/">
-      <rect class="ks-box" x="10" y="30" width="150" height="56" rx="0"/>
-      <text class="ks-label" x="85" y="55" text-anchor="middle" fill="currentColor">DRIVER TYPE</text>
-      <text class="ks-annotation" x="85" y="72" text-anchor="middle">Which component?</text>
-    </a>
-    <!-- Arrow 1 -->
-    <line class="ks-line" x1="160" y1="58" x2="185" y2="58"/>
-    <polyline class="ks-arrow" points="180,53 188,58 180,63"/>
-    <a href="attack-surfaces/">
-      <rect class="ks-box" x="190" y="30" width="150" height="56" rx="0"/>
-      <text class="ks-label" x="265" y="55" text-anchor="middle" fill="currentColor">ATTACK SURFACE</text>
-      <text class="ks-annotation" x="265" y="72" text-anchor="middle">How is it reached?</text>
-    </a>
-    <!-- Arrow 2 -->
-    <line class="ks-line" x1="340" y1="58" x2="365" y2="58"/>
-    <polyline class="ks-arrow" points="360,53 368,58 360,63"/>
-    <a href="vuln-classes/">
-      <rect class="ks-box" x="370" y="30" width="150" height="56" rx="0"/>
-      <text class="ks-label" x="445" y="55" text-anchor="middle" fill="currentColor">VULN CLASS</text>
-      <text class="ks-annotation" x="445" y="72" text-anchor="middle">What went wrong?</text>
-    </a>
-    <!-- Arrow 3 -->
-    <line class="ks-line" x1="520" y1="58" x2="545" y2="58"/>
-    <polyline class="ks-arrow" points="540,53 548,58 540,63"/>
-    <a href="primitives/">
-      <rect class="ks-box" x="550" y="30" width="150" height="56" rx="0"/>
-      <text class="ks-label" x="625" y="55" text-anchor="middle" fill="currentColor">PRIMITIVE</text>
-      <text class="ks-annotation" x="625" y="72" text-anchor="middle">What do you gain?</text>
-    </a>
-    <!-- Arrow 4 -->
-    <line class="ks-line" x1="700" y1="58" x2="725" y2="58"/>
-    <polyline class="ks-arrow" points="720,53 728,58 720,63"/>
-    <a href="case-studies/">
-      <rect class="ks-box" x="730" y="30" width="150" height="56" rx="0"/>
-      <text class="ks-label" x="805" y="55" text-anchor="middle" fill="currentColor">CASE STUDY</text>
-      <text class="ks-annotation" x="805" y="72" text-anchor="middle">Real-world CVEs</text>
-    </a>
-    <!-- Mitigations bar below -->
-    <line class="ks-line" x1="10" y1="120" x2="880" y2="120" stroke-dasharray="6,4"/>
-    <a href="mitigations/">
-      <rect class="ks-box" x="280" y="132" width="340" height="40" rx="0"/>
-      <text class="ks-label" x="450" y="157" text-anchor="middle" fill="currentColor">MITIGATIONS</text>
-    </a>
-    <!-- Vertical dashed lines connecting stages to mitigations -->
-    <line class="ks-line" x1="445" y1="86" x2="445" y2="132" stroke-dasharray="4,4" opacity="0.4"/>
-    <line class="ks-line" x1="625" y1="86" x2="625" y2="132" stroke-dasharray="4,4" opacity="0.4"/>
-    <text class="ks-annotation" x="450" y="195" text-anchor="middle">Defenses intersect every stage</text>
-    <!-- Tooling reference -->
-    <a href="tooling/">
-      <text class="ks-annotation" x="450" y="220" text-anchor="middle" text-decoration="underline">Tooling &amp; Automation</text>
-    </a>
+  <span class="ks-figure-label">FIG_001 : The two halves, and the hinge</span>
+  <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Means feeds a kernel read, write or execute primitive, which then feeds Targets. Means covers driver types, attack surfaces, vulnerability classes and case studies. Targets covers kernel-layer and user-layer defenses.">
+
+    <!-- MEANS -->
+    <text class="ks-label" x="30" y="34">MEANS &#183; HOW THE ACCESS IS OBTAINED</text>
+    <rect class="ks-box" x="30" y="48" width="300" height="34"/>
+    <text class="ks-annotation" x="45" y="69">Driver types &#183; 12 families</text>
+    <rect class="ks-box" x="30" y="92" width="300" height="34"/>
+    <text class="ks-annotation" x="45" y="113">Attack surfaces &#183; 9 entry points</text>
+    <rect class="ks-box" x="30" y="136" width="300" height="34"/>
+    <text class="ks-annotation" x="45" y="157">Vulnerability classes &#183; 10</text>
+    <rect class="ks-box" x="30" y="180" width="300" height="34"/>
+    <text class="ks-annotation" x="45" y="201">Case studies &#183; 156 CVEs, 64 drivers</text>
+
+    <!-- feed into the hinge -->
+    <path class="ks-arrow" d="M330 65 C 372 65 372 150 400 150"/>
+    <path class="ks-arrow" d="M330 109 C 372 109 372 150 400 150"/>
+    <path class="ks-arrow" d="M330 153 L400 150"/>
+    <path class="ks-arrow" d="M330 197 C 372 197 372 150 400 150"/>
+    <path class="ks-arrow" d="M394 145 L404 150 L394 155 Z" fill="currentColor"/>
+
+    <!-- the hinge -->
+    <rect class="ks-box" x="404" y="118" width="122" height="64" stroke-width="2"/>
+    <text class="ks-label" x="465" y="142" text-anchor="middle">KERNEL</text>
+    <text class="ks-label" x="465" y="156" text-anchor="middle">READ / WRITE</text>
+    <text class="ks-annotation" x="465" y="172" text-anchor="middle">21 primitives</text>
+
+    <!-- hinge feeds targets -->
+    <path class="ks-arrow" d="M526 150 L566 150"/>
+    <path class="ks-arrow" d="M560 145 L570 150 L560 155 Z" fill="currentColor"/>
+
+    <!-- TARGETS -->
+    <text class="ks-label" x="570" y="34">TARGETS &#183; WHAT IT DEFEATS</text>
+    <rect class="ks-box" x="570" y="92" width="300" height="52"/>
+    <text class="ks-annotation" x="585" y="112">Kernel layer &#183; 19 defenses</text>
+    <text class="ks-annotation" x="585" y="130">DSE, HVCI, kCET, KDP, HLAT, KASLR</text>
+    <rect class="ks-box" x="570" y="156" width="300" height="52"/>
+    <text class="ks-annotation" x="585" y="176">User layer &#183; 10 defenses</text>
+    <text class="ks-annotation" x="585" y="194">PPL, LSA, ETW-Ti, EDR, WDAC, UAC</text>
+
+    <!-- out of reach -->
+    <rect class="ks-box" x="570" y="230" width="300" height="34" stroke-dasharray="4 3"/>
+    <text class="ks-annotation" x="585" y="251">VTL1 &#183; Credential Guard, HyperGuard: out of reach</text>
+    <line class="ks-line" x1="465" y1="182" x2="465" y2="247" stroke-dasharray="3 3"/>
+    <line class="ks-line" x1="465" y1="247" x2="564" y2="247" stroke-dasharray="3 3"/>
+    <text class="ks-annotation" x="470" y="240">no path</text>
   </svg>
-  <p class="ks-figure-caption">Each stage links to a section of this knowledge base. Click any box to begin.</p>
 </div>
 
 <hr class="ks-divider">
 
-## The Analysis Pipeline
+## The two halves
 
 <ol class="ks-pipeline-list" markdown>
 <li markdown>
 <strong><a href="driver-types/">Driver Types</a></strong>
-<p>Identify the kernel component — file system, network stack, Win32k, core kernel, vendor utility, GPU — and understand its role, IRP patterns, and historical vulnerability profile. 12 categories covering 64 unique drivers.</p>
+<p>Identify the kernel component, whether file system, network stack, Win32k, core kernel, vendor utility or GPU, then understand its role, IRP patterns and historical vulnerability profile. 12 categories covering 64 unique drivers.</p>
 </li>
 <li markdown>
 <strong><a href="attack-surfaces/">Attack Surfaces</a></strong>
-<p>Map how user-mode code reaches the driver — IOCTL handlers, filesystem IRPs, ALPC, shared memory. Determines what an attacker can control.</p>
+<p>Map how user-mode code reaches the driver: IOCTL handlers, filesystem IRPs, ALPC, shared memory. This determines what an attacker can control.</p>
 </li>
 <li markdown>
 <strong><a href="vuln-classes/">Vulnerability Classes</a></strong>
-<p>Classify the bug — buffer overflow, type confusion, TOCTOU, use-after-free — and understand the corruption it enables. 10 classes with typical primitives gained.</p>
+<p>Classify the bug as buffer overflow, type confusion, TOCTOU or use-after-free, then understand the corruption it enables. 10 classes with typical primitives gained.</p>
 </li>
 <li markdown>
 <strong><a href="primitives/">Primitives</a></strong>
-<p>Convert the bug into a capability — arbitrary read/write, pool spray, token swap. 21 techniques split between arb R/W primitives and exploitation building blocks.</p>
+<p>Convert the bug into a capability: arbitrary read/write, pool spray, token swap. 21 techniques split between arb R/W primitives and exploitation building blocks.</p>
 </li>
 <li markdown>
 <strong><a href="case-studies/">Case Studies</a></strong>
-<p>Walk through the full chain for 156 real CVEs — root cause, exploitation path, patch analysis, and detection rules. 57 exploited in the wild, including 38 third-party BYOVD drivers.</p>
+<p>Walk through the full chain for 156 real CVEs, covering root cause, exploitation path, patch analysis and detection rules. 57 exploited in the wild, including 38 third-party BYOVD drivers.</p>
 </li>
 <li markdown>
 <strong><a href="mitigations/">Mitigations</a></strong>
-<p>Understand the defenses — SMEP/SMAP, kCFG/kCET, VBS/HVCI, pool hardening — and which primitives they block. Cross-cuts every pipeline stage.</p>
+<p>Understand the defenses, from SMEP and SMAP through kCFG, kCET, VBS, HVCI and pool hardening, and which primitives each one blocks. Sits on the Targets side.</p>
 </li>
 <li markdown>
 <strong><a href="tooling/">Tooling</a></strong>
@@ -144,18 +137,18 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 <div class="ks-paths" markdown>
 
 <a class="ks-path-card" href="../">
-  <strong>Explore the data</strong>
+  <strong>Explore the corpus</strong>
   <span>Interactive dashboard. Search, filter, and visualize all 156 CVEs. Heat matrix shows where the bugs cluster.</span>
 </a>
 
 <a class="ks-path-card" href="driver-types/">
   <strong>New to kernel exploitation</strong>
-  <span>Start with Driver Types to understand the landscape, then follow the pipeline left-to-right.</span>
+  <span>Start with Driver Types to understand the landscape, then start in Means and follow it to a primitive.</span>
 </a>
 
 <a class="ks-path-card" href="case-studies/">
   <strong>Researching a specific driver</strong>
-  <span>Jump to Case Studies and filter by driver name. Each CVE links back to relevant pipeline stages.</span>
+  <span>Jump to Case Studies and filter by driver name. Each CVE links back to the relevant Means pages.</span>
 </a>
 
 <a class="ks-path-card" href="tooling/autopiff-integration/">
@@ -172,4 +165,4 @@ A structured knowledge base for Windows kernel driver exploitation, organized as
 
 ## Data & Analysis
 
-The pipeline above covers *how* kernel drivers get exploited. For a data-driven view of *which* drivers are most dangerous, see the [Reference](reference/) section — 1,775 LOLDrivers analyzed with automated Ghidra decompilation, scored for weaponisability, and mapped to KDU provider compatibility.
+The two halves above cover *how* kernel drivers get exploited. For a data-driven view of *which* drivers are most dangerous, see the [Reference](reference/) section, where 1,775 LOLDrivers are analyzed with automated Ghidra decompilation, scored for weaponisability, and mapped to KDU provider compatibility.

@@ -10,7 +10,7 @@
 | **Vendor** | ASRock / ASUS |
 | **Vulnerability Class** | Arbitrary R/W / Physical Memory Mapping / Authorization Bypass |
 | **Abused Version** | Multiple versions shipped with ASRock and ASUS utilities |
-| **Status** | Blocklisted — included in Microsoft Vulnerable Driver Blocklist |
+| **Status** | Blocklisted: included in Microsoft Vulnerable Driver Blocklist |
 | **Exploited ITW** | Yes |
 | **Related CVEs** | [CVE-2025-1533](CVE-2025-1533.md) (stack overflow), [CVE-2025-3464](CVE-2025-3464.md) (auth bypass) |
 
@@ -35,7 +35,7 @@ The driver's authorization model also has a critical flaw. It relies on SHA256 h
 | IOCTL | Capability | Notes |
 |-------|-----------|-------|
 | `0xA040200C` | Physical memory R/W via MmMapIoSpace | Range-filtered by `checkPhyMemoryRange` / `g_goodRanges` |
-| — | I/O port read/write | Direct port access |
+|, | I/O port read/write | Direct port access |
 | `0xA040A45C` | MSR read/write | Allowlist filtering; excludes IA32_LSTAR and IA32_SYSENTER_EIP |
 | `0xa0402450` | `ObfDereferenceObject` on controlled address | Provides decrement-by-one primitive at `(addr - 0x30)` |
 
@@ -93,8 +93,8 @@ rule AsIO3_sys {
 | Provider | Event / Signal | Relevance |
 |----------|---------------|-----------|
 | Microsoft-Windows-Kernel-File | Driver load event | Detects loading of AsIO3.sys |
-| Sysmon | Event ID 6 — Driver loaded | Hash and signature capture |
-| Microsoft-Windows-Security-Auditing | Event 4697 — Service installed | Driver service creation |
+| Sysmon | Event ID 6: Driver loaded | Hash and signature capture |
+| Microsoft-Windows-Security-Auditing | Event 4697: Service installed | Driver service creation |
 | Microsoft-Windows-Kernel-Process | Process token modification | Post-exploitation token swap |
 
 ### Behavioral Indicators
@@ -119,8 +119,8 @@ rule AsIO3_sys {
 
 ## References
 
-- [Talos — Decrement by one to rule them all: AsIO3.sys driver exploitation](https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/)
-- [swapcontext — KDU v1.1 Release and bonus: AsIO3.sys](https://swapcontext.blogspot.com/2021/04/kdu-v11-release-and-bonus-asio3sys.html)
-- [LOLDrivers — AsIO3](https://www.loldrivers.io/)
-- [CVE-2025-1533 — Stack overflow in Win32PathToNtPath](CVE-2025-1533.md)
-- [CVE-2025-3464 — Authorization bypass and full exploit chain](CVE-2025-3464.md)
+- [Talos: Decrement by one to rule them all: AsIO3.sys driver exploitation](https://blog.talosintelligence.com/decrement-by-one-to-rule-them-all/)
+- [swapcontext: KDU v1.1 Release and bonus: AsIO3.sys](https://swapcontext.blogspot.com/2021/04/kdu-v11-release-and-bonus-asio3sys.html)
+- [LOLDrivers: AsIO3](https://www.loldrivers.io/)
+- [CVE-2025-1533: Stack overflow in Win32PathToNtPath](CVE-2025-1533.md)
+- [CVE-2025-3464: Authorization bypass and full exploit chain](CVE-2025-3464.md)

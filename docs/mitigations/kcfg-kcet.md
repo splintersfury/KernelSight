@@ -21,10 +21,10 @@ The practical effect on exploitation has been decisive. Before kCFG, a single fu
   ],
   techniques:(function(){var CS='../../case-studies/',PR='../../primitives/exploitation/';return [
     {name:'CFG-valid gadgets ("CFG-aware")',cat:'Forward-edge',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
-      if(s.cf) return ['open','Have call hijack','kCFG only checks the target is a valid function entry, not the intended one. Redirect an indirect call to NtWriteVirtualMemory, RtlSetBit or RtlClearAllBits — all valid targets. The <a href="'+PR+'bit-manipulation/">bit-manipulation primitive</a> is fully kCFG-compliant. <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a> does exactly this.'];
-      return ['gated','Needs a control-flow hijack','Works even with kCET active — the shadow stack does not constrain forward-edge target choice.'];}},
+      if(s.cf) return ['open','Have call hijack','kCFG only checks the target is a valid function entry, not the intended one. Redirect an indirect call to NtWriteVirtualMemory, RtlSetBit or RtlClearAllBits: all valid targets. The <a href="'+PR+'bit-manipulation/">bit-manipulation primitive</a> is fully kCFG-compliant. <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a> does exactly this.'];
+      return ['gated','Needs a control-flow hijack','Works even with kCET active: the shadow stack does not constrain forward-edge target choice.'];}},
     {name:'Data-only attacks',cat:'Data-only',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
-      return ['open','Bypasses both','Token swap, <code>PreviousMode</code> manipulation, and ACL/SD modification hijack no control flow at all — neither kCFG nor kCET applies. Every ITW CVE in the 2024–2026 corpus used this. Needs a kernel write primitive.'];}},
+      return ['open','Bypasses both','Token swap, <code>PreviousMode</code> manipulation, and ACL/SD modification hijack no control flow at all: neither kCFG nor kCET applies. Every ITW CVE in the 2024–2026 corpus used this. Needs a kernel write primitive.'];}},
     {name:'Third-party driver gaps (no /guard:cf)',cat:'Coverage gap',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.drv!=='third') return ['closed','MS kernel is /guard:cf','Microsoft kernel indirect calls are CFG-protected.'];
       if(s.cf) return ['open','Have call hijack','A driver not compiled with /guard:cf has unprotected indirect call sites. Hijack control flow inside it and no kCFG check applies at those sites.'];

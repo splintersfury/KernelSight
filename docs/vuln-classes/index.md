@@ -1,5 +1,5 @@
 ---
-description: "10 Windows kernel vulnerability classes — buffer overflow, use-after-free, type confusion, TOCTOU, race conditions, integer overflow, arbitrary R/W, and logic bugs with real CVE examples."
+description: "10 Windows kernel vulnerability classes: buffer overflow, use-after-free, type confusion, TOCTOU, race conditions, integer overflow, arbitrary R/W, and logic bugs with real CVE examples."
 ---
 
 # Vulnerability Classes
@@ -15,7 +15,7 @@ The landscape is not uniform. Some classes, like [buffer overflow](buffer-overfl
 The diagram below traces the path from initial trigger to exploitation primitive. A single trigger condition (say, an unchecked size field) can flow through different corruption types depending on context, and each corruption type yields a different primitive. This is why the same IOCTL handler bug might be classified as an integer overflow by one analyst and a buffer overflow by another; both are correct, because the integer overflow *causes* the buffer overflow. The classes are not mutually exclusive. They are lenses.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_004 — Bug to Primitive Flow</span>
+  <span class="ks-figure-label">FIG_004: Bug to Primitive Flow</span>
   <svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flow from trigger conditions through corruption types to primitives gained">
     <!-- Column headers -->
     <text class="ks-label" x="120" y="20" text-anchor="middle" fill="currentColor">TRIGGER</text>

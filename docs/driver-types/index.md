@@ -1,5 +1,5 @@
 ---
-description: "12 categories of Windows kernel drivers — file system, network stack, Win32k, CLFS, kernel streaming, vendor utility, and more. Each with vulnerability patterns and CVE cross-references."
+description: "12 categories of Windows kernel drivers: file system, network stack, Win32k, CLFS, kernel streaming, vendor utility, and more. Each with vulnerability patterns and CVE cross-references."
 ---
 
 # Driver Types
@@ -13,7 +13,7 @@ When you sit down to audit a Windows kernel driver, the first question is not "w
 KernelSight organizes kernel drivers into twelve categories based on their role in the Windows kernel architecture. Each category carries distinct IRP handling patterns, accessible attack surfaces, and historical vulnerability profiles. A driver's category predicts its bug classes with surprising consistency: CLFS drivers produce pool corruptions from metadata parsing, Win32k drivers produce use-after-free and type confusion from object lifecycle complexity, and vendor utility drivers produce arbitrary read/write from intentional design choices that were never meant to face adversarial callers. Understanding these patterns before you start reversing saves weeks of unfocused analysis.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_002 — Windows Kernel Architecture</span>
+  <span class="ks-figure-label">FIG_002: Windows Kernel Architecture</span>
   <svg viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Windows kernel architecture showing user mode, kernel subsystems, and HAL layers">
     <!-- User Mode Layer -->
     <rect class="ks-box" x="10" y="10" width="800" height="50"/>
@@ -62,7 +62,7 @@ KernelSight organizes kernel drivers into twelve categories based on their role 
     <text class="ks-annotation" x="580" y="252" text-anchor="middle">1 CVE</text>
     <!-- Core Kernel -->
     <rect class="ks-box" x="10" y="290" width="800" height="50"/>
-    <text class="ks-label" x="410" y="320" text-anchor="middle" fill="currentColor">CORE KERNEL — ntoskrnl.exe</text>
+    <text class="ks-label" x="410" y="320" text-anchor="middle" fill="currentColor">CORE KERNEL: ntoskrnl.exe</text>
     <text class="ks-annotation" x="160" y="320" text-anchor="middle">4 CVEs | 2 ITW</text>
     <text class="ks-annotation" x="660" y="320" text-anchor="middle">Security Reference Monitor / VBS / Process Mgmt</text>
     <!-- HAL -->

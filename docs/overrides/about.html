@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block htmltitle %}<title>Mission Briefing | KernelSight Forensic Intelligence</title>{% endblock %}
+{% block htmltitle %}<title>About KernelSight, the Windows kernel bypass reference</title>{% endblock %}
 {% block extrahead %}
-<meta name="description" content="The mission behind KernelSight — bridging raw assembly and actionable security intelligence">
-<meta property="og:title" content="About — KernelSight">
+<meta name="description" content="Why KernelSight exists: a dated, sourced record of what kernel access defeats on Windows, and what it does not.">
+<meta property="og:title" content="About KernelSight">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
       <span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Unmasking the Kernel</span>
     </h1>
     <p style="font-family:'Inter';font-size:1.25rem;color:#c6c6cc;max-width:36rem;line-height:1.7;border-left:2px solid rgba(173,198,255,0.4);padding-left:1.5rem;margin:0">
-      Bridging the architectural gap between raw assembly and actionable security intelligence. KernelSight provides the forensic clarity required to navigate the most complex driver vulnerabilities.
+      Bridging the architectural gap between raw assembly and actionable security intelligence. KernelSight records what a kernel read or write primitive actually defeats, on a stated build and CPU.
     </p>
   </div>
 </section>
@@ -93,7 +93,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
       <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(173,198,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
         <span class="material-symbols-outlined" style="color:#adc6ff">hub</span>
       </div>
-      <h4 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">3. Forensic Correlation</h4>
+      <h4 style="font-family:'Space Grotesk';font-size:1.25rem;font-weight:700;color:#e0e2eb;margin:0 0 0.75rem 0">3. Dated Verdicts</h4>
       <p style="font-family:'Inter';font-size:0.875rem;color:#c6c6cc;line-height:1.7;margin:0">Mapping shared code signatures across manufacturers to identify hidden supply chain risks.</p>
     </div>
   </div>
@@ -127,7 +127,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
     <div style="flex:1;min-width:280px">
       <h3 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 1rem 0">Built for Engineers</h3>
       <p style="font-family:'Inter';color:#c6c6cc;margin:0 0 1.5rem 0;line-height:1.7">
-        KernelSight integrates with your existing forensic workflow. Direct access to the world's most comprehensive driver intelligence database.
+        KernelSight integrates with your existing forensic workflow. Direct access to a reference whose coverage is a computed ratio rather than a claim.
       </p>
       <div style="display:flex;gap:1rem">
         <a href="{{ config.site_url }}overview/" style="padding:0.5rem 1.5rem;background:#adc6ff;color:#002e6a;font-weight:700;border-radius:4px;text-decoration:none;font-size:0.875rem">Knowledge Base</a>
@@ -138,7 +138,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
       <div style="background:#0b0e14;border-radius:0.75rem;border:1px solid rgba(69,70,76,0.15);overflow:hidden;font-family:'JetBrains Mono';font-size:0.75rem">
         <div style="background:#31353c;padding:0.5rem 1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(69,70,76,0.1)">
           <div style="display:flex;gap:0.4rem"><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(239,68,68,0.3)"></div><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(245,158,11,0.3)"></div><div style="width:0.6rem;height:0.6rem;border-radius:50%;background:rgba(34,197,94,0.3)"></div></div>
-          <span style="color:rgba(156,163,175,0.6);margin-left:0.5rem">Terminal — bash</span>
+          <span style="color:rgba(156,163,175,0.6);margin-left:0.5rem">Terminal , bash</span>
         </div>
         <div style="padding:1.5rem;line-height:2">
           <div><span style="color:rgba(173,198,255,0.5)">$</span> <span style="color:#b7c8e1">ks-cli scan --target=win32kbase.sys</span></div>
@@ -155,7 +155,7 @@ body, html { background: #10131a !important; overflow-x: hidden; }
   <div style="max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
     <div>
       <span style="font-family:'Space Grotesk';font-weight:700;color:#adc6ff;font-size:1.25rem;display:block;margin-bottom:0.5rem">KernelSight</span>
-      <span style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af">&copy; 2026 KernelSight Forensic Intelligence</span>
+      <span style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af">&copy; 2026 KernelSight</span>
     </div>
     <div style="display:flex;gap:2rem">
       <a href="https://github.com/splintersfury/KernelSight" style="font-family:'JetBrains Mono';font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;text-decoration:none">GitHub</a>

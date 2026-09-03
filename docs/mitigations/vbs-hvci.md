@@ -20,22 +20,22 @@ Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional f
   ],
   techniques:(function(){var CS='../../case-studies/',PR='../../primitives/exploitation/';return [
     {name:'Data-only attacks (token swap, PreviousMode, ACL/SD)',cat:'Data-only',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
-      if(s.rw) return ['open','Have kernel R/W','HVCI protects code, not data. Modify tokens, <code>PreviousMode</code>, or security descriptors without executing code or touching code pages — HVCI is irrelevant. See <a href="'+PR+'token-swapping/">Token Swapping</a>.'];
+      if(s.rw) return ['open','Have kernel R/W','HVCI protects code, not data. Modify tokens, <code>PreviousMode</code>, or security descriptors without executing code or touching code pages: HVCI is irrelevant. See <a href="'+PR+'token-swapping/">Token Swapping</a>.'];
       return ['gated','Needs a kernel write primitive','The primary modern strategy under HVCI: never execute code, only corrupt data structures.'];}},
     {name:'Living-off-the-land signed code / I/O Ring',cat:'Signed-code reuse',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
-      return ['open','HVCI-irrelevant','All legitimately signed kernel code passes HVCI. Chain existing syscall handlers and signed routines for read/write — the <a href="'+PR+'io-ring/">I/O Ring</a> primitive gives kernel R/W through documented interfaces, so HVCI never applies.'];}},
+      return ['open','HVCI-irrelevant','All legitimately signed kernel code passes HVCI. Chain existing syscall handlers and signed routines for read/write: the <a href="'+PR+'io-ring/">I/O Ring</a> primitive gives kernel R/W through documented interfaces, so HVCI never applies.'];}},
     {name:'Data-only BYOVD (token swap via signed driver)',cat:'BYOVD',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.admin&&s.drv) return ['open','Admin + signed driver','HVCI does not stop a signed, non-blocklisted driver doing data-only work. <a href="'+CS+'viragt64-sys/">viragt64.sys</a> (process kill) and <a href="'+CS+'Truesight-sys/">Truesight.sys</a> (handle dup) work regardless of HVCI.'];
       return ['gated','Needs admin + a non-blocklisted signed driver','Data-only BYOVD survives HVCI as long as the driver is not on the blocklist.'];}},
     {name:'Unblocklistable driver (e.g. NVDrv)',cat:'BYOVD',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
-      if(s.admin) return ['open','Admin','<a href="'+CS+'NVDrv/">NVDrv</a> (NVIDIA GPU) cannot be blocklisted without breaking display — an architectural gap in the HVCI BYOVD defense.'];
+      if(s.admin) return ['open','Admin','<a href="'+CS+'NVDrv/">NVDrv</a> (NVIDIA GPU) cannot be blocklisted without breaking display: an architectural gap in the HVCI BYOVD defense.'];
       return ['gated','Needs admin','A signed driver Microsoft cannot blocklist; usable under HVCI once you can load it.'];}},
     {name:'VBS "Windows Downdate" (CVE-2024-21302)',cat:'Attack VBS itself',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.hvci==='off') return ['closed','VBS not enabled','No VBS to downgrade on this target.'];
       if(s.admin) return ['open','Admin','Downgrade VTL 1 / Secure Kernel components to older vulnerable versions, undoing VBS without breaking the hypervisor boundary. Targets the trust model. <a href="'+CS+'CVE-2024-21302/">CVE-2024-21302</a>.'];
       return ['gated','Needs admin','SafeBreach’s downgrade of Secure-Kernel components; requires admin to reach the update path.'];}},
     {name:'Kernel shellcode injection',cat:'Code execution',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
-      if(s.hvci==='on') return ['closed','Blocked by W^X','No page in the kernel address space can be both writable and executable — shellcode injection fails.'];
+      if(s.hvci==='on') return ['closed','Blocked by W^X','No page in the kernel address space can be both writable and executable: shellcode injection fails.'];
       if(s.rw) return ['open','Have kernel R/W','Without HVCI, W^X is not hypervisor-enforced; classic shellcode injection is viable.'];
       return ['gated','Needs a kernel R/W primitive','Viable only with HVCI off.'];}},
     {name:'PTE manipulation for code execution',cat:'Code execution',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){

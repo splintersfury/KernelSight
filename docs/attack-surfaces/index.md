@@ -1,5 +1,5 @@
 ---
-description: "9 Windows kernel attack surfaces — IOCTL handlers, filesystem IRPs, NDIS/network, PnP/Power, WDF/KMDF, registry callbacks, ALPC, shared memory, and WMI/ETW entry points."
+description: "9 Windows kernel attack surfaces: IOCTL handlers, filesystem IRPs, NDIS/network, PnP/Power, WDF/KMDF, registry callbacks, ALPC, shared memory, and WMI/ETW entry points."
 ---
 
 # Attack Surfaces
@@ -13,7 +13,7 @@ A kernel exploit begins with a question that sounds simple but carries enormous 
 Windows kernel drivers do not expose a single entry point. They expose many, and each one operates under different rules. An IOCTL handler receives structured input buffers through `DeviceIoControl` with attacker-controlled sizes. A filesystem minifilter parses reparse data buffers embedded in on-disk structures that might arrive on a USB stick. A network protocol driver reassembles fragmented IPv6 packets from the wire. An ALPC message carries multiple attribute types that trigger kernel object operations during deserialization. These are fundamentally different trust boundaries with fundamentally different bug patterns, and treating them as interchangeable leads to blind spots in both offense and defense.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_003 — User-Kernel Boundary</span>
+  <span class="ks-figure-label">FIG_003: User-Kernel Boundary</span>
   <svg viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User-kernel boundary showing user mode APIs connecting to kernel handlers">
     <!-- User Mode APIs -->
     <text class="ks-label" x="410" y="20" text-anchor="middle" fill="currentColor">USER MODE</text>

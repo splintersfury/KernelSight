@@ -10,7 +10,7 @@
 | **Vendor** | ASUS |
 | **Vulnerability Class** | Arbitrary R/W / Physical Memory Mapping |
 | **Abused Version** | Multiple versions shipped with ASUS system utilities |
-| **Status** | Blocklisted — included in Microsoft Vulnerable Driver Blocklist |
+| **Status** | Blocklisted: included in Microsoft Vulnerable Driver Blocklist |
 | **Exploited ITW** | Yes |
 
 ## The Story
@@ -66,8 +66,8 @@ rule ATSZIO64_sys {
 | Provider | Event / Signal | Relevance |
 |----------|---------------|-----------|
 | Microsoft-Windows-Kernel-File | Driver load event | Detects loading of ATSZIO64.sys |
-| Sysmon | Event ID 6 — Driver loaded | Hash and signature capture |
-| Microsoft-Windows-Security-Auditing | Event 4697 — Service installed | Driver service creation |
+| Sysmon | Event ID 6: Driver loaded | Hash and signature capture |
+| Microsoft-Windows-Security-Auditing | Event 4697: Service installed | Driver service creation |
 | Microsoft-Windows-Kernel-Process | Process token modification | Post-exploitation token swap |
 
 ### Behavioral Indicators
@@ -83,6 +83,6 @@ rule ATSZIO64_sys {
 
 ## References
 
-- [LimiQS — ASUS Drivers Privilege Escalation](https://github.com/LimiQS/AsusDriversPrivEscala)
-- [DOGSHITD — SciDetectorApp](https://github.com/DOGSHITD/SciDetectorApp)
-- [LOLDrivers — ATSZIO64](https://www.loldrivers.io/)
+- [LimiQS: ASUS Drivers Privilege Escalation](https://github.com/LimiQS/AsusDriversPrivEscala)
+- [DOGSHITD: SciDetectorApp](https://github.com/DOGSHITD/SciDetectorApp)
+- [LOLDrivers: ATSZIO64](https://www.loldrivers.io/)

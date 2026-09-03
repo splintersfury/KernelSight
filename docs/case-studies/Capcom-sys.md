@@ -10,7 +10,7 @@
 | **Vendor** | Capcom |
 | **Vulnerability Class** | Logic Bug / Intentional Ring-0 Code Execution |
 | **Abused Version** | 1.0.0.4 (shipped with Street Fighter V) |
-| **Status** | Withdrawn — Capcom removed the driver; blocklisted |
+| **Status** | Withdrawn: Capcom removed the driver; blocklisted |
 | **Exploited ITW** | Yes |
 
 ## The Story
@@ -27,11 +27,11 @@ tandasat first documented the behavior. FuzzySecurity wrote the most widely-refe
 - **Vulnerable Driver Blocklist**: Included in Microsoft's recommended driver block rules
 - **HVCI behavior**: Blocked on HVCI-enabled systems (SMEP disable is incompatible with HVCI)
 - **KDU integration**: Not integrated (historical reference)
-- **LOLDrivers**: Listed at loldrivers.io — one of the most famous BYOVD examples
+- **LOLDrivers**: Listed at loldrivers.io: one of the most famous BYOVD examples
 
 ## Affected IOCTLs
 
-- `0xAA013044` — Execute user-supplied function pointer in ring 0 with SMEP disabled
+- `0xAA013044`: Execute user-supplied function pointer in ring 0 with SMEP disabled
 
 ## From User-Mode to Ring 0 in Five Steps
 
@@ -64,8 +64,8 @@ rule Capcom_sys {
 | Provider | Event / Signal | Relevance |
 |----------|---------------|-----------|
 | Microsoft-Windows-Kernel-File | Driver load event | Detects loading of Capcom.sys |
-| Sysmon | Event ID 6 — Driver loaded | Hash and signature capture |
-| Microsoft-Windows-Security-Auditing | Event 4697 — Service installed | Service creation for Capcom driver |
+| Sysmon | Event ID 6: Driver loaded | Hash and signature capture |
+| Microsoft-Windows-Security-Auditing | Event 4697: Service installed | Service creation for Capcom driver |
 | Microsoft-Windows-Kernel-Process | Process token modification | Post-exploitation detection |
 
 ### Behavioral Indicators
@@ -82,7 +82,7 @@ rule Capcom_sys {
 
 ## References
 
-- [tandasat — Capcom.sys Analysis](https://github.com/tandasat)
-- [FuzzySecurity — Capcom Exploitation](https://www.fuzzysecurity.com/tutorials/28.html)
-- [Rapid7 — Capcom.sys Exploitation](https://www.rapid7.com/)
-- [LOLDrivers — Capcom.sys](https://www.loldrivers.io/)
+- [tandasat: Capcom.sys Analysis](https://github.com/tandasat)
+- [FuzzySecurity: Capcom Exploitation](https://www.fuzzysecurity.com/tutorials/28.html)
+- [Rapid7: Capcom.sys Exploitation](https://www.rapid7.com/)
+- [LOLDrivers: Capcom.sys](https://www.loldrivers.io/)

@@ -10,7 +10,7 @@
 | **Vendor** | WatchDog Development |
 | **Vulnerability Class** | Logic Bug / Process Termination |
 | **Abused Version** | Multiple versions |
-| **Status** | Blocklisted — added to Microsoft Vulnerable Driver Blocklist |
+| **Status** | Blocklisted: added to Microsoft Vulnerable Driver Blocklist |
 | **Exploited ITW** | Yes |
 
 ## The Story
@@ -64,8 +64,8 @@ rule amsdk_sys {
 | Provider | Event / Signal | Relevance |
 |----------|---------------|-----------|
 | Microsoft-Windows-Kernel-File | Driver load event | Detects loading of amsdk.sys |
-| Sysmon | Event ID 6 — Driver loaded | Hash and signature capture |
-| Microsoft-Windows-Security-Auditing | Event 4697 — Service installed | Service creation |
+| Sysmon | Event ID 6: Driver loaded | Hash and signature capture |
+| Microsoft-Windows-Security-Auditing | Event 4697: Service installed | Service creation |
 | Microsoft-Windows-Kernel-Process | Process termination events | Mass AV/EDR termination |
 
 ### Behavioral Indicators
@@ -81,5 +81,5 @@ rule amsdk_sys {
 
 ## References
 
-- [Check Point — Silver Fox APT BYOVD](https://research.checkpoint.com/)
-- [LOLDrivers — amsdk](https://www.loldrivers.io/)
+- [Check Point: Silver Fox APT BYOVD](https://research.checkpoint.com/)
+- [LOLDrivers: amsdk](https://www.loldrivers.io/)

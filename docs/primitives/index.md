@@ -1,5 +1,5 @@
 ---
-description: "19 Windows kernel exploitation primitives — arbitrary read/write via IOCTL, pool overflow, MDL mapping, PTE manipulation, token swapping, PreviousMode, I/O Ring, WNF, and pool spray techniques."
+description: "19 Windows kernel exploitation primitives: arbitrary read/write via IOCTL, pool overflow, MDL mapping, PTE manipulation, token swapping, PreviousMode, I/O Ring, WNF, and pool spray techniques."
 ---
 
 # Primitives
@@ -13,7 +13,7 @@ Finding a vulnerability in a kernel driver is only half the story. A buffer over
 This section catalogs those building blocks. Primitives split into two families that reflect the two-phase structure of nearly every modern Windows kernel exploit. The first phase achieves arbitrary kernel read/write, converting a constrained corruption into full memory access. The second phase leverages that access for exploitation, targeting the specific kernel data structures that control privilege, identity, and access.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG_005 — Primitive Taxonomy</span>
+  <span class="ks-figure-label">FIG_005: Primitive Taxonomy</span>
   <svg viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Primitive taxonomy tree with Arbitrary R/W and Exploitation branches">
     <!-- Root -->
     <rect class="ks-box" x="310" y="10" width="200" height="36"/>

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block htmltitle %}<title>KernelSight — Kernel Driver Threat Intelligence</title>{% endblock %}
+{% block htmltitle %}<title>Explore the corpus, KernelSight</title>{% endblock %}
 {% block extrahead %}
-<meta name="description" content="Interactive threat intelligence dashboard for Windows kernel driver vulnerabilities">
-<meta property="og:title" content="KernelSight — Kernel Driver Threat Intelligence">
-<meta property="og:description" content="Interactive threat intelligence dashboard tracking 156 Windows kernel driver CVEs across 64 drivers">
+<meta name="description" content="Interactive view of the corpus behind the bypass inventories for Windows kernel driver vulnerabilities">
+<meta property="og:title" content="Explore the corpus, KernelSight">
+<meta property="og:description" content="Interactive view of the corpus behind the bypass inventories tracking 156 Windows kernel driver CVEs across 64 drivers">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="KernelSight — Threat Intelligence Dashboard">
+<meta name="twitter:title" content="Explore the corpus, KernelSight">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1087,7 +1087,7 @@ body, html {
   }
 
   /* ════════════════════════════════════════
-     Stats — count-up animation
+     Stats: count-up animation
      ════════════════════════════════════════ */
   function renderStats() {
     var stats = DATA.stats || {};

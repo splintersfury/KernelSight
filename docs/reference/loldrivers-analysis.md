@@ -1850,9 +1850,9 @@ The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, d
 
 **Risk highlights:**
 
-- `0x80102040`: Low — standard kernel APIs only
-- `0x80102044`: Low — standard kernel APIs only
-- `0x80102050`: Low — standard kernel APIs only
+- `0x80102040`: Low: standard kernel APIs only
+- `0x80102044`: Low: standard kernel APIs only
+- `0x80102050`: Low: standard kernel APIs only
 
 **Gadgets:** 306 (reg-control: 35, misc: 177, memory-read: 1, memory-write: 48, stack-pivot: 45)
 
@@ -2250,7 +2250,7 @@ The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, d
 
 **Risk highlights:**
 
-- `0x80002004`: Low — standard kernel APIs only
+- `0x80002004`: Low: standard kernel APIs only
 - `0xFFFFFFFF`: NEITHER I/O with no buffer validation
 
 **Gadgets:** 500 (reg-control: 125, misc: 238, memory-read: 80, memory-write: 35, stack-pivot: 22)
@@ -2323,7 +2323,7 @@ The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, d
 
 **Risk highlights:**
 
-- `0x80002004`: Low — standard kernel APIs only
+- `0x80002004`: Low: standard kernel APIs only
 - `0xFFFFFFFF`: NEITHER I/O with no buffer validation
 
 **Gadgets:** 500 (reg-control: 121, misc: 279, memory-read: 66, memory-write: 7, stack-pivot: 27)
@@ -2392,7 +2392,7 @@ The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, d
 
 **Risk highlights:**
 
-- `0x80002004`: Low — standard kernel APIs only
+- `0x80002004`: Low: standard kernel APIs only
 - `0xFFFFFFFF`: NEITHER I/O with no buffer validation
 
 **Gadgets:** 500 (reg-control: 126, misc: 237, memory-read: 80, memory-write: 35, stack-pivot: 22)
@@ -2463,7 +2463,7 @@ The analysis runs in two tiers. Tier 1 parses each PE file to extract imports, d
 
 **Risk highlights:**
 
-- `0x80002004`: Low — standard kernel APIs only
+- `0x80002004`: Low: standard kernel APIs only
 - `0xFFFFFFFF`: NEITHER I/O with no buffer validation
 
 **Gadgets:** 500 (reg-control: 175, misc: 223, memory-read: 41, memory-write: 8, stack-pivot: 53)
