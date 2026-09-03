@@ -13,7 +13,12 @@ extra:
 
 plugins:
   - search
-  - social
+  # Social cards need cairo and Pillow. Those have never been installed on
+  # the deploy runner, so cards were silently skipped in production while
+  # emitting one warning per page. Harmless until the build went strict.
+  # Gated so CI can turn it off explicitly rather than fail on it.
+  - social:
+      enabled: !ENV [SOCIAL_CARDS, true]
 
 theme:
   name: material
