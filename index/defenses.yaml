@@ -1,0 +1,212 @@
+# KernelSight defense roster.
+# layer = the layer of the ASSET protected, not the enforcer.
+# Generated shape; edit by hand. Validated by scripts/check_roster.py.
+version: 1
+defenses:
+
+  # ---- kernel layer, 19 ----
+  - id: smep
+    name: "SMEP"
+    layer: kernel
+    enforced_by: hardware
+    protects: "Kernel execution of user-mode pages"
+    page: docs/mitigations/smep-smap.md
+    status: current
+  - id: smap
+    name: "SMAP"
+    layer: kernel
+    enforced_by: hardware
+    protects: "Kernel data access to user-mode pages"
+    page: docs/mitigations/smep-smap.md
+    status: current
+  - id: kcfg
+    name: "kCFG"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Kernel indirect call targets"
+    page: docs/mitigations/kcfg-kcet.md
+    status: current
+  - id: kcet
+    name: "kCET"
+    layer: kernel
+    enforced_by: hardware
+    protects: "Kernel return addresses via shadow stack"
+    page: docs/mitigations/kcfg-kcet.md
+    status: current
+  - id: hvci
+    name: "VBS / HVCI"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Kernel code integrity and W^X on code pages"
+    page: docs/mitigations/vbs-hvci.md
+    status: current
+  - id: kdp
+    name: "Kernel Data Protection"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Designated read-only kernel data regions"
+    page: docs/mitigations/kdp.md
+    status: current
+  - id: pool-hardening
+    name: "Pool hardening"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Pool metadata integrity"
+    page: docs/mitigations/pool-hardening.md
+    status: current
+  - id: secure-pool
+    name: "Secure Pool"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Hypervisor-validated pool allocations"
+    page: docs/mitigations/secure-pool.md
+    status: current
+  - id: acg
+    name: "Arbitrary Code Guard"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Dynamic code generation in protected processes"
+    page: docs/mitigations/acg.md
+    status: current
+  - id: kaslr
+    name: "KASLR"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Kernel address layout confidentiality"
+    page: docs/mitigations/kaslr.md
+    status: current
+  - id: dse
+    name: "Driver Signature Enforcement"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Which drivers may load"
+    page: null
+    status: planned
+  - id: hlat
+    name: "HLAT / HVPT"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Guest page-table translation integrity"
+    page: null
+    status: planned
+  - id: mbec
+    name: "MBEC / GMET"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Mode-based execute control on guest pages"
+    page: null
+    status: planned
+  - id: patchguard
+    name: "PatchGuard"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Periodic integrity of critical kernel structures"
+    page: null
+    status: planned
+  - id: hyperguard
+    name: "HyperGuard / SKPG"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Secure-kernel-side integrity of kernel structures"
+    page: null
+    status: planned
+  - id: driver-blocklist
+    name: "Vulnerable driver blocklist"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Which signed drivers may load despite valid signatures"
+    page: null
+    status: planned
+  - id: secure-kernel
+    name: "Secure Kernel / VTL1"
+    layer: kernel
+    enforced_by: hypervisor
+    protects: "Isolated execution above the normal kernel"
+    page: null
+    status: planned
+  - id: kernel-dma-protection
+    name: "Kernel DMA Protection"
+    layer: kernel
+    enforced_by: hardware
+    protects: "Memory against bus-mastering device writes"
+    page: null
+    status: planned
+  - id: type-isolation
+    name: "Type isolation"
+    layer: kernel
+    enforced_by: kernel
+    protects: "Separation of attacker-groomable object types"
+    page: null
+    status: planned
+
+  # ---- user layer, 10 ----
+  - id: protected-process
+    name: "Protected Process Light"
+    layer: user
+    enforced_by: kernel
+    protects: "Process and thread objects of signer-qualified processes"
+    page: docs/mitigations/protected-process.md
+    status: current
+  - id: lsa-protection
+    name: "LSA Protection"
+    layer: user
+    enforced_by: kernel
+    protects: "Credential material held in the LSA process"
+    page: null
+    status: planned
+  - id: credential-guard
+    name: "Credential Guard"
+    layer: user
+    enforced_by: hypervisor
+    protects: "Credential material isolated in VTL1"
+    page: null
+    status: planned
+  - id: etw-ti
+    name: "ETW Threat Intelligence"
+    layer: user
+    enforced_by: kernel
+    protects: "The threat-intelligence telemetry channel"
+    page: null
+    status: planned
+  - id: edr-kernel-callbacks
+    name: "EDR kernel callbacks"
+    layer: user
+    enforced_by: kernel
+    protects: "Sensor notification registrations"
+    page: null
+    status: planned
+  - id: edr-usermode-hooks
+    name: "EDR user-mode hooks"
+    layer: user
+    enforced_by: kernel
+    protects: "Inline hooks placed in user-mode modules"
+    page: null
+    status: planned
+  - id: wdac-usermode
+    name: "WDAC user-mode code integrity"
+    layer: user
+    enforced_by: kernel
+    protects: "Which user-mode binaries may execute"
+    page: null
+    status: planned
+  - id: applocker
+    name: "AppLocker"
+    layer: user
+    enforced_by: kernel
+    protects: "Application allowlisting policy"
+    page: null
+    status: planned
+  - id: uac-integrity
+    name: "UAC and integrity levels"
+    layer: user
+    enforced_by: kernel
+    protects: "Token integrity levels and elevation consent"
+    page: null
+    status: planned
+  - id: amsi
+    name: "AMSI"
+    layer: user
+    enforced_by: kernel
+    protects: "Script and macro content scanning"
+    page: null
+    status: planned
