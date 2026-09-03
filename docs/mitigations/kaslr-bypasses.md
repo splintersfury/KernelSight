@@ -9,7 +9,7 @@ Understanding which bypass vectors remain open on a given build is essential for
 <script>
 (window.__ksnav=window.__ksnav||[]).push({
   sel:'#ksn-kaslr',
-  title:'Bypass Navigator',
+  title:'KASLR',
   sub:'Set your situation. Each KASLR bypass is marked <b>open</b>, <b>gated</b>, or <b>closed</b> for that exact target. Every row links into the sourced detail below.',
   fromPlatform:function(p){
     var b = p.build>=26100 ? '6' : (p.build>=22621 ? '4' : '2');

@@ -1,7 +1,7 @@
 # Storage / Caching Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Sometimes the most dangerous bugs are the simplest ones. CVE-2024-26229 in csc.sys is a single missing access check: the IOCTL handler does not verify whether the caller is a kernel-mode or user-mode caller before performing a privileged operation. No heap overflow, no race condition, no integer arithmetic gone wrong. Just an `if` statement that should have been there and was not. The exploitation path from this missing check to SYSTEM is elegant: PreviousMode manipulation gives the attacker unrestricted access to `NtReadVirtualMemory` and `NtWriteVirtualMemory`, which provides arbitrary kernel read/write without ever corrupting memory.

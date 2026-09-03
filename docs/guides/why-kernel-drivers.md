@@ -117,10 +117,10 @@ The July 2024 CrowdStrike incident (8.5 million machines crashed from a faulty c
 
 Every kernel driver is a liability. A bug in Ring 0 code grants the attacker full control of the machine, not a process, not a sandbox, but the entire kernel address space.
 
-The KernelSight corpus quantifies this cost: 134 CVEs across 62 drivers, with 52 exploited in the wild. The consequences cluster around elevation of privilege.
+The KernelSight corpus quantifies this cost: 156 CVEs across 64 drivers, with 57 exploited in the wild. The consequences cluster around elevation of privilege.
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- CVE Distribution by Consequence (134 CVEs)</span>
+  <span class="ks-figure-label">FIG -- CVE Distribution by Consequence (156 CVEs)</span>
   <svg viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing CVE distribution by consequence type">
     <!-- EoP -->
     <text class="ks-label" x="155" y="35" text-anchor="end">EoP</text>
@@ -213,9 +213,9 @@ The irreducible kernel will always pose a security risk. The real question is wh
 
 **Internal:**
 
-- [Driver Types](../driver-types/index.md) -- categorisation of the 62 drivers in the corpus
+- [Driver Types](../driver-types/index.md) -- categorisation of the 64 drivers in the corpus
 - [Attack Surfaces](../attack-surfaces/index.md) -- how kernel drivers expose themselves to user-mode callers
-- [Corpus Analytics](corpus-analytics.md) -- visual breakdown of 134 CVEs
+- [Corpus Analytics](corpus-analytics.md) -- visual breakdown of 156 CVEs
 - [Anatomy of a Secure Driver](secure-driver-anatomy.md) -- the six anti-patterns behind most kernel driver bugs
 - [Exploit Chain Patterns](exploit-chain-patterns.md) -- how kernel bugs chain to SYSTEM
 - [Mitigation Timeline](mitigation-timeline.md) -- when each defence landed

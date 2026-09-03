@@ -1,7 +1,7 @@
 # Vendor Utility Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Dell ships a BIOS update utility. It includes a kernel driver called DBUtil_2_3.sys. That driver exposes five IOCTLs that provide arbitrary kernel memory read and write. It is signed by Dell's legitimate code signing certificate. Microsoft's driver signature enforcement trusts it completely. And any user on the system can open a handle to its device object and read or write any byte in kernel memory.

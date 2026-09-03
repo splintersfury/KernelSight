@@ -5,7 +5,7 @@ description: "Windows kernel exploit mitigations -- SMEP, SMAP, kCFG, kCET, VBS,
 # Mitigations
 
 <div class="ks-pipeline-pos">
-  Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &nbsp;|&nbsp; <span class="ks-active">Mitigations</span>
+  <a href="../driver-types/">Means</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <span class="ks-half">Targets</span> <span class="ks-active">Kernel layer</span> &middot; User layer
 </div>
 
 A kernel vulnerability gives an attacker a single corruption. Turning that corruption into SYSTEM requires a chain of steps: leaking addresses, shaping memory, constructing read/write primitives, and finally modifying a privilege token or security descriptor. Mitigations work by breaking links in that chain. No single defense stops exploitation on its own. Instead, they compose into a defense-in-depth stack where each layer forces the attacker to solve an additional problem, and each additional problem demands another primitive that may not be available from the original bug.

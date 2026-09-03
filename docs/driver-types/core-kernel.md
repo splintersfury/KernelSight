@@ -1,7 +1,7 @@
 # Core Kernel
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Every Windows system runs the same kernel binary. A vulnerability in ntoskrnl.exe is not scoped to a specific driver, a specific hardware configuration, or a specific feature that might be disabled. It affects every Windows machine, period. This universality makes core kernel bugs the highest-impact category in the KernelSight corpus, and it explains why two of the four CVEs here were used at Pwn2Own or exploited in the wild by nation-state actors.

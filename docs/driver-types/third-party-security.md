@@ -1,7 +1,7 @@
 # Third-Party Security Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Capcom.sys is an anti-cheat driver that intentionally disables SMEP and executes a user-supplied function pointer in ring 0. It does this by design: the anti-cheat protection mechanism requires running user code with kernel privileges to inspect game memory for cheating tools. The "vulnerability" is that any process on the system, not just the Capcom game, can call the IOCTL and get arbitrary code execution in the kernel. This is the paradox at the heart of third-party security drivers: the capabilities that make them effective at their security function (process termination, callback management, kernel object inspection) are exactly the capabilities that attackers want.

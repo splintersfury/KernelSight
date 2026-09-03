@@ -35,6 +35,6 @@ AutoPiff's semantic rules map directly to KernelSight vulnerability classes and 
 
 ## Connection to KernelSight
 
-All 28 CVE case studies in KernelSight were bootstrapped from AutoPiff's validation corpus. Each case study includes the vulnerable and fixed builds with KB numbers, the expected detection rules and categories, and the function patterns where AutoPiff identified the patch. This means the case studies serve double duty: they document the vulnerability for researchers and validate AutoPiff's detection accuracy for the pipeline.
+All 156 CVE case studies in KernelSight were bootstrapped from AutoPiff's validation corpus. Each case study includes the vulnerable and fixed builds with KB numbers, the expected detection rules and categories, and the function patterns where AutoPiff identified the patch. This means the case studies serve double duty: they document the vulnerability for researchers and validate AutoPiff's detection accuracy for the pipeline.
 
 When AutoPiff processes a new Patch Tuesday, its findings cross-reference against the KernelSight taxonomy. A `bounds_check` detection on `clfs.sys` maps to the [buffer overflow](../vuln-classes/buffer-overflow.md) vulnerability class, the [pool overflow](../primitives/arw/pool-overflow.md) primitive, and the file format corruption exploit chain pattern (archetype A from [Exploit Chain Patterns](../guides/exploit-chain-patterns.md)). This mapping turns a raw binary diff into a structured assessment of the vulnerability's exploitation potential.

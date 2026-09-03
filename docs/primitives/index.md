@@ -5,7 +5,7 @@ description: "19 Windows kernel exploitation primitives — arbitrary read/write
 # Primitives
 
 <div class="ks-pipeline-pos">
-  Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study
+  <span class="ks-half">Means</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Finding a vulnerability in a kernel driver is only half the story. A buffer overflow, a use-after-free, a missing bounds check -- these tell you what went wrong, but they do not tell you what an attacker can do with it. The answer depends on the *primitive* the vulnerability yields: the controlled capability that transforms a memory corruption bug into something an attacker can actually use. A pool overflow in `cldflt.sys` might corrupt an adjacent pipe attribute entry, giving the attacker a controlled read beyond the allocation boundary. A missing `ProbeForWrite` in `afd.sys` might let user-mode code write to an arbitrary kernel address. The vulnerability class describes the flaw; the primitive describes the power it grants.
@@ -76,7 +76,7 @@ This section catalogs those building blocks. Primitives split into two families 
     <line class="ks-line" x1="540" y1="130" x2="540" y2="300" opacity="0.15"/>
     <line class="ks-line" x1="725" y1="130" x2="725" y2="265" opacity="0.15"/>
   </svg>
-  <p class="ks-figure-caption">19 primitives split between achieving arbitrary R/W (left) and leveraging it for exploitation (right).</p>
+  <p class="ks-figure-caption">21 primitives split between achieving arbitrary R/W (left) and leveraging it for exploitation (right).</p>
 </div>
 
 The relationship between these two families is sequential but not always one-to-one. A single pool overflow might yield a relative read through a corrupted pipe attribute, which leaks enough kernel pointers to set up an I/O Ring write, which ultimately overwrites a process token. Each primitive in the chain builds on the previous one. Understanding what each primitive provides, what it requires as input, and where it sits in the exploitation timeline is what separates a crash from a privilege escalation.
@@ -116,5 +116,5 @@ Once arbitrary kernel R/W is established, the question becomes: what do you do w
 | [Bit-Manipulation Primitives](exploitation/bit-manipulation.md) | kCFG-compliant bitmap function abuse |
 
 <div class="ks-next-pipeline">
-  Next in the pipeline: <a href="../case-studies/">Case Studies</a> &rarr; See the full chain in action across 28 real CVEs.
+  Next in the pipeline: <a href="../case-studies/">Case Studies</a> &rarr; See the full chain in action across 156 real CVEs.
 </div>

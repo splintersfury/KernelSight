@@ -1,7 +1,7 @@
 # File System Minifilters
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 When OneDrive syncs a file to the cloud, the kernel component doing the heavy lifting is a minifilter driver called cldflt.sys. It intercepts file I/O operations, translates between local file representations and cloud placeholders, and manages the reparse point data that tells Windows "this file lives in the cloud." Two heap overflows in cldflt.sys, patched months apart in the same reparse data parsing code, illustrate a pattern that recurs across the minifilter category: complex data structures processed in callback routines that were not designed with adversarial input in mind.

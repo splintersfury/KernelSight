@@ -1,7 +1,7 @@
 # Performance & GPU Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 In 2025, Kaspersky's SecureList documented an in-the-wild campaign using ThrottleStop.sys, a CPU throttling management driver, to disable antivirus products. The attack did not exploit a buffer overflow or a race condition. It used the driver's legitimate MSR write IOCTL to write arbitrary values to Model-Specific Registers, which can redirect the syscall entry point, disable SMEP, or corrupt critical CPU state. ThrottleStop.sys is designed to do this; it is a CPU tuning tool, and MSR writes are its core functionality. The attacker simply loaded it and called the IOCTL.

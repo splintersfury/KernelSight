@@ -10,8 +10,9 @@
     </label>
     <a href="{{ config.site_url }}" class="ks-supernav__logo">KernelSight</a>
     <nav class="ks-supernav__links">
-      <a href="{{ config.site_url }}explore/" class="ks-supernav__link">Explore</a>
-      <a href="{{ config.site_url }}overview/" class="ks-supernav__link ks-supernav__link--active">Docs</a>
+      <a href="{{ config.site_url }}driver-types/" class="ks-supernav__link">Means</a>
+      <a href="{{ config.site_url }}mitigations/" class="ks-supernav__link">Targets</a>
+      <a href="{{ config.site_url }}bypasses/" class="ks-supernav__link">Matrix</a>
       <a href="{{ config.site_url }}about/" class="ks-supernav__link">About</a>
     </nav>
     <div class="ks-supernav__actions">
@@ -27,12 +28,34 @@
 </div>
 {% endblock %}
 
+{% block content %}
+  {{ super() }}
+  {% if page and not page.is_homepage %}
+  <div class="ks-pagedate" data-page-url="{{ page.url }}"></div>
+  <script>
+  (function () {
+    var el = document.querySelector('.ks-pagedate');
+    if (!el) return;
+    fetch('{{ config.site_url }}assets/page-dates.json').then(function (r) { return r.json(); }).then(function (d) {
+      var when = d.pages[el.getAttribute('data-page-url')];
+      if (!when) return;
+      var days = Math.floor((Date.now() - Date.parse(when)) / 86400000);
+      var age = days > 365 ? 'over a year ago' : (days > 180 ? 'over six months ago'
+              : (days > 30 ? Math.floor(days / 30) + ' months ago' : 'this month'));
+      el.textContent = 'This page last changed ' + when + ', ' + age + '.';
+      if (days > 180) el.setAttribute('data-stale', 'true');
+    }).catch(function () {});
+  })();
+  </script>
+  {% endif %}
+{% endblock %}
+
 {% block extrahead %}
   <!-- OpenGraph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KernelSight">
   {% if page %}
-  <meta property="og:title" content="{{ page.title }} — KernelSight">
+  <meta property="og:title" content="{{ page.title }}, KernelSight">
   <meta property="og:description" content="{{ page.meta.description | default(config.site_description, true) }}">
   <meta property="og:url" content="{{ page.canonical_url }}">
   {% else %}
@@ -42,7 +65,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary">
   {% if page %}
-  <meta name="twitter:title" content="{{ page.title }} — KernelSight">
+  <meta name="twitter:title" content="{{ page.title }}, KernelSight">
   <meta name="twitter:description" content="{{ page.meta.description | default(config.site_description, true) }}">
   {% else %}
   <meta name="twitter:title" content="KernelSight">
@@ -70,7 +93,7 @@
   <script>
     (function() {
       var m = location.pathname.match(
-        /\/(driver-types|attack-surfaces|vuln-classes|primitives|case-studies|mitigations|tooling|reference)\b/
+        /\/(driver-types|attack-surfaces|vuln-classes|primitives|case-studies|mitigations|bypasses|guides|tooling|reference)\b/
       );
       var map = {
         'driver-types': 'drivers',
@@ -79,6 +102,8 @@
         'primitives': 'primitives',
         'case-studies': 'cases',
         'mitigations': 'mitigations',
+        'bypasses': 'mitigations',
+        'guides': 'tooling',
         'tooling': 'tooling',
         'reference': 'tooling'
       };

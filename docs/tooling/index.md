@@ -1,7 +1,7 @@
 # Tooling
 
 <div class="ks-pipeline-pos">
-  Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &nbsp;|&nbsp; <span class="ks-active">Tooling</span>
+  <a href="../driver-types/">Means</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../mitigations/">Targets</a> &nbsp;|&nbsp; <span class="ks-active">Reference</span>
 </div>
 
 The vulnerability classes and exploitation primitives described in the pipeline are theoretical until you can find them in real binaries. This section covers the practical side: the tools and workflows that turn a driver binary into a vulnerability assessment, a Patch Tuesday advisory into a root cause analysis, and a crash dump into a confirmed exploitable condition.
@@ -27,5 +27,5 @@ The tools divide into two workflows. **Offensive research** (finding new vulnera
 If you are new to Windows kernel research, start with [Debugging](debugging.md) to set up a kernel debugging environment, then move to [Static Analysis](static-analysis.md) to learn how to navigate a driver binary. If you already have debugging experience and want to find vulnerabilities, [Fuzzing](fuzzing.md) covers the automated discovery tools. If you are focused on Patch Tuesday analysis, go directly to [Patch Diffing](patch-diffing.md) and [AutoPiff Integration](autopiff-integration.md).
 
 <div class="ks-next-pipeline">
-  <a href="../index.md">&larr; Pipeline Overview</a>
+  <a href="../">&larr; Back to Overview</a>
 </div>

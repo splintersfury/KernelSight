@@ -9,7 +9,7 @@ Microsoft introduced VBS and HVCI in Windows 10 version 1607 (RS1) as optional f
 <script>
 (window.__ksnav=window.__ksnav||[]).push({
   sel:'#ksn-hvci',
-  title:'Bypass Navigator',
+  title:'VBS / HVCI',
   sub:'HVCI enforces code integrity, not data integrity. Set your foothold; each row shows whether HVCI stops that path on this target. Rows link into the detail below.',
   fromPlatform:function(p){
     return {hvci:(p.hvci?'on':'off'), rw:p.prims, admin:p.admin, drv:false};

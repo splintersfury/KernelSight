@@ -1,7 +1,7 @@
 # File System Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Plug a USB drive into a Windows machine and the kernel immediately begins parsing untrusted data structures at ring 0. The same thing happens when a standard user double-clicks a VHD file. File system drivers sit at the boundary between raw storage and the structured file hierarchy that the rest of the OS depends on, and every field they read from disk is attacker-controlled if the media is crafted. This makes them one of the few kernel attack surfaces reachable without any special privileges, API calls, or network access.

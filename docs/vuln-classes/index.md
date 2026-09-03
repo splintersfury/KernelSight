@@ -5,7 +5,7 @@ description: "10 Windows kernel vulnerability classes — buffer overflow, use-a
 # Vulnerability Classes
 
 <div class="ks-pipeline-pos">
-  Driver Type &rarr; Attack Surface &rarr; <span class="ks-active">Vuln Class</span> &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> Driver Type &rarr; Attack Surface &rarr; <span class="ks-active">Vuln Class</span> &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 Every kernel exploit begins with a bug, and every bug belongs to a class. Once attacker-controlled input crosses the user/kernel boundary through an [attack surface](../attack-surfaces/), something has to go wrong inside the driver for that input to become dangerous. The vulnerability class describes *what* goes wrong: a size that is not checked, a pointer that outlives its object, a value that is read twice from memory the attacker controls. Understanding these classes is not just taxonomy for its own sake. It shapes how you read patches, where you focus during code review, and which AutoPiff rules you write.

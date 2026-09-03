@@ -9,7 +9,7 @@ The practical effect on exploitation has been decisive. Before kCFG, a single fu
 <script>
 (window.__ksnav=window.__ksnav||[]).push({
   sel:'#ksn-kcfg',
-  title:'Bypass Navigator',
+  title:'kCFG / kCET',
   sub:'kCFG validates indirect-call targets; kCET protects return addresses. Set what is enforced and what you can corrupt; each row shows whether the control-flow path still works.',
   fromPlatform:function(p){
     return {kcet:(p.kcet?'on':'off'), drv:'ms', cf:p.prims, stack:p.prims};

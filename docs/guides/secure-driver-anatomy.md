@@ -2,15 +2,15 @@
 
 > Six anti-patterns behind most Windows kernel driver vulnerabilities -- and how to avoid them.
 
-Most kernel driver vulnerabilities are not exotic. They are not novel exploitation techniques or deep architectural flaws. They are missing checks. A length that was not validated. A lock that was not held. An offset from a file that was trusted without verification. Across 134 CVEs in the KernelSight corpus, the same small set of root causes appears again and again, accounting for the vast majority of the bugs that reach production, get patched on Patch Tuesday, and sometimes get exploited in the wild before the patch ships.
+Most kernel driver vulnerabilities are not exotic. They are not novel exploitation techniques or deep architectural flaws. They are missing checks. A length that was not validated. A lock that was not held. An offset from a file that was trusted without verification. Across 156 CVEs in the KernelSight corpus, the same small set of root causes appears again and again, accounting for the vast majority of the bugs that reach production, get patched on Patch Tuesday, and sometimes get exploited in the wild before the patch ships.
 
 This page distills those root causes into six anti-patterns. Each one describes a specific coding mistake, shows real CVE examples, and provides the fix. If you are writing a kernel driver, these six checks will prevent the majority of exploitable bugs. If you are auditing one, these are the patterns to search for first.
 
 ## Root Cause Distribution
 
 <div class="ks-figure" markdown>
-  <span class="ks-figure-label">FIG -- Root Cause Distribution (134 CVEs)</span>
-  <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing root cause distribution across 134 CVEs">
+  <span class="ks-figure-label">FIG -- Root Cause Distribution (156 CVEs)</span>
+  <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal bar chart showing root cause distribution across 156 CVEs">
     <!-- Unvalidated Input -->
     <text class="ks-label" x="215" y="35" text-anchor="end">Unvalidated Input</text>
     <rect class="ks-box" x="220" y="22" width="380" height="20" rx="0"/>
@@ -40,7 +40,7 @@ This page distills those root causes into six anti-patterns. Each one describes 
     <rect class="ks-box" x="220" y="214" width="13" height="20" rx="0"/>
     <text class="ks-annotation" x="241" y="228">~2%</text>
   </svg>
-  <p class="ks-figure-caption">Categories mapped from 134 CVEs in the KernelSight corpus. "Unvalidated Input" includes missing length checks, unchecked offsets, and unbounded copies.</p>
+  <p class="ks-figure-caption">Categories mapped from 156 CVEs in the KernelSight corpus. "Unvalidated Input" includes missing length checks, unchecked offsets, and unbounded copies.</p>
 </div>
 
 The distribution tells a clear story. Sixty percent of kernel driver CVEs stem from a single root cause category: unvalidated input. The driver reads a value from userland, from an on-disk structure, or from a network packet, and uses it without checking whether it makes sense. The remaining categories occur less frequently but share a common theme: the driver trusts something it should not.

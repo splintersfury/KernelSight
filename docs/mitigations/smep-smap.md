@@ -9,7 +9,7 @@ Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Preventio
 <script>
 (window.__ksnav=window.__ksnav||[]).push({
   sel:'#ksn-smep',
-  title:'Bypass Navigator',
+  title:'SMEP / SMAP',
   sub:'SMEP/SMAP block crossing the user/kernel boundary for code or data. Set what else is enforced and what you hold; each row shows whether the boundary bypass still works.',
   fromPlatform:function(p){
     var era = p.kcet ? 'kcet' : (p.build>=22621 ? 'kcfg' : 'legacy');

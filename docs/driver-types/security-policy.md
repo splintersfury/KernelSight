@@ -1,7 +1,7 @@
 # Security / Policy Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 In February 2024, Avast disclosed that the Lazarus Group had been exploiting CVE-2024-21338 in appid.sys for months. The bug was not a memory corruption vulnerability. It was a missing access check on an IOCTL that dispatched a caller-controlled function pointer from a kernel pool allocation. An attacker with admin privileges could send a single IOCTL and get direct kernel code execution, no heap spray, no race condition, no exploit chain. This is the defining characteristic of security and policy driver bugs: they often bypass the entire memory corruption exploitation process because the driver's own functionality, when accessed by the wrong caller, *is* the primitive.

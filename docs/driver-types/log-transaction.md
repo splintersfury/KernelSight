@@ -1,7 +1,7 @@
 # Log / Transaction Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study
+  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
 </div>
 
 If you had to pick a single Windows kernel driver to study for exploitation patterns, it should be clfs.sys. The Common Log File System driver has been exploited in the wild at least seven times (four in the KernelSight corpus), making it the most repeatedly targeted individual driver component in the Windows kernel. Every exploit follows the same template: craft a `.blf` log file with corrupted metadata, open it from a standard user account via `CreateLogFile`, and let clfs.sys parse the corrupted offsets into a pool overflow. The reason it keeps producing bugs is architectural: a complex binary metadata format with dozens of offset and length fields, all trusted by the parser and all controllable by anyone who can write a file.
