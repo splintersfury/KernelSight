@@ -18,7 +18,7 @@ The pipeline is built on [Karton](https://github.com/CERT-Polska/karton), a dist
 
 ## Rule Mapping
 
-AutoPiff's semantic rules map directly to KernelSight vulnerability classes and patch patterns. The complete mapping is maintained in [`index/autopiff_rule_map.yaml`](../../index/autopiff_rule_map.yaml).
+AutoPiff's semantic rules map directly to KernelSight vulnerability classes and patch patterns. The complete mapping is maintained in [`index/autopiff_rule_map.yaml`](https://github.com/splintersfury/KernelSight/blob/main/index/autopiff_rule_map.yaml).
 
 | AutoPiff Category | KernelSight Technique | What the Rule Detects |
 |---|---|---|
