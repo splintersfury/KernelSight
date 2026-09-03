@@ -17,26 +17,26 @@ The practical effect on exploitation has been decisive. Before kCFG, a single fu
     {id:'held',label:'What you can corrupt',type:'checks',wide:true,options:[['cf','indirect call / callback pointer'],['stack','stack / return address']]}
   ],
   techniques:(function(){var CS='../../case-studies/',PR='../../primitives/exploitation/';return [
-    {name:'CFG-valid gadgets ("CFG-aware")',cat:'Forward-edge',ev:function(s){
+    {name:'CFG-valid gadgets ("CFG-aware")',cat:'Forward-edge',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.cf) return ['open','Have call hijack','kCFG only checks the target is a valid function entry, not the intended one. Redirect an indirect call to NtWriteVirtualMemory, RtlSetBit or RtlClearAllBits — all valid targets. The <a href="'+PR+'bit-manipulation/">bit-manipulation primitive</a> is fully kCFG-compliant. <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a> does exactly this.'];
       return ['gated','Needs a control-flow hijack','Works even with kCET active — the shadow stack does not constrain forward-edge target choice.'];}},
-    {name:'Data-only attacks',cat:'Data-only',ev:function(s){
+    {name:'Data-only attacks',cat:'Data-only',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['open','Bypasses both','Token swap, <code>PreviousMode</code> manipulation, and ACL/SD modification hijack no control flow at all — neither kCFG nor kCET applies. Every ITW CVE in the 2024–2026 corpus used this. Needs a kernel write primitive.'];}},
-    {name:'Third-party driver gaps (no /guard:cf)',cat:'Coverage gap',ev:function(s){
+    {name:'Third-party driver gaps (no /guard:cf)',cat:'Coverage gap',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.drv!=='third') return ['closed','MS kernel is /guard:cf','Microsoft kernel indirect calls are CFG-protected.'];
       if(s.cf) return ['open','Have call hijack','A driver not compiled with /guard:cf has unprotected indirect call sites. Hijack control flow inside it and no kCFG check applies at those sites.'];
       return ['gated','Needs a control-flow hijack','Exploitable only where you can corrupt a call target inside the unprotected driver.'];}},
-    {name:'Unprotected callbacks (exception / APC / I/O completion)',cat:'Coverage gap',ev:function(s){
+    {name:'Unprotected callbacks (exception / APC / I/O completion)',cat:'Coverage gap',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['gated','Partial coverage','Some callback paths are not fully kCFG-validated. Microsoft is closing these each release, so coverage varies by build.'];}},
-    {name:'ROP chains (classic)',cat:'Code reuse',ev:function(s){
+    {name:'ROP chains (classic)',cat:'Code reuse',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.kcet==='on') return ['closed','Shadow stack blocks it','kCET detects return-address tampering at the first RET, long before the chain does anything.'];
       if(s.stack) return ['open','Have stack control','Without a hardware shadow stack, classic return-address ROP still chains gadgets.'];
       return ['gated','Needs stack control','Viable only where kCET is not enforced.'];}},
-    {name:'Stack pivot',cat:'Code reuse',ev:function(s){
+    {name:'Stack pivot',cat:'Code reuse',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.kcet==='on') return ['closed','Shadow stack blocks it','The SSP is independent of RSP; pivoting RSP mismatches the shadow stack on the next RET.'];
       if(s.stack) return ['open','Have stack control','Pivot RSP into attacker-controlled memory where kCET is absent.'];
       return ['gated','Needs stack control','Viable only where kCET is not enforced.'];}},
-    {name:'kCET shadow-stack direct bypass',cat:'Hardware',ev:function(s){
+    {name:'kCET shadow-stack direct bypass',cat:'Hardware',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['closed','No public bypass','As of early 2026 there is no public kCET bypass. Shadow-stack writes need special instructions unreachable via normal memory writes.'];}}
   ];})()
 });

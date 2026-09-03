@@ -71,7 +71,9 @@
         '<div class="ksn__rcat">' + esc(t.cat) + '</div>' +
         '<div class="ksn__rwhy">' + why + '</div></div>' +
         '<div class="ksn__rside"><span class="ksn__pill ksn__pill--' + status + '">' + status + '</span>' +
-        '<span class="ksn__req">' + esc(req) + '</span></div></div>';
+        '<span class="ksn__req">' + esc(req) + '</span>' +
+        (t.basis ? '<span class="ksn__basis">' + esc(t.basis) + ' &middot; ' + esc(t.asOf || '') + '</span>' : '') +
+        '</div></div>';
     });
     list.innerHTML = html || '<div class="ksn__rwhy" style="padding:8px 2px">Nothing is open for this situation. Widen your access, add a primitive, or drop the &ldquo;only open&rdquo; filter.</div>';
     root.querySelector('[data-count]').textContent =

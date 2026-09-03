@@ -18,44 +18,44 @@ Understanding which bypass vectors remain open on a given build is essential for
     {id:'prims',label:'Primitives you hold',type:'checks',wide:true,options:[['write','arbitrary write'],['bitflip','bit-flip / partial write']]}
   ],
   techniques:(function(){var CS='../../case-studies/';return [
-    {name:'NtQuerySystemInformation — SystemModuleInformation (class 11)',cat:'API disclosure',ev:function(s){
+    {name:'NtQuerySystemInformation — SystemModuleInformation (class 11)',cat:'API disclosure',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(+s.build<=1) return ['open','Any IL','Returns ntoskrnl / driver / HAL base addresses to any process on this build.'];
       if(s.il==='medium') return ['gated','Medium IL','Restricted to Medium IL from 20H1; you have it. Returns module bases directly.'];
       return ['gated','Needs Medium IL / SD corruption','Low-IL access closed from 20H1. Unlock it from Low IL with SepMediumDaclSd corruption below if you hold a write primitive.'];}},
-    {name:'NtQuerySystemInformation — SystemBigPoolInformation (class 66)',cat:'API disclosure',ev:function(s){
+    {name:'NtQuerySystemInformation — SystemBigPoolInformation (class 66)',cat:'API disclosure',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(+s.build<=1) return ['open','Any IL','Leaks big-pool allocation addresses and tags — locate specific kernel objects.'];
       if(s.il==='medium') return ['gated','Medium IL, partial','Tightened at 21H1–21H2; some allocation data still returns at Medium IL.'];
       return ['closed','Restricted','Progressively restricted from 20H1; not available at Low IL on this build.'];}},
-    {name:'NtQuerySystemInformation — SystemExtendedHandleInformation (class 64)',cat:'API disclosure',ev:function(s){
+    {name:'NtQuerySystemInformation — SystemExtendedHandleInformation (class 64)',cat:'API disclosure',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(+s.build<=1) return ['open','Any IL','Handle-table entries expose kernel object pointers (processes, tokens, threads).'];
       if(s.il==='medium') return ['gated','Medium IL, partial','Restricted in later builds; some object pointers still reachable at Medium IL.'];
       return ['closed','Restricted','Not available at Low IL on this build.'];}},
-    {name:'EnumDeviceDrivers / GetDeviceDriverBaseAddress (PSAPI)',cat:'API disclosure',ev:function(s){
+    {name:'EnumDeviceDrivers / GetDeviceDriverBaseAddress (PSAPI)',cat:'API disclosure',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(+s.build>=6) return ['closed','Elevated only on 24H2','PSAPI wrapper over NtQuerySystemInformation; restricted to elevated callers from 24H2.'];
       if(+s.build<=1||s.il==='medium') return ['open','Non-elevated OK','Simpler interface to the same module-base data; open to non-elevated callers before 24H2.'];
       return ['gated','Needs Medium IL','Follows the NtQuerySystemInformation IL gate.'];}},
-    {name:'NtQueryVirtualMemory — MemoryWorkingSetExInformation',cat:'API disclosure (indirect)',ev:function(s){
+    {name:'NtQueryVirtualMemory — MemoryWorkingSetExInformation',cat:'API disclosure (indirect)',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['open','Any IL','Leaks page-frame numbers and VA metadata; infer kernel layout from working-set analysis. No documented IL restriction.'];}},
-    {name:'ETW kernel-logger pointer leaks',cat:'ETW',ev:function(s){
+    {name:'ETW kernel-logger pointer leaks',cat:'ETW',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(+s.build<=3) return ['open','ETW session','Kernel-logger event payloads and create-callback data expose raw pointers pre-22H2.'];
       return ['closed','Patched 22H2','Most pointer leaks fixed in 22H2 (backported to 21H2). Broad surface, so new vectors still surface occasionally.'];}},
-    {name:'Prefetch timing side-channel',cat:'Timing side-channel',ev:function(s){
+    {name:'Prefetch timing side-channel',cat:'Timing side-channel',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.cpu==='amd') return ['gated','Intel-reliable','prefetch + rdtsc over the 256 candidate bases. Inconsistent on AMD; needs KVA shadowing disabled.'];
       return ['open','No vuln, no priv','prefetch + rdtsc latency over 256 bases; works on 24H2 with KVA shadow off. Reliable on Intel'+(s.cpu==='any'?', inconsistent on AMD':'')+'. <a href="https://exploits.forsale/24h2-nt-exploit/" target="_blank" rel="noopener">24H2 NT Exploit</a>.'];}},
-    {name:'Entropy brute-force (256 bases)',cat:'Timing side-channel',ev:function(s){
+    {name:'Entropy brute-force (256 bases)',cat:'Timing side-channel',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['gated','Seed leak','Only 8 bits. Once any partial leak narrows the range, enumerate the rest. An amplifier, not a standalone leak.'];}},
-    {name:'Interrupt timing side-channel',cat:'Timing side-channel',ev:function(s){
+    {name:'Interrupt timing side-channel',cat:'Timing side-channel',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       return ['open','No vuln, no priv','Interrupt-handling time varies with cache state, correlating with layout. Lower bandwidth and less reliable than prefetch.'];}},
-    {name:'SepMediumDaclSd — DACL zeroing',cat:'SD corruption',ev:function(s){
+    {name:'SepMediumDaclSd — DACL zeroing',cat:'SD corruption',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.write) return ['open','Have write','Zero the global DACL (e.g. RtlClearAllBits) to drop the IL gate; Low-IL can then query module addresses. See <a href="../../primitives/exploitation/acl-sd-manipulation/">ACL / SD Manipulation</a>.'];
       return ['gated','Needs arbitrary write','Converts an arbitrary-write primitive into a KASLR bypass — no info-leak vuln needed. Structural, works across modern builds.'];}},
-    {name:'SepMediumDaclSd — Control bit-flip (SE_SACL_PRESENT)',cat:'SD corruption',ev:function(s){
+    {name:'SepMediumDaclSd — Control bit-flip (SE_SACL_PRESENT)',cat:'SD corruption',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.write||s.bitflip) return ['open','Have bit-flip','Clear the 0x10 Control bit so SeAccessCheck skips MIC validation — one bit defeats DACL + integrity checks. StarLabs used <a href="'+CS+'CVE-2024-30088/">CVE-2024-30088</a>.'];
       return ['gated','Needs bit-flip / partial write','A single-bit variant of DACL corruption; the cheapest SD-corruption path.'];}},
-    {name:'WIL feature-flag bypass (Feature_RestrictKernelAddressLeaks)',cat:'SD corruption',ev:function(s){
+    {name:'WIL feature-flag bypass (Feature_RestrictKernelAddressLeaks)',cat:'SD corruption',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.write||s.bitflip) return ['open','Have bit-set','Flip the WIL runtime flag with RtlSetBit to stop address scrubbing; pair with DACL zeroing to fully defeat NtQuerySystemInformation restrictions. Chain: <a href="'+CS+'CVE-2026-21241/">CVE-2026-21241</a>.'];
       return ['gated','Needs bit-set primitive','Defeats the secondary gate Microsoft added after the DACL restrictions. Combine with DACL corruption.'];}},
-    {name:'Driver-specific info-disclosure vuln',cat:'Driver info leak',ev:function(s){
+    {name:'Driver-specific info-disclosure vuln',cat:'Driver info leak',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       return ['gated','Needs an unpatched driver leak','The most practical bypass on a fully patched system with no write primitive. Browse candidates by build in the <a href="../../explore/">Explore</a> table. Known leaks: <a href="'+CS+'CVE-2024-38256/">CVE-2024-38256</a>, <a href="'+CS+'CVE-2024-21338/">CVE-2024-21338</a>, <a href="'+CS+'CVE-2023-32019/">CVE-2023-32019</a>.'];}}
   ];})()
 });

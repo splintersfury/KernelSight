@@ -17,24 +17,24 @@ Supervisor Mode Execution Prevention (SMEP) and Supervisor Mode Access Preventio
     {id:'held',label:'What you hold',type:'checks',wide:true,options:[['arw','arbitrary read/write'],['stack','stack / return-address control']]}
   ],
   techniques:(function(){var PR='../../primitives/';return [
-    {name:'PTE remapping (clear the U/S bit)',cat:'PTE',ev:function(s){
+    {name:'PTE remapping (clear the U/S bit)',cat:'PTE',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.arw) return ['open','Have ARW','Locate the PTE for a user page and clear its U/S bit so the CPU treats it as supervisor — bypasses both SMEP and SMAP. The most durable bypass; works on current systems. Needs the PTE base. See <a href="'+PR+'arw/pte-manipulation/">PTE Manipulation</a>.'];
       return ['gated','Needs an ARW primitive','Turns an arbitrary read/write into a full SMEP+SMAP bypass by reclassifying a user page as supervisor.'];}},
-    {name:'Data-only attacks',cat:'Data-only',ev:function(s){
+    {name:'Data-only attacks',cat:'Data-only',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.arw) return ['open','Have kernel R/W','Never crosses the user/kernel boundary: manipulate token privileges, <code>PreviousMode</code>, or security descriptors entirely within kernel space. SMEP/SMAP are irrelevant. The dominant modern approach.'];
       return ['gated','Needs a kernel R/W primitive','Sidesteps SMEP and SMAP by operating only on kernel data through an existing primitive.'];}},
-    {name:'KUSER_SHARED_DATA staging',cat:'Data staging',ev:function(s){
+    {name:'KUSER_SHARED_DATA staging',cat:'Data staging',layer:'kernel',asOf:'2026-09-03',basis:'cited',ev:function(s){
       if(s.arw) return ['open','Have write','The fixed page at 0xFFFFF78000000000 is supervisor-readable/writable — a known writable kernel location for data-only staging. NX blocks code execution from it. See <a href="'+PR+'exploitation/kuser-shared-data/">KUSER_SHARED_DATA</a>.'];
       return ['gated','Needs a write primitive','A limited, fixed-address writable kernel scratch area for data-only work.'];}},
-    {name:'CR4 bit-flip via ROP (clear SMEP)',cat:'Code reuse',ev:function(s){
+    {name:'CR4 bit-flip via ROP (clear SMEP)',cat:'Code reuse',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.era!=='legacy'||s.vbs==='on') return ['closed','kCET / VBS block it','kCET traps the ROP chain and VBS traps CR4 writes at the hypervisor level. Viable only on legacy systems without these protections.'];
       if(s.stack) return ['open','Have stack control','ROP to a mov cr4, <reg> gadget clears the SMEP bit — the original, simplest bypass.'];
       return ['gated','Needs stack / ROP control','Legacy only.'];}},
-    {name:'STAC via ROP (defeat SMAP)',cat:'Code reuse',ev:function(s){
+    {name:'STAC via ROP (defeat SMAP)',cat:'Code reuse',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.era==='kcet') return ['closed','kCET blocks it','On 24H2 kCET detects return-address tampering before the STAC gadget can execute.'];
       if(s.stack) return ['open','Have stack control','ROP to a STAC gadget sets the AC flag, re-enabling user-mode access from kernel.'];
       return ['gated','Needs stack control','Requires stack control and no hardware shadow stack.'];}},
-    {name:'MDL remapping (MmMapLockedPagesSpecifyCache)',cat:'Historical',ev:function(s){
+    {name:'MDL remapping (MmMapLockedPagesSpecifyCache)',cat:'Historical',layer:'kernel',asOf:'2026-09-03',basis:'inferred',ev:function(s){
       if(s.era==='legacy'&&s.arw) return ['open','Legacy + ARW','Map a user buffer into kernel space via an MDL to get a supervisor-mode alias with U/S clear.'];
       if(s.era==='legacy') return ['gated','Needs ARW','Historical alias trick; requires an ARW primitive.'];
       return ['closed','Restricted on modern Windows','Modern builds have restricted this MDL aliasing technique.'];}}

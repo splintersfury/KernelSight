@@ -34,3 +34,4 @@
 .ksn__dot--open{background:#3fb950;} .ksn__dot--gated{background:#d29922;} .ksn__dot--closed{background:var(--md-default-fg-color--lighter);}
 .ksn__legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:.7rem;color:var(--md-default-fg-color--light);}
 @media (max-width:480px){.ksn__row{grid-template-columns:14px 1fr;}.ksn__rside{grid-column:2;align-items:flex-start;flex-direction:row;}}
+.ksn__basis{font-size:.6rem;color:var(--md-default-fg-color--light);font-variant-numeric:tabular-nums;}
