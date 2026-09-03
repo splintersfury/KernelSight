@@ -50,3 +50,11 @@ def test_check_catches_a_bad_layer_value():
         "page": None, "status": "planned",
     }]
     assert any("layer" in e for e in check(bad))
+
+
+def test_protected_process_page_exists_and_registers_a_navigator():
+    page = ROOT / "docs" / "mitigations" / "protected-process.md"
+    assert page.exists()
+    text = page.read_text(encoding="utf-8")
+    assert "__ksnav" in text
+    assert text.count("layer:'user'") == 3
