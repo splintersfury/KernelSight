@@ -19,8 +19,16 @@ def built_pages():
     if "pages" not in _cache:
         subprocess.run([sys.executable, "scripts/build_dashboard_data.py"], cwd=ROOT,
                        check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["mkdocs", "build", "--strict"], cwd=ROOT, check=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Capture rather than discard: a strict-mode failure here is the whole
+        # point of the test, so the warning that caused it must reach the report.
+        result = subprocess.run(["mkdocs", "build", "--strict"], cwd=ROOT,
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            raise AssertionError(
+                "mkdocs build --strict failed:\n"
+                + "\n".join(l for l in (result.stdout + result.stderr).splitlines()
+                             if "WARNING" in l or "ERROR" in l or "Aborted" in l)
+            )
         site = ROOT / "site"
         _cache["pages"] = {str(p.relative_to(site)) for p in site.rglob("*.html")}
     return _cache["pages"]

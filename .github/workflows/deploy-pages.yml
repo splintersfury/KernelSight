@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: "20"
 
-      - run: pip install mkdocs-material pyyaml pytest
+      - run: pip install "mkdocs==1.6.1" "mkdocs-material==9.7.2" pyyaml pytest
 
       - name: Validate roster and verdicts
         run: |
