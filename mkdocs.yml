@@ -47,6 +47,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/navigator.js
+  - javascripts/matrix.js
 
 markdown_extensions:
   - admonition
