@@ -42,7 +42,7 @@
       var days = Math.floor((Date.now() - Date.parse(when)) / 86400000);
       var age = days > 365 ? 'over a year ago' : (days > 180 ? 'over six months ago'
               : (days > 30 ? Math.floor(days / 30) + ' months ago' : 'this month'));
-      el.textContent = 'This page last changed ' + when + ', ' + age + '.';
+      el.textContent = 'Content last changed ' + when + ', ' + age + '. Punctuation and formatting passes are not counted.';
       if (days > 180) el.setAttribute('data-stale', 'true');
     }).catch(function () {});
   })();
