@@ -5,7 +5,7 @@ description: "134 Windows kernel CVE case studies with root cause analysis, expl
 # Case Studies
 
 <div class="ks-pipeline-pos">
-  <span class="ks-half">Means</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
+  <span class="ks-half">Getting in</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
 This is the core of KernelSight: 156 real-world Windows kernel CVEs, dissected from root cause through exploitation to patch. Every entry connects the full pipeline together, showing how a driver type exposes an attack surface, which harbors a vulnerability class, which yields a primitive, which becomes a chain to SYSTEM.

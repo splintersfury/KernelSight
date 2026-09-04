@@ -1,7 +1,7 @@
 # Win32k Subsystem
 
 <div class="ks-pipeline-pos">
-  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
+  <span class="ks-half">Getting in</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
 For over a decade, Win32k was the single most exploited component in the Windows kernel. Sandbox escape chains for Chrome and Edge reliably ended with a Win32k bug. Nation-state actors stockpiled Win32k zero-days. The sheer volume of bugs led Microsoft to invest in syscall filtering, type isolation, and eventually Win32k lockdown for certain process types. The three CVEs in the KernelSight corpus represent the current state of this arms race: the bugs are harder to find and harder to exploit than they were five years ago, but the attack surface is still enormous, and the structural patterns that produce bugs, complex object hierarchies, re-entrant callbacks, and a massive syscall table, have not fundamentally changed.

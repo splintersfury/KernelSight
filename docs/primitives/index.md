@@ -5,7 +5,7 @@ description: "19 Windows kernel exploitation primitives: arbitrary read/write vi
 # Primitives
 
 <div class="ks-pipeline-pos">
-  <span class="ks-half">Means</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
+  <span class="ks-half">Getting in</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; <span class="ks-active">Primitive</span> &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
 Finding a vulnerability in a kernel driver is only half the story. A buffer overflow, a use-after-free, a missing bounds check -- these tell you what went wrong, but they do not tell you what an attacker can do with it. The answer depends on the *primitive* the vulnerability yields: the controlled capability that transforms a memory corruption bug into something an attacker can actually use. A pool overflow in `cldflt.sys` might corrupt an adjacent pipe attribute entry, giving the attacker a controlled read beyond the allocation boundary. A missing `ProbeForWrite` in `afd.sys` might let user-mode code write to an arbitrary kernel address. The vulnerability class describes the flaw; the primitive describes the power it grants.

@@ -1,7 +1,7 @@
 # Tooling
 
 <div class="ks-pipeline-pos">
-  <a href="../driver-types/">Means</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../mitigations/">Targets</a> &nbsp;|&nbsp; <span class="ks-active">Reference</span>
+  <a href="../driver-types/">Getting in</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../mitigations/">What stops them</a> &nbsp;|&nbsp; <span class="ks-active">Reference</span>
 </div>
 
 The vulnerability classes and exploitation primitives described in the pipeline are theoretical until you can find them in real binaries. This section covers the practical side: the tools and workflows that turn a driver binary into a vulnerability assessment, a Patch Tuesday advisory into a root cause analysis, and a crash dump into a confirmed exploitable condition.

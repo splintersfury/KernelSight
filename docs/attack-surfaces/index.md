@@ -5,7 +5,7 @@ description: "9 Windows kernel attack surfaces: IOCTL handlers, filesystem IRPs,
 # Attack Surfaces
 
 <div class="ks-pipeline-pos">
-  <span class="ks-half">Means</span> Driver Type &rarr; <span class="ks-active">Attack Surface</span> &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
+  <span class="ks-half">Getting in</span> Driver Type &rarr; <span class="ks-active">Attack Surface</span> &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
 A kernel exploit begins with a question that sounds simple but carries enormous consequences: how does user-mode code reach the vulnerable driver? The answer determines everything that follows. It dictates what data the attacker controls, how much of it they control, what validation (if any) sits between them and the bug, and whether the vulnerability is reachable from a sandbox, a low-integrity process, or even a remote machine with no authentication at all.

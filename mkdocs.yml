@@ -73,8 +73,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Start here: start-here.md
   - Overview: overview.md
-  - Means:
+  - How attackers get in:
     - Drivers:
       - driver-types/index.md
       - File System Drivers: driver-types/filesystem.md
@@ -309,7 +310,7 @@ nav:
         - CVE-2026-20876: case-studies/CVE-2026-20876.md
         - CVE-2026-21253: case-studies/CVE-2026-21253.md
         - CVE-2026-21533: case-studies/CVE-2026-21533.md
-  - Targets:
+  - What stops them:
     - Bypass matrix: bypasses/index.md
     - Kernel layer:
       - mitigations/index.md

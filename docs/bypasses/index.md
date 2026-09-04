@@ -5,7 +5,7 @@ description: "What a kernel read or write primitive defeats on a given Windows b
 # Bypass matrix
 
 <div class="ks-pipeline-pos">
-  <a href="../driver-types/">Means</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <span class="ks-half">Targets</span> <span class="ks-active">Everything at once</span>
+  <a href="../driver-types/">Getting in</a> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <span class="ks-half">What stops them</span> <span class="ks-active">Everything at once</span>
 </div>
 
 Same Windows version, same HVCI checkbox, different silicon, different answers. Pick a

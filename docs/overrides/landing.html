@@ -12,6 +12,10 @@
    corners and shared edges have to become a vertical stack instead. */
 @media (max-width: 860px) {
   .two-col { grid-template-columns: 1fr !important; }
+  /* the worked-example chain: labels sit above their step, not beside */
+  .wx-chain { grid-template-columns: 1fr !important; gap: 0 !important; }
+  .wx-chain .wx-step { padding-top: 0 !important; margin-bottom: 0.4rem !important; }
+  .wx-chain > div:not(.wx-step) { margin-left: 0 !important; padding-left: 1.1rem !important; }
   .flow-panel { border-radius: 0 !important; border: 1px solid rgba(69,70,76,0.3) !important; }
   .flow-left  { border-radius: 1rem 1rem 0 0 !important; border-bottom: none !important; }
   .flow-right { border-radius: 0 0 1rem 1rem !important; border-top: none !important;
@@ -61,177 +65,115 @@ body, html { background: #10131a !important; overflow-x: hidden; }
 </header>
 
 <!-- Hero -->
-<section class="blueprint-grid" style="min-height:70vh;display:flex;align-items:center;position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(to top,#10131a 0%,transparent 50%);z-index:1"></div>
-  <div style="position:absolute;right:-5%;top:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(5,102,217,0.08) 0%,transparent 70%);pointer-events:none"></div>
-  <div style="max-width:720px;margin:0 auto;padding:5rem 2rem;position:relative;z-index:2;text-align:center">
-    <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;margin-bottom:1.5rem;border-radius:4px;border:1px solid rgba(173,198,255,0.3);background:rgba(173,198,255,0.08)">
-      <div style="width:0.5rem;height:0.5rem;border-radius:50%;background:#adc6ff;animation:pulse 2s infinite"></div>
-      <span style="font-family:'JetBrains Mono';font-size:0.65rem;font-weight:600;color:#adc6ff;text-transform:uppercase;letter-spacing:0.15em">Windows Kernel Bypass Reference</span>
-    </div>
-    <h1 class="ks-hero-h1" style="font-family:'Space Grotesk';font-size:3.5rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 1.5rem 0;line-height:1.1">
-      What kernel access<br><span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">actually buys you</span>
+<section class="blueprint-grid" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,#10131a 0%,transparent 55%);z-index:1"></div>
+  <div style="position:absolute;right:-5%;top:-12%;width:480px;height:480px;background:radial-gradient(circle,rgba(5,102,217,0.08) 0%,transparent 70%);pointer-events:none"></div>
+  <div style="max-width:760px;margin:0 auto;padding:5.5rem 2rem 3rem;position:relative;z-index:2">
+
+    <h1 class="ks-hero-h1" style="font-family:'Space Grotesk';font-size:3rem;font-weight:700;letter-spacing:-0.03em;color:#e0e2eb;margin:0 0 1.5rem 0;line-height:1.12">
+      A driver bug is not<br><span style="background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">a normal bug</span>
     </h1>
-    <p style="font-family:'Inter';font-size:1.1rem;color:#9ca3af;max-width:32rem;margin:0 auto 2.5rem auto;line-height:1.7">
-      The means of obtaining kernel read, write or execution on Windows, and the defenses at both
-      kernel and user level that such access does or does not defeat. Every verdict is dated and
-      tied to a build and a CPU feature set.
+
+    <p style="font-family:'Inter';font-size:1.05rem;color:#c3c8d2;margin:0 0 1.1rem 0;line-height:1.75">
+      Windows decides who may read a file, open a process, or run a program inside the kernel.
+      Code that reaches the kernel is not just privileged. It sits on the same side of the fence
+      as the thing doing the deciding.
     </p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-      <a href="{{ config.site_url }}bypasses/" style="text-decoration:none;background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);color:#002e6a;padding:0.75rem 2rem;border-radius:0.5rem;font-family:'Space Grotesk';font-weight:700;font-size:0.875rem;display:flex;align-items:center;gap:0.5rem;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-        Open the bypass matrix <span class="material-symbols-outlined" style="font-size:1.1rem">arrow_forward</span>
+    <p style="font-family:'Inter';font-size:1.05rem;color:#9ca3af;margin:0 0 2.25rem 0;line-height:1.75">
+      This site follows that one idea all the way down: how attackers get there, and which of
+      Windows' defenses still hold once they do.
+    </p>
+
+    <div style="display:flex;gap:0.9rem;flex-wrap:wrap;align-items:center">
+      <a href="{{ config.site_url }}start-here/" style="text-decoration:none;background:linear-gradient(135deg,#adc6ff 0%,#0566d9 100%);color:#002e6a;padding:0.8rem 1.9rem;border-radius:0.5rem;font-family:'Space Grotesk';font-weight:700;font-size:0.9rem">
+        Start here, a 7 stage path
       </a>
-      <a href="{{ config.site_url }}overview/" style="text-decoration:none;border:1px solid rgba(69,70,76,0.3);color:#e0e2eb;padding:0.75rem 2rem;border-radius:0.5rem;font-family:'Space Grotesk';font-weight:600;font-size:0.875rem;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">
-        How access is obtained
+      <a href="{{ config.site_url }}bypasses/" style="text-decoration:none;color:#adc6ff;font-family:'Inter';font-size:0.85rem;border-bottom:1px solid rgba(173,198,255,0.35);padding-bottom:1px">
+        or jump to the bypass matrix
       </a>
     </div>
   </div>
 </section>
 
-<!-- Hardening curve, computed from the verdict functions -->
-<section style="max-width:900px;margin:-3rem auto 0 auto;padding:0 2rem;position:relative;z-index:3">
-  <div style="background:#1c2026;border:1px solid rgba(69,70,76,0.28);border-radius:1rem;padding:1.6rem 1.75rem 1.4rem">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:0.5rem">
-      <div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:#e0e2eb">What still works, as the platform hardens</div>
-      <div id="curve-total" style="font-family:'JetBrains Mono';font-size:0.65rem;color:#6b7280"></div>
+<!-- One worked example, the whole model without naming it -->
+<section style="max-width:820px;margin:0 auto;padding:1rem 2rem 0;position:relative;z-index:3">
+  <div style="background:#1c2026;border:1px solid rgba(69,70,76,0.3);border-radius:1rem;padding:2rem 2.25rem 1.75rem">
+
+    <h2 style="font-family:'Space Grotesk';font-size:1.3rem;font-weight:700;color:#e0e2eb;margin:0 0 0.5rem 0;letter-spacing:-0.01em">One real example, start to finish</h2>
+    <p style="font-family:'Inter';font-size:0.86rem;color:#9ca3af;margin:0 0 2rem 0;line-height:1.7">
+      In 2024 the Lazarus Group did not bring a vulnerable driver with them. They used one that
+      was already on every Windows machine: the kernel driver behind AppLocker, a security
+      feature.
+    </p>
+
+    <div class="wx-chain" style="display:grid;grid-template-columns:150px 1fr;gap:0 1.5rem;align-items:start">
+
+      <div class="wx-step" style="font-family:'JetBrains Mono';font-size:0.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;padding-top:0.15rem">The bug</div>
+      <div style="padding-bottom:1.5rem;border-left:1px solid rgba(69,70,76,0.4);padding-left:1.5rem;margin-left:-1.5rem;position:relative">
+        <span style="position:absolute;left:-4.5px;top:6px;width:8px;height:8px;border-radius:50%;background:#adc6ff"></span>
+        <div style="font-family:'Inter';font-size:0.88rem;color:#e0e2eb;margin-bottom:0.3rem">One control code had no permission check</div>
+        <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.65">Any process could open the device and send it. The handler then trusted a pointer the caller supplied, without checking it pointed anywhere sane.</div>
+      </div>
+
+      <div class="wx-step" style="font-family:'JetBrains Mono';font-size:0.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;padding-top:0.15rem">What it gave</div>
+      <div style="padding-bottom:1.5rem;border-left:1px solid rgba(69,70,76,0.4);padding-left:1.5rem;margin-left:-1.5rem;position:relative">
+        <span style="position:absolute;left:-4.5px;top:6px;width:8px;height:8px;border-radius:50%;background:#adc6ff"></span>
+        <div style="font-family:'Inter';font-size:0.88rem;color:#e0e2eb;margin-bottom:0.3rem">Read and write anywhere in kernel memory</div>
+        <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.65">No race to win, no memory to groom, no address to leak first. Send the request, choose the address.</div>
+      </div>
+
+      <div class="wx-step" style="font-family:'JetBrains Mono';font-size:0.62rem;color:#3fb950;text-transform:uppercase;letter-spacing:0.1em;padding-top:0.15rem">What that beat</div>
+      <div style="padding-bottom:1.5rem;border-left:1px solid rgba(69,70,76,0.4);padding-left:1.5rem;margin-left:-1.5rem;position:relative">
+        <span style="position:absolute;left:-4.5px;top:6px;width:8px;height:8px;border-radius:50%;background:#3fb950"></span>
+        <div style="font-family:'Inter';font-size:0.88rem;color:#e0e2eb;margin-bottom:0.3rem">The antivirus, the credential store, the audit trail</div>
+        <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.65">Each of those is guarded by a decision recorded in kernel memory. Once you can edit that memory, you are editing the decision itself rather than defeating it.</div>
+      </div>
+
+      <div class="wx-step" style="font-family:'JetBrains Mono';font-size:0.62rem;color:#d29922;text-transform:uppercase;letter-spacing:0.1em;padding-top:0.15rem">What it did not</div>
+      <div style="border-left:1px solid transparent;padding-left:1.5rem;margin-left:-1.5rem;position:relative">
+        <span style="position:absolute;left:-4.5px;top:6px;width:8px;height:8px;border-radius:50%;background:#d29922"></span>
+        <div style="font-family:'Inter';font-size:0.88rem;color:#e0e2eb;margin-bottom:0.3rem">Credential Guard, on the same machine, untouched</div>
+        <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.65">Windows keeps those secrets somewhere the kernel itself cannot reach. Total control of the kernel buys nothing there. That boundary is the most useful thing on this site.</div>
+      </div>
+
     </div>
-    <div id="curve-rows" style="display:flex;flex-direction:column;gap:0.9rem;margin-top:1.3rem"></div>
-    <p id="curve-note" style="font-family:'Inter';font-size:0.75rem;color:#8b919b;line-height:1.6;margin:1.1rem 0 0;padding-top:0.95rem;border-top:1px solid rgba(69,70,76,0.25)"></p>
+
+    <p style="font-family:'Inter';font-size:0.84rem;color:#8b919b;margin:1.9rem 0 0;padding-top:1.2rem;border-top:1px solid rgba(69,70,76,0.28);line-height:1.7">
+      Bug, then capability, then what the capability is worth. That shape repeats across
+      <a href="{{ config.site_url }}case-studies/" style="color:#adc6ff;text-decoration:none;border-bottom:1px solid rgba(173,198,255,0.3)">156 real cases</a>,
+      and learning to read it is what the <a href="{{ config.site_url }}start-here/" style="color:#adc6ff;text-decoration:none;border-bottom:1px solid rgba(173,198,255,0.3)">path</a> teaches.
+      Read this one in full: <a href="{{ config.site_url }}case-studies/CVE-2024-21338/" style="color:#adc6ff;text-decoration:none;border-bottom:1px solid rgba(173,198,255,0.3)">CVE-2024-21338</a>.
+    </p>
   </div>
-  <div id="coverage-line" style="display:flex;flex-wrap:wrap;gap:2rem;align-items:baseline;margin-top:1rem;padding:1rem 1.25rem;background:#1c2026;border:1px solid rgba(69,70,76,0.22);border-radius:0.625rem"></div>
+</section>
+
+<!-- What is in here -->
+<section style="max-width:820px;margin:4rem auto 5rem;padding:0 2rem">
+  <h2 style="font-family:'Space Grotesk';font-size:1.3rem;font-weight:700;color:#e0e2eb;margin:0 0 1.5rem 0;letter-spacing:-0.01em">What is in here</h2>
+  <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+    <a href="{{ config.site_url }}driver-types/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:0.875rem;padding:1.5rem;border:1px solid rgba(69,70,76,0.22);display:block">
+      <div style="font-family:'Space Grotesk';font-size:0.98rem;font-weight:700;color:#e0e2eb;margin-bottom:0.5rem">How attackers get in</div>
+      <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7">Which drivers, which entry points, which mistakes, and what each one hands the attacker. 156 real cases, 64 drivers, 21 techniques.</div>
+    </a>
+    <a href="{{ config.site_url }}bypasses/" class="landing-card" style="text-decoration:none;background:#1c2026;border-radius:0.875rem;padding:1.5rem;border:1px solid rgba(173,198,255,0.22);display:block">
+      <div style="font-family:'Space Grotesk';font-size:0.98rem;font-weight:700;color:#e0e2eb;margin-bottom:0.5rem">What still stops them</div>
+      <div style="font-family:'Inter';font-size:0.8rem;color:#9ca3af;line-height:1.7">29 Windows defenses, each with a maintained list of what defeats it and what does not, dated and tied to a specific build and CPU.</div>
+    </a>
+  </div>
+  <p id="coverage-line" style="font-family:'Inter';font-size:0.78rem;color:#6b7280;margin:1.25rem 0 0;line-height:1.7"></p>
 </section>
 
 <script>
 (function () {
-  var rows = document.getElementById('curve-rows');
-  if (!rows) return;
+  var el = document.getElementById('coverage-line');
+  if (!el) return;
   fetch('assets/hero-curve.json').then(function (r) { return r.json(); }).then(function (d) {
-    var total = d.techniques;
-    document.getElementById('curve-total').textContent = total + ' techniques, re-evaluated per configuration';
-    var flat = d.configs.filter(function (c, i, a) { return i > 0 && c.open === a[i - 1].open; }).length;
-    rows.innerHTML = d.configs.map(function (c) {
-      function w(n) { return (n / total * 100).toFixed(1) + '%'; }
-      return '<div>'
-        + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.35rem">'
-        + '<span style="font-family:\'JetBrains Mono\';font-size:0.68rem;color:#c3c8d2">' + c.label + '</span>'
-        + '<span style="font-family:\'Space Grotesk\';font-size:0.9rem;font-weight:700;color:#3fb950">' + c.open + '</span>'
-        + '</div>'
-        + '<div style="display:flex;overflow:hidden;border-radius:3px;height:22px">'
-        + '<div style="width:' + w(c.open) + ';background:#3fb950"></div>'
-        + '<div style="width:' + w(c.gated) + ';background:#d29922"></div>'
-        + '<div style="width:' + w(c.closed) + ';background:#3a4150"></div>'
-        + '</div></div>';
-    }).join('');
-    document.getElementById('curve-note').textContent = flat
-      ? 'The flat tail is a gap in this reference, not in Windows. No inventory here models HLAT yet, so the last configurations cannot be told apart. Closing that is the next increment.'
-      : 'Same Windows version, different silicon, different answers.';
-    var r = d.roster;
-    document.getElementById('coverage-line').innerHTML = [
-      [r.total, 'defenses in the roster'],
-      [r.with_inventory, 'have a reviewed inventory'],
-      [total, 'techniques carry a dated verdict']
-    ].map(function (p) {
-      return '<div><span style="font-family:\'Space Grotesk\';font-size:1.3rem;font-weight:700;color:#e0e2eb">' + p[0]
-           + '</span> <span style="font-family:\'Inter\';font-size:0.8rem;color:#9ca3af">' + p[1] + '</span></div>';
-    }).join('') + '<div style="margin-left:auto;font-family:\'Inter\';font-size:0.75rem;color:#6b7280">Comprehensiveness is a ratio. The second figure is the one that moves.</div>';
-  }).catch(function () {
-    rows.innerHTML = '<div style="font-family:\'Inter\';font-size:0.8rem;color:#9ca3af">Curve unavailable.</div>';
-  });
+    el.textContent = d.roster.total + ' defenses tracked, ' + d.roster.with_inventory
+      + ' with a reviewed list of what defeats them, across ' + d.techniques
+      + ' techniques carrying a dated verdict. That second number is the one that moves.';
+  }).catch(function () {});
 })();
 </script>
-
-<!-- Means, the primitive, Targets -->
-<section style="max-width:960px;margin:5rem auto 4.5rem;padding:0 2rem">
-
-  <h2 style="font-family:'Space Grotesk';font-size:1.5rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0;text-align:center;letter-spacing:-0.01em">Getting in, and what it buys</h2>
-  <p style="font-family:'Inter';color:#9ca3af;text-align:center;margin:0 auto 2.75rem;font-size:0.9rem;line-height:1.65;max-width:52ch">
-    Every page here is one of two things. Either it explains how kernel access is obtained, or it
-    records what that access defeats. The primitive in the middle is what connects them.
-  </p>
-
-  <!-- the model, in one line -->
-  <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center;margin-bottom:3rem">
-
-    <div class="flow-panel flow-left" style="flex:1 1 280px;min-width:260px;background:#1c2026;border:1px solid rgba(69,70,76,0.3);border-radius:1rem 0 0 1rem;padding:1.4rem 1.5rem">
-      <div style="font-family:'Space Grotesk';font-size:0.95rem;font-weight:700;color:#e0e2eb;margin-bottom:0.2rem">Means</div>
-      <div style="font-family:'Inter';font-size:0.75rem;color:#8b919b;margin-bottom:1rem;line-height:1.5">Where the bugs are, and what they yield</div>
-      <div style="display:flex;flex-wrap:wrap;gap:0.4rem">
-        <a href="{{ config.site_url }}driver-types/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Driver types</a>
-        <a href="{{ config.site_url }}attack-surfaces/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Attack surfaces</a>
-        <a href="{{ config.site_url }}vuln-classes/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">Vulnerability classes</a>
-        <a href="{{ config.site_url }}case-studies/" style="font-family:'Inter';font-size:0.72rem;color:#c3c8d2;text-decoration:none;padding:0.3rem 0.65rem;border-radius:999px;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">161 case studies</a>
-      </div>
-    </div>
-
-    <div class="flow-panel flow-mid" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#151922;border-top:1px solid rgba(69,70,76,0.3);border-bottom:1px solid rgba(69,70,76,0.3);padding:1.4rem 1.1rem;min-width:190px">
-      <div style="text-align:center">
-        <svg viewBox="0 0 120 12" width="100%" height="12" style="max-width:120px;display:block;margin:0 auto 0.7rem" aria-hidden="true">
-          <line x1="0" y1="6" x2="106" y2="6" stroke="#3a4150" stroke-width="1.5"></line>
-          <path d="M106 2 L114 6 L106 10 Z" fill="#3a4150"></path>
-        </svg>
-        <a href="{{ config.site_url }}primitives/" style="text-decoration:none;display:block">
-          <div style="font-family:'JetBrains Mono';font-size:0.7rem;color:#adc6ff;line-height:1.5">kernel read<br>write, execute</div>
-          <div style="font-family:'Inter';font-size:0.68rem;color:#6b7280;margin-top:0.45rem">21 primitives</div>
-        </a>
-        <svg viewBox="0 0 120 12" width="100%" height="12" style="max-width:120px;display:block;margin:0.7rem auto 0" aria-hidden="true">
-          <line x1="0" y1="6" x2="106" y2="6" stroke="#3a4150" stroke-width="1.5"></line>
-          <path d="M106 2 L114 6 L106 10 Z" fill="#3a4150"></path>
-        </svg>
-      </div>
-    </div>
-
-    <div class="flow-panel flow-right" style="flex:1 1 280px;min-width:260px;background:#1c2026;border:1px solid rgba(173,198,255,0.3);border-radius:0 1rem 1rem 0;padding:1.4rem 1.5rem">
-      <div style="font-family:'Space Grotesk';font-size:0.95rem;font-weight:700;color:#e0e2eb;margin-bottom:0.2rem">Targets</div>
-      <div style="font-family:'Inter';font-size:0.75rem;color:#8b919b;margin-bottom:1rem;line-height:1.5">What the primitive is spent on, and what resists it</div>
-      <div style="display:flex;flex-direction:column;gap:0.45rem">
-        <a href="{{ config.site_url }}mitigations/" style="display:flex;justify-content:space-between;align-items:baseline;text-decoration:none;padding:0.45rem 0.7rem;border-radius:0.625rem;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">
-          <span style="font-family:'Inter';font-size:0.78rem;color:#c3c8d2">Kernel-layer defenses</span>
-          <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:#6b7280">19</span>
-        </a>
-        <a href="{{ config.site_url }}mitigations/protected-process/" style="display:flex;justify-content:space-between;align-items:baseline;text-decoration:none;padding:0.45rem 0.7rem;border-radius:0.625rem;background:rgba(173,198,255,0.07);border:1px solid rgba(173,198,255,0.18)">
-          <span style="font-family:'Inter';font-size:0.78rem;color:#c3c8d2">User-layer defenses</span>
-          <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:#6b7280">10</span>
-        </a>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- what each half answers -->
-  <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-
-    <div style="background:#1c2026;border-radius:1rem;padding:1.6rem 1.75rem;border:1px solid rgba(69,70,76,0.22)">
-      <div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0">Start in Means if you are asking</div>
-      <p style="font-family:'Inter';font-size:0.82rem;color:#9ca3af;line-height:1.75;margin:0 0 1rem 0">
-        Which drivers expose this surface. What the bug class looks like in the wild. Whether
-        anyone has published a working chain. What read or write primitive this yields.
-      </p>
-      <p style="font-family:'Inter';font-size:0.78rem;color:#8b919b;line-height:1.7;margin:0">
-        This is the older half of the site and the larger one. It ends at a primitive, which is
-        where the other half begins.
-      </p>
-    </div>
-
-    <div style="background:#1c2026;border-radius:1rem;padding:1.6rem 1.75rem;border:1px solid rgba(173,198,255,0.22)">
-      <div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:#e0e2eb;margin:0 0 0.6rem 0">Start in Targets if you are asking</div>
-      <p style="font-family:'Inter';font-size:0.82rem;color:#9ca3af;line-height:1.75;margin:0 0 1rem 0">
-        I have kernel write on this build. Does it reach LSASS. Does it silence the sensor. Will
-        it survive HVCI, or newer silicon, or the next cumulative update.
-      </p>
-      <p style="font-family:'Inter';font-size:0.78rem;color:#8b919b;line-height:1.7;margin:0">
-        Defenses are filed by the layer of the asset they protect, not by what enforces them.
-        Credential Guard sits here as a case where the answer is no.
-      </p>
-    </div>
-
-  </div>
-
-  <p style="font-family:'Inter';font-size:0.8rem;color:#8b919b;text-align:center;margin:2.25rem auto 0;max-width:56ch;line-height:1.7">
-    Not sure which half you want? The <a href="{{ config.site_url }}bypasses/" style="color:#adc6ff;text-decoration:none;border-bottom:1px solid rgba(173,198,255,0.35)">bypass matrix</a>
-    takes a build and a CPU and tells you what is still open on it.
-  </p>
-
-</section>
 
 <!-- Footer -->
 <footer style="border-top:1px solid rgba(69,70,76,0.15);padding:3rem 1.5rem;background:#10131a;margin-top:3rem">

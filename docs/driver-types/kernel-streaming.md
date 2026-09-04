@@ -1,7 +1,7 @@
 # Kernel Streaming Drivers
 
 <div class="ks-pipeline-pos">
-  <span class="ks-half">Means</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">Targets</a>
+  <span class="ks-half">Getting in</span> <span class="ks-active">Driver Type</span> &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; Case Study &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
 DevCore's winning entry at Pwn2Own Vancouver 2024 used a single untrusted pointer dereference in ks.sys to achieve local privilege escalation on a fully patched Windows 11 system. That bug, CVE-2024-35250, was one of six kernel streaming CVEs in the KernelSight corpus, all found within a two-year window. Kernel Streaming has quietly become one of the most productive attack surfaces in the Windows kernel, not because the individual bugs are novel, but because the framework combines three vulnerability-prone patterns in a single subsystem: a large IOCTL dispatch table, cross-architecture structure translation, and direct MDL manipulation.
