@@ -183,12 +183,12 @@ defenses:
     page: null
     status: planned
   - id: wdac-usermode
-    name: "WDAC user-mode code integrity"
+    name: "App Control for Business"
     layer: user
     enforced_by: kernel
-    protects: "Which user-mode binaries may execute"
-    page: null
-    status: planned
+    protects: "Which user-mode binaries may execute, by organisation-authored policy"
+    page: docs/mitigations/app-control-for-business.md
+    status: current
   - id: applocker
     name: "AppLocker"
     layer: user

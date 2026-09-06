@@ -326,6 +326,7 @@ nav:
       - KASLR Bypasses: mitigations/kaslr-bypasses.md
     - User layer:
       - Protected Process Light: mitigations/protected-process.md
+      - App Control for Business: mitigations/app-control-for-business.md
       - Smart App Control: mitigations/smart-app-control.md
   - Reference:
     - Guides:

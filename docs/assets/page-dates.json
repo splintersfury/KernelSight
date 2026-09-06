@@ -14,7 +14,7 @@
 "attack-surfaces/shared-memory/": "2026-03-20",
 "attack-surfaces/wdf/": "2026-03-20",
 "attack-surfaces/wmi-etw/": "2026-03-20",
-"bypasses/": "2026-09-04",
+"bypasses/": "2026-09-07",
 "case-studies/": "2026-09-07",
 "case-studies/ATSZIO64-sys/": "2026-03-20",
 "case-studies/AsIO3-sys/": "2026-09-04",
@@ -207,6 +207,7 @@
 "mitigations/pool-hardening/": "2026-03-20",
 "mitigations/protected-process/": "2026-09-04",
 "mitigations/secure-pool/": "2026-03-20",
+"mitigations/smart-app-control/": "2026-09-07",
 "mitigations/smep-smap/": "2026-09-04",
 "mitigations/vbs-hvci/": "2026-09-04",
 "overview/": "2026-09-07",
@@ -257,5 +258,5 @@
 "vuln-classes/use-after-free/": "2026-03-20"
 },
 "pages_over_six_months_old": 1,
-"pages_total": 253
+"pages_total": 254
 }
