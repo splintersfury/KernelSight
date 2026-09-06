@@ -203,6 +203,13 @@ defenses:
     protects: "Token integrity levels and elevation consent"
     page: null
     status: planned
+  - id: smart-app-control
+    name: "Smart App Control"
+    layer: user
+    enforced_by: kernel
+    protects: "Which user-mode code may execute, by signature and reputation"
+    page: docs/mitigations/smart-app-control.md
+    status: current
   - id: amsi
     name: "AMSI"
     layer: user

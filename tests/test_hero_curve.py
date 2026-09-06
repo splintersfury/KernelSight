@@ -38,7 +38,7 @@ def test_open_count_never_rises_as_the_platform_hardens():
 
 def test_roster_block_matches_the_roster_file():
     roster = build()["roster"]
-    assert (roster["total"], roster["kernel"], roster["user"]) == (29, 19, 10)
+    assert (roster["total"], roster["kernel"], roster["user"]) == (30, 19, 11)
 
 
 def test_every_navigator_config_declares_a_platform_projection():

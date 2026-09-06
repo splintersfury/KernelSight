@@ -44,10 +44,10 @@ different answers across the roster.
 
     <!-- VTL0 user -->
     <rect class="ks-box" x="40" y="272" width="620" height="98"/>
-    <text class="ks-label" x="56" y="294">VTL0 USER: 10 DEFENSES</text>
+    <text class="ks-label" x="56" y="294">VTL0 USER: 11 DEFENSES</text>
     <text class="ks-annotation" x="56" y="314">Protects user-mode assets, but the decision is stored and enforced in the</text>
     <text class="ks-annotation" x="56" y="328">kernel, which is why a kernel write reaches all of it</text>
-    <text class="ks-annotation" x="56" y="352">PP/PPL &middot; LSA Protection &middot; ETW-Ti &middot; EDR callbacks &middot; WDAC &middot; AppLocker &middot; UAC &middot; AMSI</text>
+    <text class="ks-annotation" x="56" y="352">PP/PPL &middot; LSA Protection &middot; ETW-Ti &middot; EDR callbacks &middot; WDAC &middot; AppLocker &middot; Smart App Control &middot; UAC &middot; AMSI</text>
 
     <!-- reach bracket -->
     <path class="ks-arrow" d="M700 140 L716 140 L716 370 L700 370"/>

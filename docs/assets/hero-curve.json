@@ -1,42 +1,42 @@
 {
   "generated": "computed from the ev() functions, not hand maintained",
-  "techniques": 40,
+  "techniques": 44,
   "configs": [
     {
       "label": "Windows 10 2004",
-      "open": 25,
+      "open": 26,
       "gated": 11,
-      "closed": 4
+      "closed": 7
     },
     {
       "label": "11 22H2, kCET",
-      "open": 17,
+      "open": 18,
       "gated": 9,
-      "closed": 14
+      "closed": 17
     },
     {
       "label": "11 24H2, pre-11th gen",
-      "open": 16,
+      "open": 17,
       "gated": 9,
-      "closed": 15
+      "closed": 18
     },
     {
       "label": "11 24H2, HLAT",
-      "open": 16,
+      "open": 17,
       "gated": 9,
-      "closed": 15
+      "closed": 18
     },
     {
       "label": "11 25H2, HLAT",
-      "open": 16,
+      "open": 17,
       "gated": 9,
-      "closed": 15
+      "closed": 18
     }
   ],
   "roster": {
-    "total": 29,
+    "total": 30,
     "kernel": 19,
-    "user": 10,
-    "with_inventory": 11
+    "user": 11,
+    "with_inventory": 12
   }
 }

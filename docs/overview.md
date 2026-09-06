@@ -64,8 +64,8 @@ What kernel access buys you on Windows. One half of this site covers how the acc
     <text class="ks-annotation" x="585" y="112">Kernel layer &#183; 19 defenses</text>
     <text class="ks-annotation" x="585" y="130">DSE, HVCI, kCET, KDP, HLAT, KASLR</text>
     <rect class="ks-box" x="570" y="156" width="300" height="52"/>
-    <text class="ks-annotation" x="585" y="176">User layer &#183; 10 defenses</text>
-    <text class="ks-annotation" x="585" y="194">PPL, LSA, ETW-Ti, EDR, WDAC, UAC</text>
+    <text class="ks-annotation" x="585" y="176">User layer &#183; 11 defenses</text>
+    <text class="ks-annotation" x="585" y="194">PPL, LSA, ETW-Ti, EDR, WDAC, SAC, UAC</text>
 
     <!-- out of reach -->
     <rect class="ks-box" x="570" y="230" width="300" height="34" stroke-dasharray="4 3"/>

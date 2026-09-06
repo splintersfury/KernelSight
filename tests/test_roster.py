@@ -7,15 +7,15 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from check_roster import load_roster, check
 
 
-def test_roster_has_29_defenses():
-    assert len(load_roster()) == 29
+def test_roster_has_30_defenses():
+    assert len(load_roster()) == 30
 
 
-def test_layer_split_is_19_kernel_10_user():
+def test_layer_split_is_19_kernel_11_user():
     roster = load_roster()
     kernel = [d for d in roster if d["layer"] == "kernel"]
     user = [d for d in roster if d["layer"] == "user"]
-    assert (len(kernel), len(user)) == (19, 10)
+    assert (len(kernel), len(user)) == (19, 11)
 
 
 def test_every_id_is_unique():

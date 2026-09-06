@@ -11,8 +11,9 @@ VALID_BASIS = {"tested", "cited", "inferred"}
 
 
 def test_scan_finds_every_shipping_technique():
-    # 37 on the four original kernel-layer pages, plus 3 on protected-process.
-    assert len(scan()) == 40
+    # 37 on the four original kernel-layer pages, 3 on protected-process,
+    # 4 on smart-app-control.
+    assert len(scan()) == 44
 
 
 def test_every_technique_has_the_three_required_fields():
