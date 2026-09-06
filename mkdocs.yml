@@ -310,6 +310,7 @@ nav:
         - CVE-2026-20876: case-studies/CVE-2026-20876.md
         - CVE-2026-21253: case-studies/CVE-2026-21253.md
         - CVE-2026-21533: case-studies/CVE-2026-21533.md
+      - CVE-2026-68820: case-studies/CVE-2026-68820.md
   - What stops them:
     - Bypass matrix: bypasses/index.md
     - Kernel layer:

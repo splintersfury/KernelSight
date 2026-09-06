@@ -8,7 +8,7 @@ description: "134 Windows kernel CVE case studies with root cause analysis, expl
   <span class="ks-half">Getting in</span> Driver Type &rarr; Attack Surface &rarr; Vuln Class &rarr; Primitive &rarr; <span class="ks-active">Case Study</span> &rarr; <span class="ks-hinge">kernel access</span> &rarr; <a href="../bypasses/">What stops them</a>
 </div>
 
-This is the core of KernelSight: 156 real-world Windows kernel CVEs, dissected from root cause through exploitation to patch. Every entry connects the full pipeline together, showing how a driver type exposes an attack surface, which harbors a vulnerability class, which yields a primitive, which becomes a chain to SYSTEM.
+This is the core of KernelSight: 157 real-world Windows kernel CVEs, dissected from root cause through exploitation to patch. Every entry connects the full pipeline together, showing how a driver type exposes an attack surface, which harbors a vulnerability class, which yields a primitive, which becomes a chain to SYSTEM.
 
 The corpus is not just a reference list. It is a structured dataset built for pattern recognition. Researchers studying CLFS will find twelve entries spanning four years and five distinct bug classes, revealing how Microsoft's incremental fixes kept leaving adjacent parsing logic unpatched. Those tracking BYOVD trends will find 41 third-party driver case studies documenting the shift from arbitrary R/W primitives (2019-2023) to process termination as the dominant abuse pattern (2024-2026). And anyone building detection will find YARA rules, ETW indicators, behavioral signatures, and AutoPiff rules attached to the entries where they matter most.
 

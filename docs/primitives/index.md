@@ -116,5 +116,5 @@ Once arbitrary kernel R/W is established, the question becomes: what do you do w
 | [Bit-Manipulation Primitives](exploitation/bit-manipulation.md) | kCFG-compliant bitmap function abuse |
 
 <div class="ks-next-pipeline">
-  Next in the pipeline: <a href="../case-studies/">Case Studies</a> &rarr; See the full chain in action across 156 real CVEs.
+  Next in the pipeline: <a href="../case-studies/">Case Studies</a> &rarr; See the full chain in action across 157 real CVEs.
 </div>

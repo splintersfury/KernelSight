@@ -1,6 +1,6 @@
 # AFD Attack Surface Deep-Dive
 
-No single Windows kernel driver has produced more privilege escalation vulnerabilities than `afd.sys`. With 13 CVEs in the KernelSight corpus and three confirmed in-the-wild exploits (including one attributed to the Lazarus Group), the Ancillary Function Driver for WinSock is the most consistently exploited networking component in the Windows kernel. Its bugs span nearly every vulnerability class: use-after-free, heap overflow, missing validation, integer overflow, and race conditions. What makes AFD remarkable is not any single bug, but the architectural reality that keeps producing them.
+No single Windows kernel driver has produced more privilege escalation vulnerabilities than `afd.sys`. With 14 CVEs in the KernelSight corpus and four confirmed in-the-wild exploits, two of them attributed to the Lazarus Group, the Ancillary Function Driver for WinSock is the most consistently exploited networking component in the Windows kernel. Its bugs span nearly every vulnerability class: use-after-free, heap overflow, missing validation, integer overflow, and race conditions. What makes AFD remarkable is not any single bug, but the architectural reality that keeps producing them.
 
 ## Why AFD Cannot Stop Being Vulnerable
 
@@ -57,6 +57,41 @@ Five properties make this driver a persistent target:
 | CVE-2025-62213 | 2025 | UAF | No | Object lifetime error |
 | CVE-2025-62217 | 2025 | EoP | No | Elevation of privilege |
 | CVE-2026-21241 | 2026 | UAF / Race | No | AfdNotifyPostEvents spinlock race |
+
+## Four in the wild, and the same window every time
+
+Four of this driver's bugs have been exploited in the wild, and they are not four different
+mistakes. [CVE-2024-38193](CVE-2024-38193.md) raced a free against continued use of Registered
+I/O buffers. [CVE-2025-32709](CVE-2025-32709.md) used memory after socket closure.
+[CVE-2026-21241](CVE-2026-21241.md) raced a spinlock release around `AfdNotifyPostEvents`.
+[CVE-2026-68820](CVE-2026-68820.md) raced two unsynchronised paths over the same socket state,
+and Lazarus ran it as a zero-day for five weeks.
+
+Each fix closed one window. None of them closed the class, because the class is not a coding
+error. It follows from three properties of the driver that are not going to change:
+
+**Socket state outlives any single call.** A socket is a long-lived object touched by many
+operations over its life. Anything that must survive between calls has to be reachable from more
+than one path, and every such object is a candidate for two paths reaching it at once.
+
+**The caller controls the concurrency.** A process decides how many threads to point at one
+socket handle, and when. The attacker, not the driver, chooses the interleaving, and can retry
+as many times as they like at no cost.
+
+**Teardown is asynchronous and racy by design.** Closure, cancellation and completion all
+originate from different places: a user request, a network event, a timer. The driver cannot
+serialise them behind one lock without making sockets slow, so it serialises narrowly, and each
+narrow scope is a place where the boundary can be drawn a few instructions wrong.
+
+Put together, this is a driver where the attacker supplies the timing, the object outlives the
+call, and the correct locking scope is decided by hand in dozens of places. Patching one race
+tells you nothing about the next one.
+
+For a defender the practical consequence is that no amount of AFD patching converts this driver
+into a safe surface, and none of the platform mitigations help. A use-after-free exploited for
+data-only kernel read and write never executes attacker code, never leaves a signed-code path
+and never touches a page HVCI verifies. The
+[mitigation landscape](#the-mitigation-landscape) section below covers why.
 
 ## The Patterns That Keep Repeating
 

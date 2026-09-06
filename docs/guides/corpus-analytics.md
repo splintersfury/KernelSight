@@ -1,6 +1,6 @@
 # Corpus Analytics
 
-> Visual breakdown of 156 CVEs across 64 drivers -- what gets exploited, how often, and where the patterns cluster.
+> Visual breakdown of 157 CVEs across 64 drivers -- what gets exploited, how often, and where the patterns cluster.
 
 The KernelSight corpus is not a random sample. It is a curated collection of Windows kernel CVEs that have published exploit research: writeups, proof-of-concept code, in-the-wild campaign reports, or detailed binary analysis. The selection bias is deliberate. A CVE with no public analysis cannot teach patterns. A CVE with a full exploit chain walkthrough reveals how vulnerability classes connect to exploitation primitives and how mitigations shape attacker behavior. This page presents the data, and the patterns that emerge from it, in visual form.
 
@@ -129,7 +129,7 @@ Annual volume stays between 90 and 140 with no clear upward trend since 2017. Th
 
 ### Corpus Coverage
 
-The KernelSight corpus samples 156 of roughly 1,200 kernel-mode CVEs disclosed since 2015, about 12%. The sampling is deliberate: the corpus tracks CVEs with published exploit research, not a random cross-section of Patch Tuesday fixes.
+The KernelSight corpus samples 157 of roughly 1,200 kernel-mode CVEs disclosed since 2015, about 12%. The sampling is deliberate: the corpus tracks CVEs with published exploit research, not a random cross-section of Patch Tuesday fixes.
 
 | Period | NVD Total | Corpus | Coverage |
 |--------|-----------|--------|----------|

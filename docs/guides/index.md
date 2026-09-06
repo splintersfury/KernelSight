@@ -12,7 +12,7 @@ The six guides approach the same body of data from different angles.
 
 [Anatomy of a Secure Driver](secure-driver-anatomy.md) distills the corpus into six anti-patterns that account for the vast majority of kernel driver vulnerabilities. Each anti-pattern includes the specific coding mistake, real CVE examples, and the fix. This is the closest thing to a checklist for driver developers and auditors.
 
-[Corpus Analytics](corpus-analytics.md) presents a visual breakdown of 156 CVEs across 64 drivers, showing where vulnerabilities cluster by driver family, year, vulnerability class, and exploitation status. The data reveals which drivers generate the most bugs and which bug types are most likely to be exploited in the wild.
+[Corpus Analytics](corpus-analytics.md) presents a visual breakdown of 157 CVEs across 64 drivers, showing where vulnerabilities cluster by driver family, year, vulnerability class, and exploitation status. The data reveals which drivers generate the most bugs and which bug types are most likely to be exploited in the wild.
 
 [Exploit Chain Patterns](exploit-chain-patterns.md) identifies the five recurring chain shapes that turn a kernel bug into SYSTEM. From file format corruption through pool spray to token swap, these archetypes describe how real-world exploits navigate the defense-in-depth stack.
 

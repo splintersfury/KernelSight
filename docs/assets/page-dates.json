@@ -1,5 +1,5 @@
 {
-"generated": "2026-09-04",
+"generated": "2026-09-07",
 "newest_page": "2026-09-04",
 "pages": {
 "": "2026-03-26",
@@ -236,6 +236,7 @@
 "reference/kdu-compatibility/": "2026-03-20",
 "reference/loldrivers-analysis/": "2026-03-20",
 "reference/resources/": "2026-03-20",
+"start-here/": "2026-09-04",
 "tooling/": "2026-09-04",
 "tooling/autopiff-integration/": "2026-09-04",
 "tooling/debugging/": "2026-03-20",
@@ -255,5 +256,5 @@
 "vuln-classes/use-after-free/": "2026-03-20"
 },
 "pages_over_six_months_old": 1,
-"pages_total": 251
+"pages_total": 252
 }

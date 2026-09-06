@@ -1,6 +1,24 @@
 {
   "cves": [
     {
+      "id": "CVE-2026-68820",
+      "driver": "afd.sys",
+      "description": "AFD WinSock: unsynchronised socket-state access races a free against a dereference, giving kernel R/W",
+      "vuln_class": "use-after-free",
+      "itw": true,
+      "has_poc": false,
+      "has_writeup": true,
+      "case_study": "case-studies/CVE-2026-68820/",
+      "vuln_build": "10.0.26100",
+      "fix_build": "10.0.26100.9168",
+      "win_version": "Win11 24H2",
+      "references": {
+        "msrc": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-68820",
+        "writeup": "https://cybersecuritynews.com/windows-afd-sys-zero-day-exploited/",
+        "poc": ""
+      }
+    },
+    {
       "id": "CVE-2022-21882",
       "driver": "win32kbase.sys",
       "description": "Win32k — ConsoleWindow flag misinterprets WndExtra causing type confusion EoP",
@@ -2931,8 +2949,8 @@
   "matrix": {
     "rows": [
       "clfs.sys",
-      "ntoskrnl.exe",
       "afd.sys",
+      "ntoskrnl.exe",
       "cldflt.sys",
       "win32k.sys",
       "dwmcore.dll",
@@ -2962,6 +2980,21 @@
       "toctou-double-fetch"
     ],
     "cells": {
+      "afd.sys|use-after-free": {
+        "count": 9,
+        "itw": 3,
+        "cves": [
+          "CVE-2026-68820",
+          "CVE-2024-38193",
+          "CVE-2026-21241",
+          "CVE-2025-32709",
+          "CVE-2025-60719",
+          "CVE-2025-53147",
+          "CVE-2025-53718",
+          "CVE-2025-62213",
+          "CVE-2025-62217"
+        ]
+      },
       "clfs.sys|buffer-overflow": {
         "count": 10,
         "itw": 5,
@@ -3076,20 +3109,6 @@
         "cves": [
           "CVE-2024-38054",
           "CVE-2025-53149"
-        ]
-      },
-      "afd.sys|use-after-free": {
-        "count": 8,
-        "itw": 2,
-        "cves": [
-          "CVE-2024-38193",
-          "CVE-2026-21241",
-          "CVE-2025-32709",
-          "CVE-2025-60719",
-          "CVE-2025-53147",
-          "CVE-2025-53718",
-          "CVE-2025-62213",
-          "CVE-2025-62217"
         ]
       },
       "ksthunk.sys|arbitrary-rw-primitives": {
@@ -3375,14 +3394,14 @@
     }
   },
   "stats": {
-    "total_cves": 156,
+    "total_cves": 157,
     "total_drivers": 64,
-    "itw_count": 57,
+    "itw_count": 58,
     "poc_count": 33,
     "vuln_class_counts": {
       "buffer-overflow": 51,
+      "use-after-free": 27,
       "arbitrary-rw-primitives": 27,
-      "use-after-free": 26,
       "logic-bugs": 21,
       "race-conditions": 11,
       "uninitialized-memory": 7,
@@ -3393,8 +3412,8 @@
     },
     "driver_counts": {
       "clfs.sys": 15,
+      "afd.sys": 14,
       "ntoskrnl.exe": 14,
-      "afd.sys": 13,
       "cldflt.sys": 9,
       "win32k.sys": 9,
       "dwmcore.dll": 8,
@@ -3460,7 +3479,7 @@
     "win_version_counts": {
       "Unspecified": 125,
       "Win11 22H2": 29,
-      "Win11 24H2": 2
+      "Win11 24H2": 3
     }
   }
 }

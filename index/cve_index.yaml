@@ -3,6 +3,27 @@
 version: 1
 
 cves:
+  - cve_id: "CVE-2026-68820"
+    driver: "afd.sys"
+    description: "AFD WinSock: unsynchronised socket-state access races a free against a dereference, giving kernel R/W"
+    vuln_class: "use-after-free"
+    autopiff_category: "race_condition"
+    itw: true
+    vuln_version:
+      build: "10.0.26100"
+      kb: "pre-KB5121003"
+    fix_version:
+      build: "10.0.26100.9168"
+      kb: "KB5121003"
+    references:
+      msrc: "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-68820"
+      writeup: "https://cybersecuritynews.com/windows-afd-sys-zero-day-exploited/"
+      poc: ""
+    autopiff_rules:
+      - "spinlock_acquisition_added"
+      - "added_use_after_free_guard"
+    case_study: "docs/case-studies/CVE-2026-68820.md"
+
   - cve_id: "CVE-2022-21882"
     driver: "win32kbase.sys"
     description: "Win32k — ConsoleWindow flag misinterprets WndExtra causing type confusion EoP"
