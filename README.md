@@ -16,7 +16,7 @@ The exploitation pipeline for Windows kernel drivers, from attack surface to pri
 
 KernelSight is an interactive knowledge base that maps how Windows kernel drivers get exploited. It tracks 157 CVEs across 64 drivers, organized as a pipeline that mirrors how exploitation actually works: identify a driver, find its attack surface, classify the bug, convert it into a primitive, and escalate to SYSTEM.
 
-The landing page is an interactive threat intelligence dashboard with a driver-by-vuln-class heat matrix, searchable CVE explorer, and export functionality. The knowledge base behind it contains 278 pages of narrative-driven technical content covering vulnerability classes, exploitation primitives, kernel mitigations, and real-world case studies.
+The landing page is an interactive threat intelligence dashboard with a driver-by-vuln-class heat matrix, searchable CVE explorer, and export functionality. The knowledge base behind it contains 279 pages of narrative-driven technical content covering vulnerability classes, exploitation primitives, kernel mitigations, and real-world case studies.
 
 ## Corpus
 
@@ -110,7 +110,7 @@ python -m pytest tests/ -q                # corpus consistency checks
 
 ```
 KernelSight/
-├── docs/                    # MkDocs source (278 markdown pages)
+├── docs/                    # MkDocs source (279 markdown pages)
 │   ├── index.md             # Dashboard landing page (custom template)
 │   ├── overview.md          # Pipeline overview page
 │   ├── driver-types/        # 12 driver categories
