@@ -331,6 +331,7 @@ nav:
     - DEVCORE streaming sweep: notable-exploits/devcore-streaming.md
     - Connor McGarr: notable-exploits/connor-mcgarr.md
     - Zerodium: notable-exploits/zerodium.md
+    - The agentic finders: notable-exploits/agentic-finders.md
 
   - What stops them:
     - Bypass matrix: bypasses/index.md
